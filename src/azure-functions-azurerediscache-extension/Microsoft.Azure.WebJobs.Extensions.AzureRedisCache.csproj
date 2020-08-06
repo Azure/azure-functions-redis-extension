@@ -12,11 +12,6 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>C:\Users\t-jab\Desktop\fin_demo_extension\</OutputPath>
-    <DocumentationFile>C:\Users\t-jab\Desktop\ProjRepoV1\src\azure-functions-azurerediscache-extension\Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.xml</DocumentationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.16" />
     <PackageReference Include="StackExchange.Redis" Version="2.1.58" />
