@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.Azure.WebJobs.Extensions.AzureRedisCache</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Extensions.Hosting.AzureRedisCacheExtension">
+            <summary>
+            Build IWebJob from new AddAzureRedisCache instance.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheExtensionConfigProvider.Initialize(Microsoft.Azure.WebJobs.Host.Config.ExtensionConfigContext)">
+            <summary>
+            Initializes binding to trigger provider via binding rule,
+            also adds JSON serialization for multi-language support
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheExtensionStartup">
+            <summary>
+            AzureRedisCache extension startup.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheExtensionTrigger">
+            <summary>
+            Trigger Binding, manages and binds context to listener.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheListener">
+            <summary>
+             Responsible for managing connections and listening to a given Azure Redis Cache.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheListener.InitializeConnectionString(System.String)">
+            <summary>
+            Creates redis cache multiplexer connection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheListener.CloseMultiplexer(StackExchange.Redis.ConnectionMultiplexer)">
+            <summary>
+            Closes redis cache multiplexer connection.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheListener.ProcessMessageAsync(System.Threading.CancellationToken,System.String,System.String,System.String)" -->
+        <member name="M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheListener.EnablePubSub(StackExchange.Redis.ISubscriber,System.Threading.CancellationToken)">
+            <summary>
+            Enables basic redis pub/sub.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheListener.EnableKeyspaceNotifications(StackExchange.Redis.ISubscriber,System.Threading.CancellationToken)">
+            <summary>
+            Enables key space notifications on the channel provided in local.settings.json.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheListener.StartAsync(System.Threading.CancellationToken)">
+            <summary>
+            Executes enabled functions, primary listener method.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheListener.StopAsync(System.Threading.CancellationToken)">
+            <summary>
+            Triggers disconnect from cache when cancellation token is invoked.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheMessageModel">
+            <summary>
+            This model gets returned when the function is triggered.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheTriggerProvider">
+            <summary>
+            Provides trigger binding, variables configured in local.settings.json are being retrieved here.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheTriggerProvider.resolveConnectionString(Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheTriggerAttribute)">
+            <summary>
+            Resolves connection string from 'CacheConnection' trigger input parameter.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheTriggerProvider.resolveChannelName(Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.AzureRedisCacheTriggerAttribute)">
+            <summary>
+            Resolves channel name from 'ChannelName' trigger input parameter.
+            </summary>
+        </member>
+    </members>
+</doc>

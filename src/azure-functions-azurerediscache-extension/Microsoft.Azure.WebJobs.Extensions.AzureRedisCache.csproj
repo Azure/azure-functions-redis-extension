@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Microsoft.Azure</Authors>
+    <Company>Microsoft</Company>
+    <Product>Azure Redis Cache Extension for Azure Functions</Product>
+    <Description>Azure redis cache extension for azure functions.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>Azure, Azure Redis Cache, Redis, Redis Cache, Azure Redis Cache Extension, Azure Functions</PackageTags>
+    <RepositoryUrl>https://github.com/microsoft/Azure-functions-AzureRedisCache-Extension</RepositoryUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>C:\Users\t-jab\Desktop\fin_demo_extension\</OutputPath>
+    <DocumentationFile>C:\Users\t-jab\Desktop\ProjRepoV1\src\azure-functions-azurerediscache-extension\Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.16" />
+    <PackageReference Include="StackExchange.Redis" Version="2.1.58" />
+  </ItemGroup>
+
+</Project>

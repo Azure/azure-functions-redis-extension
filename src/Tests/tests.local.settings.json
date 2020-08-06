@@ -1,0 +1,4 @@
+{
+  "ConnectionString": "<YOUR_CACHE_CONNECTION_STRING_HERE>",
+  "ChannelName": "<YOUR_CHANNEL_NAME_HERE>"
+}
