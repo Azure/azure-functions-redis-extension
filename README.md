@@ -3,7 +3,7 @@
 
 The Azure Functions Redis cache extension allows you to receive Redis pub/sub messages and Redis key space notification events from your Azure Redis cache all via the [Azure functions interface](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-your-first-function-visual-studio).
 
-To get started with developing with this extension, make sure you first [set up an Azure cache for Redis instance](https://docs.microsoft.com/en-us/azure/azure-cache-for-redis/quickstart-create-redis). Then you can go ahead and begin developing your functions in azure portal or visual studio with C#. 
+To get started with developing with this extension, make sure you first [set up an Azure cache for Redis instance](https://docs.microsoft.com/en-us/azure/azure-cache-for-redis/quickstart-create-redis). Then you can go ahead and begin developing your functions.
 
 NOTE: _While Azure function extensions have multi-language support, for the purposes of this demo I will be using C# & Visual Studio._
 
