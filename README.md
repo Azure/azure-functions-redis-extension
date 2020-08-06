@@ -47,7 +47,7 @@ NOTE: _The only trigger parameter that doesn't support _local.settings.json_ key
 |isKeySpaceNotificationsEnabled|A boolean value indicating whether or not you wish to enable key space event notifications.|`bool`| `true` (or `false`)|no|
 
 # Pub-Sub Mode Configuration
-See [AzureRedisCacheListener.cs](https://github.com/microsoft/Azure-functions-AzureRedisCache-Extension/src/azure-functions-azurerediscache-extension/AzureRedisCacheListener.cs) for additional context on _pub-sub_ mode implementation.
+See [AzureRedisCacheListener.cs](https://github.com/microsoft/Azure-functions-AzureRedisCache-Extension/blob/main/src/azure-functions-azurerediscache-extension/AzureRedisCacheListener.cs) for additional context on _pub-sub_ mode implementation.
 
 ```C#
 [FunctionName("AzureRedisCachePubSubDemo")]
@@ -65,7 +65,7 @@ To ensure pub-sub mode is enabled correctly, provide valid `CacheConnection` str
 Note: _Trigger input parameters can be passed in literally or via the _local.settings.json_ configuration file, further discussed in the **trigger parameter configuration** section of this document_.
 
 # Key Space Notifications Mode Configuration
-See [AzureRedisCacheListener.cs](https://github.com/microsoft/Azure-functions-AzureRedisCache-Extension/src/azure-functions-azurerediscache-extension/AzureRedisCacheListener.cs) for additional context on _key space notifications_ mode implementation.
+See [AzureRedisCacheListener.cs](https://github.com/microsoft/Azure-functions-AzureRedisCache-Extension/blob/main/src/azure-functions-azurerediscache-extension/AzureRedisCacheListener.cs) for additional context on _key space notifications_ mode implementation.
 
 Before we jump into the code example for this we need to ensure that Redis key space notifications are enabled in our cache. To do this:
 
