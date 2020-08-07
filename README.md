@@ -14,9 +14,9 @@ NOTE: _While Azure function extensions have multi-language support, for the purp
 > 
 > 3.  Use `AzureRedisCacheExtension.sln` under the `azurerediscache-demo-function` folder to open the solution. 
 
->For demo purposes the Azure function trigger in the `azurerediscache-demo-function` folder already has the `azure-functions-azurerediscache-extension` library linked as a _project reference_.
+	>For demo purposes the Azure function trigger in the `azurerediscache-demo-function` folder already has the `azure-functions-azurerediscache-extension` library linked as a _project reference_.
 
->But if you don't wish to use project references in your own project a NuGet package will also be available.
+	>But if you don't wish to use project references in your own project a NuGet package will also be available.
 > 
 > 4. All the trigger configuration code below is written in `azurerediscache-demo-function/AzureRedisCacheDemoFunction.cs`
 > 
