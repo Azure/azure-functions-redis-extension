@@ -6,5 +6,3 @@
 ; about Ownership Enforcer can be found at https://aka.ms/ownershipenforcer.
 alfantp
 lasingam
-ankikuma
-t-jab
