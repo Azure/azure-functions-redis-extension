@@ -45,10 +45,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
         ///</summary>
         public void InitializeConnectionString(string cacheConnectionString)
         {
-            multiplexer = CreateMultiplexer();
             if (string.IsNullOrWhiteSpace(cacheConnectionString))
                 throw new ArgumentNullException(nameof(cacheConnectionString));
 
+            multiplexer = CreateMultiplexer();
             connectionString = cacheConnectionString;
         }
 

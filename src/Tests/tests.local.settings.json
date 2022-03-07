@@ -1,4 +1,4 @@
 {
-  "ConnectionString": "<YOUR_CACHE_CONNECTION_STRING_HERE>",
-  "ChannelName": "<YOUR_CHANNEL_NAME_HERE>"
+  "ConnectionString": "ishika-goel.redis.cache.windows.net:6380,password=MtxRS56VnCyheF2TsuwKZrEbLsLxqh42eAzCaE0qus4=,ssl=True,abortConnect=False",
+  "ChannelName": "__keyspace@0__:*"
 }
