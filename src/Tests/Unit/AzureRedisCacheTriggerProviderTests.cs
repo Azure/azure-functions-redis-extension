@@ -1,10 +1,8 @@
 ﻿using Xunit;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.Azure.WebJobs.Extensions.AzureRedisCache;
 using Microsoft.Extensions.Configuration;
-using Moq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.Tests.Unit
 {
