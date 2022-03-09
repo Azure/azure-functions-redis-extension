@@ -9,13 +9,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
     ///<summary>
     ///Provides trigger binding, variables configured in local.settings.json are being retrieved here.
     ///</summary>
-    class AzureRedisCacheTriggerProvider : ITriggerBindingProvider
+    public class AzureRedisCacheTriggerProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration _configuration;
+
         public AzureRedisCacheTriggerProvider(IConfiguration configuration)
         {
             _configuration = configuration;
         }
+
         public Task<ITriggerBinding> TryCreateAsync(TriggerBindingProviderContext context)
         {
             if (context == null)
@@ -24,16 +26,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
             }
             
             ParameterInfo parameter = context.Parameter;
-            AzureRedisCacheTriggerAttribute attribute = parameter.GetCustomAttribute<AzureRedisCacheTriggerAttribute>(inherit: false);
-            
+            AzureRedisCacheTriggerAttribute attribute = parameter.GetCustomAttribute<AzureRedisCacheTriggerAttribute>(inherit: false); 
 
             if (attribute == null)
             {
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
-            string cacheConnectionString = resolveConnectionString(attribute);
-            string channelName = resolveChannelName(attribute);
+            string cacheConnectionString = ResolveConnectionString(attribute);
+            string channelName = ResolveChannelName(attribute);
             bool isKeySpaceNotificationsEnabed = attribute.IsKeySpaceNotificationsEnabled;
 
             return Task.FromResult<ITriggerBinding>(new AzureRedisCacheExtensionTrigger(cacheConnectionString, channelName, isKeySpaceNotificationsEnabed));
@@ -42,7 +43,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
         ///<summary>
         ///Resolves connection string from 'CacheConnection' trigger input parameter.
         ///</summary>
-        string resolveConnectionString(AzureRedisCacheTriggerAttribute attributeContext) {
+        public string ResolveConnectionString(AzureRedisCacheTriggerAttribute attributeContext) 
+        {
             string unresolvedConnectionString = attributeContext.CacheConnection;
 
             if (!string.IsNullOrEmpty(unresolvedConnectionString))
@@ -52,11 +54,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
                     string resolvedConnectionStringKey = unresolvedConnectionString.Substring(1, unresolvedConnectionString.Length - 2);
                     return _configuration.GetConnectionStringOrSetting(resolvedConnectionStringKey);
                 }
-                else {
+                else 
+                {
                     return unresolvedConnectionString;
                 }
             }
-            else {
+            else 
+            {
                 throw new ArgumentNullException("empty connection string key");
             }
 
@@ -65,7 +69,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
         ///<summary>
         ///Resolves channel name from 'ChannelName' trigger input parameter.
         ///</summary>
-        string resolveChannelName(AzureRedisCacheTriggerAttribute attributeContext) {
+        public string ResolveChannelName(AzureRedisCacheTriggerAttribute attributeContext) 
+        {
             string unresolvedChannelName = attributeContext.ChannelName;
 
             if (!string.IsNullOrEmpty(unresolvedChannelName))
@@ -75,11 +80,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
                     string resolvedChannelNameKey = unresolvedChannelName.Substring(1, unresolvedChannelName.Length - 2);
                     return _configuration.GetConnectionStringOrSetting(resolvedChannelNameKey);
                 }
-                else {
+                else 
+                {
                     return unresolvedChannelName;
                 }
             }
-            else {
+            else 
+            {
                 throw new ArgumentNullException("empty channel name key");
             }
         }
