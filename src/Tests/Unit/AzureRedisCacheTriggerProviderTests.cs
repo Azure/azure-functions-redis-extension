@@ -14,64 +14,82 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.Tests.Unit
         /// Test naming format : MethodName_StateUnderTest_ExpectedBehaviour
         /// </summary>
 
-        // private static readonly Mock<IConfiguration> config = new Mock<IConfiguration>();
-
         readonly static IConfiguration config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
         {
-            { "CacheConnection", "testing" }
+            { "CacheConnection", "testCacheConnectionString" },
+            { "ChannelName", "testChannelName" }
         }).Build();
 
         readonly AzureRedisCacheTriggerProvider triggerProvider = new AzureRedisCacheTriggerProvider(config);
 
-        [Fact]  
-        public void ResolveConnectionString_ValidConnectionString_ReturnsResolvedConnectionString()
+        [Theory]
+        [InlineData("%CacheConnection%", "testCacheConnectionString")]
+        [InlineData("testCacheConnectionString","testCacheConnectionString")]
+        public void ResolveConnectionString_ValidConnectionString_ReturnsResolvedConnectionString(string cacheConnectionString, string expectedResult)
         {
             // arrange
             AzureRedisCacheTriggerAttribute unresolvedAzureRedisCacheTriggerAttribute = new AzureRedisCacheTriggerAttribute
             {
-                CacheConnection = "%testing%"
+                CacheConnection = cacheConnectionString
             };
-            string expected = "testing";
 
             // act
-            string res = triggerProvider.ResolveConnectionString(unresolvedAzureRedisCacheTriggerAttribute);
+            string resolvedConnectionString = triggerProvider.ResolveConnectionString(unresolvedAzureRedisCacheTriggerAttribute);
            
             // assert
-            Assert.Equal(expected , res);
+            Assert.Equal(expectedResult , resolvedConnectionString);
         }
 
-        //[Fact]
-        //public void ResolveConnectionString_EmptyConnectionString_ThrowsArgumentNullException()
-        //{
+        [Fact]
+        public void ResolveConnectionString_EmptyConnectionString_ThrowsArgumentNullException()
+        {
             // arrange
-            //unresolvedAzureRedisCacheTriggerAttribute.CacheConnection = null;
+            AzureRedisCacheTriggerAttribute unresolvedAzureRedisCacheTriggerAttribute = new AzureRedisCacheTriggerAttribute
+            {
+                CacheConnection = ""
+            };
 
             // act
+            var expectedException = Record.Exception(() => triggerProvider.ResolveConnectionString(unresolvedAzureRedisCacheTriggerAttribute));
 
             // assert
+            Assert.NotNull(expectedException);
+            Assert.IsType<ArgumentNullException>(expectedException);
+        }
 
-        //}
-
-        //[Fact]
-        //public void ResolveChannelName_ValidChannelName_ReturnsResolvedChannelName()
-        //{
+        [Theory]
+        [InlineData("%ChannelName%", "testChannelName")]
+        [InlineData("testChannelName", "testChannelName")]
+        public void ResolveChannelName_ValidChannelName_ReturnsResolvedChannelName(string channelName, string expectedResult)
+        {
             // arrange
-            //unresolvedAzureRedisCacheTriggerAttribute.ChannelName = "%hvhgcjh%";
+            AzureRedisCacheTriggerAttribute unresolvedAzureRedisCacheTriggerAttribute = new AzureRedisCacheTriggerAttribute
+            {
+                ChannelName = channelName
+            };
+
             // act
+            string resolvedChannelName = triggerProvider.ResolveChannelName(unresolvedAzureRedisCacheTriggerAttribute);
 
             // assert
+            Assert.Equal(expectedResult, resolvedChannelName);
+        }
 
-        //}
-
-        //[Fact]
-        //public void ResolveChannelName_EmptyChannelName_ThrowsArgumentNullException()
-        //{
+        [Fact]
+        public void ResolveChannelName_EmptyChannelName_ThrowsArgumentNullException()
+        {
             // arrange
-            //unresolvedAzureRedisCacheTriggerAttribute.ChannelName = null;
+            AzureRedisCacheTriggerAttribute unresolvedAzureRedisCacheTriggerAttribute = new AzureRedisCacheTriggerAttribute
+            {
+                ChannelName = ""
+            };
+
             // act
+            var expectedException = Record.Exception(() => triggerProvider.ResolveChannelName(unresolvedAzureRedisCacheTriggerAttribute));
 
             // assert
-
-        //}
-    }
+            Assert.NotNull(expectedException);
+            Assert.IsType<ArgumentNullException>(expectedException);
+        }
+}
 }
