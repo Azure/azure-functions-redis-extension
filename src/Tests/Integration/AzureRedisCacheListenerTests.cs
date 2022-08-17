@@ -14,7 +14,7 @@ namespace XUnitFunctionTests
         are provided in tests.local.settings.json (or your own custom config json file).
         */
 
-        static TestCacheConfig cacheConfig = new TestCacheConfig("tests.local.settings.json");
+        static TestCacheConfig cacheConfig = new TestCacheConfig("Integration/tests.local.settings.json");
         static string cacheConnectionString = cacheConfig.connectionString;
         static string channelName = cacheConfig.channelName;
 

@@ -16,7 +16,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
         private string _cacheConnectionString;
         private string _channelName;
         private bool _isKeySpaceNotificationsEnabled;
-        public AzureRedisCacheExtensionTrigger(string connectionString, string channelName, bool isKeySpaceNotificationsEnabled) {
+
+        public AzureRedisCacheExtensionTrigger(string connectionString, string channelName, bool isKeySpaceNotificationsEnabled) 
+        {
             _cacheConnectionString = connectionString;
             _channelName = channelName;
             _isKeySpaceNotificationsEnabled = isKeySpaceNotificationsEnabled;

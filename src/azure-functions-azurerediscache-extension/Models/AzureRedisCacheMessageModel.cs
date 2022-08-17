@@ -9,6 +9,5 @@
         public string Message { get; set; }
         public string Key { get; set; }
         public string KeySpaceNotification { get; set; }
-
     }
 }

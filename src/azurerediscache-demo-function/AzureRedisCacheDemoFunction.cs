@@ -7,10 +7,8 @@ namespace AzureRedisCacheDemoFunction
 {
     public static class AzureRedisCacheDemoFunction
     {
-
         
         [FunctionName("AzureRedisCacheDemoFunctionPubSub")]
-
         public static void Run(
             [AzureRedisCacheTrigger(CacheConnection = "%CacheConnection%", ChannelName = "%ChannelName%")]
             AzureRedisCacheMessageModel result, ILogger logger)

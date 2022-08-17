@@ -29,26 +29,35 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
         }
 
         //Basic state machine for monitoring subscriber state:
-        public enum SubscriberIsRunning {
+        public enum SubscriberIsRunning 
+        {
             keySpaceNotifications = 0,
             pubSub = 1,
             Neither = 2,
         }
+
         SubscriberIsRunning subscriberCurrentState = SubscriberIsRunning.Neither;
 
         //Methods for redis cache connection management:
         string connectionString = "";
-        public ConnectionMultiplexer RedisConnectionMultiplexer { get { return multiplexer.Value; } }
+
+        public ConnectionMultiplexer RedisConnectionMultiplexer 
+        { 
+            get 
+            { 
+                return multiplexer.Value; 
+            } 
+        }
 
         ///<summary>
         ///Creates redis cache multiplexer connection.
         ///</summary>
         public void InitializeConnectionString(string cacheConnectionString)
         {
-            multiplexer = CreateMultiplexer();
             if (string.IsNullOrWhiteSpace(cacheConnectionString))
                 throw new ArgumentNullException(nameof(cacheConnectionString));
 
+            multiplexer = CreateMultiplexer();
             connectionString = cacheConnectionString;
         }
 
@@ -74,6 +83,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
                 }
             }
         }
+
         ///<summary>
         ///Process message from channel by building a AzureRedisCacheMessageModel & triggering the function.
         ///</summary>
@@ -95,10 +105,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
         {
             subscriberCurrentState = SubscriberIsRunning.pubSub;
             subscriber.Subscribe($"{_channelName}").OnMessage(async (msg) =>
-           {
+            {
                //In pub/sub mode only AzureRedisCache.Message and AzureRedisCache.Channel are used.
                await ProcessMessageAsync(cancellationToken, msg.Message);
-           });
+            });
         }
 
         ///<summary>
@@ -141,7 +151,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
                     {
                         EnableKeyspaceNotifications(subscriber, cancellationToken);
                     }
-                    else {
+                    else 
+                    {
                         EnablePubSub(subscriber, cancellationToken);
                     }
                 });
@@ -180,6 +191,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
         {
             return RedisConnectionMultiplexer;
         }
+
         public SubscriberIsRunning getSubscriberState() {
             return subscriberCurrentState;
         }

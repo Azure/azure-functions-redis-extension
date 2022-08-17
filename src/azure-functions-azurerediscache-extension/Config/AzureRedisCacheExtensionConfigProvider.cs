@@ -11,7 +11,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.AzureRedisCache
     public class AzureRedisCacheExtensionConfigProvider : IExtensionConfigProvider
     {
         private readonly IConfiguration _configuration;
-        public AzureRedisCacheExtensionConfigProvider(IConfiguration configuration) {
+        public AzureRedisCacheExtensionConfigProvider(IConfiguration configuration) 
+        {
             _configuration = configuration;
         }
 

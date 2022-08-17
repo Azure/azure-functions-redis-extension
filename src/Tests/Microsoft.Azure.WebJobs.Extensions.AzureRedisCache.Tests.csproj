@@ -21,11 +21,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\azure-functions-azurerediscache-extension\Microsoft.Azure.WebJobs.Extensions.AzureRedisCache.csproj" />
-    <ProjectReference Include="..\azurerediscache-function\AzureRedisCacheDemoFunction.csproj" />
+    <ProjectReference Include="..\azurerediscache-demo-function\AzureRedisCacheDemoFunction.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="tests.local.settings.json">
+    <None Update="Integration\tests.local.settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
