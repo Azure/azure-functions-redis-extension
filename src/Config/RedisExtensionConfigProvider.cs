@@ -2,6 +2,7 @@
 using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -42,6 +43,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             FluentBindingRule<RedisScriptAttribute> scriptRule = context.AddBindingRule<RedisScriptAttribute>();
             scriptRule.BindToInput(new RedisScriptConverter(configuration));
 #pragma warning restore CS0618
+<<<<<<< HEAD
+=======
+            rule.BindToTrigger<RedisMessageModel>(new RedisTriggerBindingProvider(configuration));
+
+
+#pragma warning disable CS0618
+            FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
+#pragma warning restore CS0618
+            streamsTriggerRule.BindToTrigger<RedisStream[]>(new RedisStreamsTriggerBindingProvider(configuration));
+>>>>>>> 770767b (move all existing trigger classes under PubSubTrigger folder, and create completely new StreamsTrigger)
         }
     }
 }

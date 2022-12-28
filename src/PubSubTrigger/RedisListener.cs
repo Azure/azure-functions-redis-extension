@@ -114,7 +114,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Process message from channel by building a RedisMessageModel & triggering the function.
         /// </summary>
-        internal async Task ProcessMessageAsync(RedisTriggerType triggerType, string trigger, string message, CancellationToken cancellationtoken)
+        internal async Task ProcessMessageAsync(RedisTriggerType triggerType, string trigger, string message, CancellationToken cancellationToken)
         {
             var callBack = new RedisMessageModel
             {
@@ -123,7 +123,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 Message = message
             };
 
-            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = callBack }, cancellationtoken);
+            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = callBack }, cancellationToken);
         }
 
         /// <summary>

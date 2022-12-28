@@ -1,5 +1,10 @@
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
+<<<<<<< HEAD
+=======
+using System.Collections.Generic;
+using System.Linq;
+>>>>>>> 770767b (move all existing trigger classes under PubSubTrigger folder, and create completely new StreamsTrigger)
 using System.Text.Json;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
@@ -63,6 +68,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         {
             logger.LogInformation($"Triggered on {result.Message} event for key {result.Trigger}");
             logger.LogInformation($"Value of key {result.Message} = {value}");
+        }
+
+
+        [FunctionName("StreamsTrigger")]
+        public static void StreamsTrigger(
+            [RedisStreamsTrigger(ConnectionString = "127.0.0.1:6379", Keys = "streamKey" )]
+            RedisStream[] streams, ILogger logger)
+        {
+            foreach (RedisStream stream in streams)
+            {
+                foreach (StreamEntry entry in stream.Entries)
+                {
+                    logger.LogInformation($"Key={stream.Key}, Id={entry.Id}, Values={JsonSerializer.Serialize(entry.Values.ToDictionary(v => v.Name.ToString(), v => v.Value.ToString()))}");
+                }
+            }
         }
     }
 }
