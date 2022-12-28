@@ -49,8 +49,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     case RedisTriggerType.PubSub:
                         EnablePubSub(multiplexer, cancellationToken);
                         break;
-                    case RedisTriggerType.Stream:
-                        throw new NotImplementedException("Stream triggers are not implemented yet.");
+                    case RedisTriggerType.ShardedPubSub:
+                        throw new NotImplementedException("Sharded PubSub triggers are not implemented yet.");
                     default: 
                         break;
                 }

@@ -3,18 +3,18 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Bindings
+namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    internal class RedisConverter : IConverter<RedisAttribute, IConnectionMultiplexer>
+    internal class RedisConnectionConverter : IConverter<RedisConnectionAttribute, IConnectionMultiplexer>
     {
         private readonly IConfiguration configuration;
 
-        public RedisConverter(IConfiguration configuration)
+        public RedisConnectionConverter(IConfiguration configuration)
         {
             this.configuration = configuration;
         }
 
-        public IConnectionMultiplexer Convert(RedisAttribute input)
+        public IConnectionMultiplexer Convert(RedisConnectionAttribute input)
         {
             return ConnectionMultiplexer.Connect(input.ConnectionString);
         }

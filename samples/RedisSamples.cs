@@ -32,15 +32,25 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation(JsonSerializer.Serialize(result));
         }
 
-        [FunctionName("KeyspaceTriggerInputBinding")]
-        public static void KeyspaceTriggerInputBinding(
+        [FunctionName("KeyeventTriggerConnectionBinding")]
+        public static void KeyeventTriggerInputBinding(
             [RedisTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeyEvent, Trigger = "set")] RedisMessageModel result,
-            [Redis(ConnectionString = localhost)] IConnectionMultiplexer connectionMultiplexer,
+            [RedisConnection(ConnectionString = localhost)] IConnectionMultiplexer connectionMultiplexer,
             ILogger logger)
         {
+            logger.LogInformation(JsonSerializer.Serialize(result));
             logger.LogInformation($"Triggered on {result.Trigger} for key {result.Message}");
             logger.LogInformation($"Value of key {result.Message} = {connectionMultiplexer.GetDatabase().StringGet(result.Message)}");
-            logger.LogInformation(JsonSerializer.Serialize(result));
+        }
+
+        [FunctionName("KeyspaceTriggerCommandBinding")]
+        public static void KeyspaceTriggerInputBinding(
+            [RedisTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "keytest")] RedisMessageModel result,
+            [RedisCommand(ConnectionString = localhost, RedisCommand = "get", Arguments = "keytest")] RedisResult value,
+            ILogger logger)
+        {
+            logger.LogInformation($"Triggered on {result.Message} event for key {result.Trigger}");
+            logger.LogInformation($"Value of key {result.Message} = {value}");
         }
     }
 }

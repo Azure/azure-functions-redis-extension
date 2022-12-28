@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Azure.WebJobs.Description;
-using Microsoft.Azure.WebJobs.Extensions.Redis.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Configuration;
 
@@ -32,11 +31,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 #pragma warning restore CS0618
             triggerRule.BindToTrigger<RedisMessageModel>(new RedisTriggerBindingProvider(configuration));
 
-            // input binding
+            // input connection multiplexer binding
 #pragma warning disable CS0618
-            FluentBindingRule<RedisAttribute> rule = context.AddBindingRule<RedisAttribute>();
+            FluentBindingRule<RedisConnectionAttribute> connectionRule = context.AddBindingRule<RedisConnectionAttribute>();
 #pragma warning restore CS0618
-            rule.BindToInput(new RedisConverter(configuration));
+            connectionRule.BindToInput(new RedisConnectionConverter(configuration));
+
+            // input connection multiplexer binding
+#pragma warning disable CS0618
+            FluentBindingRule<RedisCommandAttribute> commandRule = context.AddBindingRule<RedisCommandAttribute>();
+#pragma warning restore CS0618
+            commandRule.BindToInput(new RedisCommandConverter(configuration));
         }
     }
 }
