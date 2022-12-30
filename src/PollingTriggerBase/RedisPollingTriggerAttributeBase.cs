@@ -16,6 +16,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public int PollingInterval { get; set; } = 5000;
 
         /// <summary>
+        /// How many messages should be assigned to a worker at a time.
+        /// Used to determine how many workers the function should scale to.
+        /// </summary>
+        public int MessagesPerWorker { get; set; } = 1000;
+
+        /// <summary>
         /// Keys to read from, space-delimited.
         /// </summary>
         public string Keys { get; set; }
@@ -23,6 +29,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Number of elements to pull from the list at one time.
         /// </summary>
-        public int Count { get; set; } = 10;
+        public int Count { get; set; } = 100;
     }
 }

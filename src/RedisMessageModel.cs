@@ -9,6 +9,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         public RedisTriggerType TriggerType { get; set; }
         public string Trigger { get; set; }
-        public string[] Message { get; set; }
+        public string Message { get; set; }
     }
 }

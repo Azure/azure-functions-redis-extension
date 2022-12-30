@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
@@ -17,84 +18,49 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal StreamPosition[] positions;
         internal string consumerGroup;
         internal string consumerName;
-        internal bool deleteAfterProcess;
 
-        public RedisStreamsListener(string connectionString, int pollingInterval, string keys, int count, string consumerGroup, string consumerName, bool deleteAfterProcess, ITriggeredFunctionExecutor executor)
-            : base(connectionString, pollingInterval, keys, count, executor)
+        public RedisStreamsListener(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int count, string consumerGroup, string consumerName, ITriggeredFunctionExecutor executor)
+            : base(connectionString, pollingInterval, messagesPerWorker, keys, count, executor)
         {
             this.consumerGroup = consumerGroup;
             this.consumerName = consumerName;
-            this.deleteAfterProcess = deleteAfterProcess;
             this.positions = this.keys.Select((key) => new StreamPosition(key, 0)).ToArray();
         }
 
         public override async Task<bool> PollAsync(CancellationToken cancellationToken)
         {
-            if (String.IsNullOrEmpty(consumerGroup) && String.IsNullOrEmpty(consumerName))
-            {
-                return (await PollNoGroup(cancellationToken)) == 0;
-            }
-
-            if (!String.IsNullOrEmpty(consumerGroup) && !String.IsNullOrEmpty(consumerName))
-            {
-                return (await PollGroup(cancellationToken)) == 0;
-            }
-            return true;
-        }
-
-        private async Task<int> PollNoGroup(CancellationToken cancellationToken)
-        {
             IDatabase db = multiplexer.GetDatabase();
-            RedisStream[] streams = await db.StreamReadAsync(positions, count);
+            RedisStream[] streams = String.IsNullOrEmpty(consumerGroup) 
+                ? await db.StreamReadAsync(positions, count) 
+                : await db.StreamReadGroupAsync(positions, consumerGroup, consumerName, count);
 
-            for (int i = 0; i < positions.Length; i++)
+            for (int i = 0; i < streams.Length; i++)
             {
-                if (streams[i].Entries.Length > 0)
+                foreach (StreamEntry entry in streams[i].Entries)
                 {
-                    positions[i] = new StreamPosition(positions[i].Key, streams[i].Entries.Last().Id);
-
                     var triggerValue = new RedisMessageModel
                     {
-                        TriggerType = RedisTriggerType.List,
+                        TriggerType = RedisTriggerType.Streams,
                         Trigger = streams[i].Key,
-                        Message = streams[i].Entries.Select(entry => JsonSerializer.Serialize(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()))).ToArray()
+                        Message = JsonSerializer.Serialize(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()))
                     };
 
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
-                    if (deleteAfterProcess)
-                    {
-                        await db.StreamDeleteAsync(positions[i].Key, streams[i].Entries.Select(entry => entry.Id).ToArray());
-                    }
                 }
+                await db.StreamDeleteAsync(streams[i].Key, streams[i].Entries.Select(entry => entry.Id).ToArray());
             }
-            return streams.Sum(stream => stream.Entries.Length);
+            return streams.Sum(stream => stream.Entries.Length) == 0;
         }
 
-        private async Task<int> PollGroup(CancellationToken cancellationToken)
+        public override Task<RedisPollingMetrics> GetMetricsAsync()
         {
-            IDatabase db = multiplexer.GetDatabase();
-            RedisStream[] streams = await db.StreamReadGroupAsync(positions, consumerGroup, consumerName, count);
-
-            for (int i = 0; i < positions.Length; i++)
+            var metrics = new RedisPollingMetrics
             {
-                if (streams[i].Entries.Length > 0)
-                {
-                    positions[i] = new StreamPosition(positions[i].Key, streams[i].Entries.Last().Id);
-                    var triggerValue = new RedisMessageModel
-                    {
-                        TriggerType = RedisTriggerType.List,
-                        Trigger = streams[i].Key,
-                        Message = streams[i].Entries.Select(entry => JsonSerializer.Serialize(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()))).ToArray()
-                    };
+                Count = keys.Sum((key) => multiplexer.GetDatabase().StreamLength(key)),
+                Timestamp = DateTime.UtcNow,
+            };
 
-                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
-                    if (deleteAfterProcess)
-                    {
-                        await db.StreamDeleteAsync(positions[i].Key, streams[i].Entries.Select(entry => entry.Id).ToArray());
-                    }
-                }
-            }
-            return streams.Sum(stream => stream.Entries.Length);
+            return Task.FromResult(metrics);
         }
     }
 }

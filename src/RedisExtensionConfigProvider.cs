@@ -41,11 +41,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             rule.BindToTrigger<RedisMessageModel>(new RedisPubSubTriggerBindingProvider(configuration));
 
             FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
-            streamsTriggerRule.BindToTrigger<RedisStream[]>(new RedisStreamsTriggerBindingProvider(configuration));
             streamsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisStreamsTriggerBindingProvider(configuration));
 
             FluentBindingRule<RedisListsTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListsTriggerAttribute>();
             listsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisListsTriggerBindingProvider(configuration));
+#pragma warning restore CS0618
         }
     }
 }

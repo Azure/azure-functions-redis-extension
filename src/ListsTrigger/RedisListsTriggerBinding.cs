@@ -16,15 +16,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         private readonly string connectionString;
         private readonly int pollingInterval;
+        private readonly int messagesPerWorker;
         private readonly string keys;
         private readonly int count;
         private readonly bool listPopFromBeginning;
 
 
-        public RedisListsTriggerBinding(string connectionString, int pollingInterval, string keys, int count, bool listPopFromBeginning)
+        public RedisListsTriggerBinding(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int count, bool listPopFromBeginning)
         {
             this.connectionString = connectionString;
             this.pollingInterval = pollingInterval;
+            this.messagesPerWorker = messagesPerWorker;
             this.keys = keys;
             this.count = count;
             this.listPopFromBeginning = listPopFromBeginning;
@@ -47,7 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException("context");
             }
 
-            return Task.FromResult<IListener>(new RedisListsListener(connectionString, pollingInterval, keys, count, listPopFromBeginning, context.Executor));
+            return Task.FromResult<IListener>(new RedisListsListener(connectionString, pollingInterval, messagesPerWorker, keys, count, listPopFromBeginning, context.Executor));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

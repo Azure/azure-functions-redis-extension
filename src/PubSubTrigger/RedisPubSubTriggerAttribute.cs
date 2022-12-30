@@ -3,12 +3,11 @@ using Microsoft.Azure.WebJobs.Description;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    [Binding]
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
-
     /// <summary>
     /// Trigger binding attributes
     /// </summary>
+    [Binding]
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
     public class RedisPubSubTriggerAttribute : Attribute
     {
         /// <summary>
@@ -27,17 +26,5 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         [AutoResolve]
         public string Trigger { get; set; }
-    }
-
-    /// <summary>
-    /// The different types of notifications that the function will trigger on.
-    /// </summary>
-    public enum RedisTriggerType
-    {
-        KeySpace,
-        KeyEvent,
-        PubSub,
-        Streams,
-        List
     }
 }

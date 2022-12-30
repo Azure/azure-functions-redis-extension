@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Listeners;
+using Microsoft.Azure.WebJobs.Host.Scale;
 using StackExchange.Redis;
 
 
@@ -12,21 +13,25 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for polling a cache.
     /// </summary>
-    internal abstract class RedisPollingListenerBase : IListener
+    internal abstract class RedisPollingListenerBase : IListener, IScaleMonitor<RedisPollingMetrics>
     {
         internal string connectionString;
         internal TimeSpan pollingInterval;
+        internal int messagesPerWorker;
         internal RedisKey[] keys;
         internal int count;
         internal ITriggeredFunctionExecutor executor;
         internal IConnectionMultiplexer multiplexer;
-
+        internal Version version;
         private bool isConnected = false;
 
-        public RedisPollingListenerBase(string connectionString, int pollingInterval, string keys, int count, ITriggeredFunctionExecutor executor)
+        public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
+
+        public RedisPollingListenerBase(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int count, ITriggeredFunctionExecutor executor)
         {
             this.connectionString = connectionString;
             this.pollingInterval = TimeSpan.FromMilliseconds(pollingInterval);
+            this.messagesPerWorker = messagesPerWorker;
             this.keys = keys.Split('_').Select(key => new RedisKey(key)).ToArray();
             this.count = count;
             this.executor = executor;
@@ -35,7 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Executes enabled functions, primary listener method.
         /// </summary>
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public virtual async Task StartAsync(CancellationToken cancellationToken)
         {
             if (isConnected)
             {
@@ -46,6 +51,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (multiplexer.IsConnected)
             {
                 isConnected = true;
+                version = multiplexer.GetServers()[0].Version;
                 _ = Task.Run(() => Loop(cancellationToken));
             }
             else
@@ -123,6 +129,44 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 throw new Exception("Failed to close connection to cache.");
             }
+        }
+
+        async Task<ScaleMetrics> IScaleMonitor.GetMetricsAsync()
+        {
+            return await this.GetMetricsAsync().ConfigureAwait(false);
+        }
+
+        public abstract Task<RedisPollingMetrics> GetMetricsAsync();
+
+        public ScaleStatus GetScaleStatus(ScaleStatusContext<RedisPollingMetrics> context)
+        {
+            return GetScaleStatusCore(context.WorkerCount, context.Metrics?.ToArray());
+        }
+
+        public ScaleStatus GetScaleStatus(ScaleStatusContext context)
+        {
+            return GetScaleStatusCore(context.WorkerCount, context.Metrics?.Cast<RedisPollingMetrics>().ToArray());
+        }
+
+        private ScaleStatus GetScaleStatusCore(int workerCount, RedisPollingMetrics[] metrics)
+        {
+            // don't scale up or down if we don't have enough metrics
+            if (metrics is null)
+            {
+                return new ScaleStatus { Vote = ScaleVote.None };
+            }
+
+            if (workerCount * messagesPerWorker < metrics.Last().Count)
+            {
+                return new ScaleStatus { Vote = ScaleVote.ScaleOut };
+            }
+
+            if ((workerCount - 1) * messagesPerWorker > metrics.Last().Count)
+            {
+                return new ScaleStatus { Vote = ScaleVote.ScaleIn };
+            }
+
+            return new ScaleStatus { Vote = ScaleVote.None };
         }
     }
 }

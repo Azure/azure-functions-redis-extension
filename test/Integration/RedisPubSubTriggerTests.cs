@@ -25,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 TriggerType = RedisTriggerType.PubSub,
                 Trigger = channel,
-                Message = new string[] { message }
+                Message = message
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -64,13 +64,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 TriggerType = RedisTriggerType.KeySpace,
                 Trigger = key,
-                Message = new string[] { "set" }
+                Message = "set"
             };
             RedisMessageModel expectedDelReturn = new RedisMessageModel
             {
                 TriggerType = RedisTriggerType.KeySpace,
                 Trigger = key,
-                Message = new string[] { "del" }
+                Message = "del"
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -106,7 +106,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 TriggerType = RedisTriggerType.KeyEvent,
                 Trigger = IntegrationTestFunctions.keyeventEvent,
-                Message = new string[] { key }
+                Message = key
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -140,13 +140,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 TriggerType = RedisTriggerType.KeyEvent,
                 Trigger = "set",
-                Message = new string[] { key }
+                Message = key
             };
             RedisMessageModel expectedDelReturn = new RedisMessageModel
             {
                 TriggerType = RedisTriggerType.KeyEvent,
                 Trigger = "del",
-                Message = new string[] { key }
+                Message = key
             };
 
             Dictionary<string, int> counts = new Dictionary<string, int>

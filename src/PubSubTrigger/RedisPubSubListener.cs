@@ -120,7 +120,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 TriggerType = triggerType,
                 Trigger = trigger,
-                Message = new string[] { message }
+                Message = message
             };
 
             await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = callBack }, cancellationToken);

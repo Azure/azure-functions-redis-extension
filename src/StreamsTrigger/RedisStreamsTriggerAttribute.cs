@@ -19,10 +19,5 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// The consumer name that the function will use when reading from the stream.
         /// </summary>
         public string StreamConsumerName { get; set; } = null;
-
-        /// <summary>
-        /// The consumer name that the function will use when reading from the stream.
-        /// </summary>
-        public bool DeleteAfterProcess { get; set; } = false;
     }
 }

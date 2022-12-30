@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Executors;
-using Microsoft.Azure.WebJobs.Host.Listeners;
 using StackExchange.Redis;
-
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -17,38 +14,91 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool listPopFromBeginning;
 
-        public RedisListsListener(string connectionString, int pollingInterval, string keys, int count, bool listPopFromBeginning, ITriggeredFunctionExecutor executor)
-            : base(connectionString, pollingInterval, keys, count, executor)
+        public RedisListsListener(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int count, bool listPopFromBeginning, ITriggeredFunctionExecutor executor)
+            : base(connectionString, pollingInterval, messagesPerWorker, keys, count, executor)
         {
             this.listPopFromBeginning = listPopFromBeginning;
         }
 
+        public override async Task StartAsync(CancellationToken cancellationToken)
+        {
+            await base.StartAsync(cancellationToken);
+            if (version < new Version("7.0") && keys.Length > 1)
+            {
+                // lmpop is 7.0 and higher, so function will only be able to trigger on a single key
+                throw new ArgumentException($"The cache's {version} is lower than 7.0, and does not support lmpop");
+            }
+
+            if (version < new Version("6.2"))
+            {
+                // count option only introduced in 6.2 and higher
+                // changing values here to ensure proper scaling logic
+                count = 1;
+                messagesPerWorker = 10;
+            }
+        }
+
         public override async Task<bool> PollAsync(CancellationToken cancellationToken)
         {
-            ListPopResult result;
-            if (listPopFromBeginning)
+            IDatabase db = multiplexer.GetDatabase();
+            bool triggered = false;
+            if (version >= new Version("7.0"))
             {
-                result = await multiplexer.GetDatabase().ListLeftPopAsync(keys, count);
+                var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, count) : await db.ListRightPopAsync(keys, count);
+                triggered = result.Values.Length > 0;
+                foreach (RedisValue value in result.Values)
+                {
+                    RedisMessageModel triggerValue = new RedisMessageModel
+                    {
+                        TriggerType = RedisTriggerType.List,
+                        Trigger = result.Key,
+                        Message = value
+                    };
+                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                }
+            }
+            else if (version >= new Version("6.2"))
+            {
+                var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], count) : await db.ListRightPopAsync(keys[0], count);
+                triggered = result.Length > 0;
+                foreach (RedisValue value in result)
+                {
+                    RedisMessageModel triggerValue = new RedisMessageModel
+                    {
+                        TriggerType = RedisTriggerType.List,
+                        Trigger = keys[0],
+                        Message = value
+                    };
+                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                }
             }
             else
             {
-                result = await multiplexer.GetDatabase().ListRightPopAsync(keys, count);
+                var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0]) : await db.ListRightPopAsync(keys[0]);
+                if (!result.IsNullOrEmpty)
+                {
+                    triggered = true;
+                    RedisMessageModel triggerValue = new RedisMessageModel
+                    {
+                        TriggerType = RedisTriggerType.List,
+                        Trigger = keys[0],
+                        Message = result
+                    };
+                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                }
             }
+            return !triggered;
+        }
 
-            if (result.IsNull)
+        public override Task<RedisPollingMetrics> GetMetricsAsync()
+        {
+            var metrics = new RedisPollingMetrics
             {
-                return true;
-            }
-
-            var triggerValue = new RedisMessageModel
-            {
-                TriggerType = RedisTriggerType.List,
-                Trigger = result.Key,
-                Message = result.Values.ToStringArray()
+                Count = keys.Sum((key) => multiplexer.GetDatabase().ListLength(key)),
+                Timestamp = DateTime.UtcNow,
             };
-            
-            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
-            return false;
+
+            return Task.FromResult(metrics);
         }
     }
 }

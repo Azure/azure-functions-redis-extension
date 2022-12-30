@@ -13,7 +13,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName("PubSubTrigger")]
         public static void PubSubTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.PubSub, Trigger = "maran")] RedisMessageModel result,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.PubSub, Trigger = "pubsubTest")] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -21,7 +21,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName("KeyspaceTrigger")]
         public static void KeyspaceTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "maran2")] RedisMessageModel result,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "keyspaceTest")] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName("StreamsTrigger")]
         public static void StreamsTrigger(
-            [RedisStreamsTrigger(ConnectionString = "127.0.0.1:6379", Keys = "streamKey")]
+            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest")]
             RedisMessageModel result, ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -78,7 +78,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName("ListsTrigger")]
         public static void ListsTrigger(
-            [RedisListsTrigger(ConnectionString = "127.0.0.1:6379", Keys = "listKey")]
+            [RedisListsTrigger(ConnectionString = localhost, Keys = "listTest")]
             RedisMessageModel result, ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));

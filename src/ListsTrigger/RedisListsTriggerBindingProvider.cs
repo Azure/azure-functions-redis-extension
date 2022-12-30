@@ -35,11 +35,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             string connectionString = attribute.ConnectionString;
             int pollingInterval = attribute.PollingInterval;
+            int messagesPerWorker = attribute.MessagesPerWorker;
             int count = attribute.Count;
             string keys = attribute.Keys;
             bool listPopFromBeginning = attribute.ListPopFromBeginning;
 
-            return Task.FromResult<ITriggerBinding>(new RedisListsTriggerBinding(connectionString, pollingInterval, keys, count, listPopFromBeginning));
+            return Task.FromResult<ITriggerBinding>(new RedisListsTriggerBinding(connectionString, pollingInterval, messagesPerWorker, keys, count, listPopFromBeginning));
         }
     }
 }

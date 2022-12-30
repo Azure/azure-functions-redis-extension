@@ -35,13 +35,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             string connectionString = attribute.ConnectionString;
             string keys = attribute.Keys;
+            int messagesPerWorker = attribute.MessagesPerWorker;
             string consumerGroup = attribute.StreamConsumerGroup;
             string consumerName = attribute.StreamConsumerName;
             int count = attribute.Count;
             int pollingInterval = attribute.PollingInterval;
-            bool deleteAfterProcess = attribute.DeleteAfterProcess;
 
-            return Task.FromResult<ITriggerBinding>(new RedisStreamsTriggerBinding(connectionString, pollingInterval, keys, count, consumerGroup, consumerName, deleteAfterProcess));
+            return Task.FromResult<ITriggerBinding>(new RedisStreamsTriggerBinding(connectionString, pollingInterval, messagesPerWorker, keys, count, consumerGroup, consumerName));
         }
     }
 }
