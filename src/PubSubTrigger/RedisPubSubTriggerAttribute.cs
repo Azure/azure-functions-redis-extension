@@ -9,7 +9,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Trigger binding attributes
     /// </summary>
-    public class RedisTriggerAttribute : Attribute
+    public class RedisPubSubTriggerAttribute : Attribute
     {
         /// <summary>
         /// Cache connection string.
@@ -37,6 +37,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         KeySpace,
         KeyEvent,
         PubSub,
-        Stream
+        Streams,
+        List
     }
 }

@@ -12,26 +12,22 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Trigger Binding, manages and binds context to listener.
     /// </summary>
-    internal class RedisStreamsTriggerBinding : ITriggerBinding
+    internal class RedisListsTriggerBinding : ITriggerBinding
     {
         private readonly string connectionString;
         private readonly int pollingInterval;
         private readonly string keys;
         private readonly int count;
-        private readonly string consumerGroup;
-        private readonly string consumerName;
-        private readonly bool deleteAfterProcess;
+        private readonly bool listPopFromBeginning;
 
 
-        public RedisStreamsTriggerBinding(string connectionString, int pollingInterval, string keys, int count, string consumerGroup, string consumerName, bool deleteAfterProcess)
+        public RedisListsTriggerBinding(string connectionString, int pollingInterval, string keys, int count, bool listPopFromBeginning)
         {
             this.connectionString = connectionString;
             this.pollingInterval = pollingInterval;
             this.keys = keys;
             this.count = count;
-            this.consumerGroup = consumerGroup;
-            this.consumerName = consumerName;
-            this.deleteAfterProcess = deleteAfterProcess;
+            this.listPopFromBeginning = listPopFromBeginning;
         }
 
         public Type TriggerValueType => typeof(RedisMessageModel);
@@ -51,7 +47,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException("context");
             }
 
-            return Task.FromResult<IListener>(new RedisStreamsListener(connectionString, pollingInterval, keys, count, consumerGroup, consumerName, deleteAfterProcess, context.Executor));
+            return Task.FromResult<IListener>(new RedisListsListener(connectionString, pollingInterval, keys, count, listPopFromBeginning, context.Executor));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

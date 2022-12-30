@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
-    public class RedisTriggerTests
+    public class RedisPubSubTriggerTests
     {
         [Theory]
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_SingleChannel), IntegrationTestFunctions.pubsubChannel, "test")]
@@ -25,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 TriggerType = RedisTriggerType.PubSub,
                 Trigger = channel,
-                Message = message
+                Message = new string[] { message }
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -64,13 +64,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 TriggerType = RedisTriggerType.KeySpace,
                 Trigger = key,
-                Message = "set"
+                Message = new string[] { "set" }
             };
             RedisMessageModel expectedDelReturn = new RedisMessageModel
             {
                 TriggerType = RedisTriggerType.KeySpace,
                 Trigger = key,
-                Message = "del"
+                Message = new string[] { "del" }
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -106,7 +106,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 TriggerType = RedisTriggerType.KeyEvent,
                 Trigger = IntegrationTestFunctions.keyeventEvent,
-                Message = key
+                Message = new string[] { key }
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -140,13 +140,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 TriggerType = RedisTriggerType.KeyEvent,
                 Trigger = "set",
-                Message = key
+                Message = new string[] { key }
             };
             RedisMessageModel expectedDelReturn = new RedisMessageModel
             {
                 TriggerType = RedisTriggerType.KeyEvent,
                 Trigger = "del",
-                Message = key
+                Message = new string[] { key }
             };
 
             Dictionary<string, int> counts = new Dictionary<string, int>

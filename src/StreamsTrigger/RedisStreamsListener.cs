@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Executors;
-using Microsoft.Azure.WebJobs.Host.Listeners;
 using StackExchange.Redis;
 
 
@@ -12,139 +12,89 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for managing connections and listening to a given Azure Redis Cache.
     /// </summary>
-    internal sealed class RedisStreamsListener : IListener
+    internal sealed class RedisStreamsListener : RedisPollingListenerBase
     {
-        internal const int DEFAULT_POLLING_INTERVAL_MS = 1000;
-
-        internal string connectionString;
         internal StreamPosition[] positions;
-        internal string trigger;
         internal string consumerGroup;
         internal string consumerName;
-        internal int count;
-        internal TimeSpan pollingInterval;
-        internal ITriggeredFunctionExecutor executor;
+        internal bool deleteAfterProcess;
 
-        internal IConnectionMultiplexer multiplexer;
-
-        public RedisStreamsListener(string connectionString, string[] keys, string consumerGroup, string consumerName, int count, int pollingInterval, ITriggeredFunctionExecutor executor)
+        public RedisStreamsListener(string connectionString, int pollingInterval, string keys, int count, string consumerGroup, string consumerName, bool deleteAfterProcess, ITriggeredFunctionExecutor executor)
+            : base(connectionString, pollingInterval, keys, count, executor)
         {
-            this.connectionString = connectionString;
-            this.positions = keys.Select(key => new StreamPosition(key, 0)).ToArray();
             this.consumerGroup = consumerGroup;
             this.consumerName = consumerName;
-            this.count = count;
-            this.pollingInterval = TimeSpan.FromMilliseconds(pollingInterval);
-            this.executor = executor;
+            this.deleteAfterProcess = deleteAfterProcess;
+            this.positions = this.keys.Select((key) => new StreamPosition(key, 0)).ToArray();
         }
 
-        /// <summary>
-        /// Executes enabled functions, primary listener method.
-        /// </summary>
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public override async Task<bool> PollAsync(CancellationToken cancellationToken)
         {
-            multiplexer = InitializeConnectionMultiplexer(connectionString);
-            if (multiplexer.IsConnected)
+            if (String.IsNullOrEmpty(consumerGroup) && String.IsNullOrEmpty(consumerName))
             {
-                IDatabase db = multiplexer.GetDatabase();
-                if (String.IsNullOrEmpty(consumerGroup) && String.IsNullOrEmpty(consumerName))
-                {
-                    while (true)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        RedisStream[] streams = await db.StreamReadAsync(positions, count);
-                        if (streams.Length == 0)
-                        {
-                            await Task.Delay(pollingInterval);
-                        }
-                        else
-                        {
-                            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = streams }, cancellationToken);
-                            foreach (RedisStream stream in streams)
-                            {
-                                await db.StreamDeleteAsync(stream.Key, stream.Entries.Select(entry => entry.Id).ToArray());
-                            }
-                        }
-                    }
-                }
+                return (await PollNoGroup(cancellationToken)) == 0;
+            }
 
-                if (!String.IsNullOrEmpty(consumerGroup) && !String.IsNullOrEmpty(consumerName))
-                {
-                    while (true)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        RedisStream[] streams = await multiplexer.GetDatabase().StreamReadGroupAsync(positions, consumerGroup, consumerName, count);
-                        if (streams.Length == 0)
-                        {
-                            await Task.Delay(pollingInterval);
-                        }
-                        else
-                        {
-                            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = streams }, cancellationToken);
-                            foreach (RedisStream stream in streams)
-                            {
-                                await db.StreamAcknowledgeAsync(stream.Key, consumerGroup, stream.Entries.Select(entry => entry.Id).ToArray());
-                            }
+            if (!String.IsNullOrEmpty(consumerGroup) && !String.IsNullOrEmpty(consumerName))
+            {
+                return (await PollGroup(cancellationToken)) == 0;
+            }
+            return true;
+        }
 
-                        }
+        private async Task<int> PollNoGroup(CancellationToken cancellationToken)
+        {
+            IDatabase db = multiplexer.GetDatabase();
+            RedisStream[] streams = await db.StreamReadAsync(positions, count);
+
+            for (int i = 0; i < positions.Length; i++)
+            {
+                if (streams[i].Entries.Length > 0)
+                {
+                    positions[i] = new StreamPosition(positions[i].Key, streams[i].Entries.Last().Id);
+
+                    var triggerValue = new RedisMessageModel
+                    {
+                        TriggerType = RedisTriggerType.List,
+                        Trigger = streams[i].Key,
+                        Message = streams[i].Entries.Select(entry => JsonSerializer.Serialize(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()))).ToArray()
+                    };
+
+                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                    if (deleteAfterProcess)
+                    {
+                        await db.StreamDeleteAsync(positions[i].Key, streams[i].Entries.Select(entry => entry.Id).ToArray());
                     }
                 }
             }
-            else
-            {
-                throw new ArgumentException("Failed to connect to cache.");
-            }
+            return streams.Sum(stream => stream.Entries.Length);
         }
 
-        /// <summary>
-        /// Triggers disconnect from cache when cancellation token is invoked.
-        /// </summary>
-        public Task StopAsync(CancellationToken cancellationToken)
+        private async Task<int> PollGroup(CancellationToken cancellationToken)
         {
-            CloseMultiplexer(multiplexer);
-            return Task.CompletedTask;
-        }
+            IDatabase db = multiplexer.GetDatabase();
+            RedisStream[] streams = await db.StreamReadGroupAsync(positions, consumerGroup, consumerName, count);
 
-        public void Cancel()
-        {
-            CloseMultiplexer(multiplexer);
-        }
-
-        public void Dispose()
-        {
-            CloseMultiplexer(multiplexer);
-        }
-
-        /// <summary>
-        /// Creates redis cache multiplexer connection.
-        /// </summary>
-        private static IConnectionMultiplexer InitializeConnectionMultiplexer(string connectionString)
-        {
-            try
+            for (int i = 0; i < positions.Length; i++)
             {
-                return ConnectionMultiplexer.Connect(connectionString);
-            }
-            catch (Exception)
-            {
-                throw new Exception("Failed to create connection to cache.");
-            }
+                if (streams[i].Entries.Length > 0)
+                {
+                    positions[i] = new StreamPosition(positions[i].Key, streams[i].Entries.Last().Id);
+                    var triggerValue = new RedisMessageModel
+                    {
+                        TriggerType = RedisTriggerType.List,
+                        Trigger = streams[i].Key,
+                        Message = streams[i].Entries.Select(entry => JsonSerializer.Serialize(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()))).ToArray()
+                    };
 
-        }
-
-        /// <summary>
-        /// Closes redis cache multiplexer connection.
-        /// </summary>
-        internal void CloseMultiplexer(IConnectionMultiplexer existingMultiplexer)
-        {
-            try
-            {
-                existingMultiplexer.Close();
-                existingMultiplexer.Dispose();
+                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                    if (deleteAfterProcess)
+                    {
+                        await db.StreamDeleteAsync(positions[i].Key, streams[i].Entries.Select(entry => entry.Id).ToArray());
+                    }
+                }
             }
-            catch (Exception)
-            {
-                throw new Exception("Failed to close connection to cache.");
-            }
+            return streams.Sum(stream => stream.Entries.Length);
         }
     }
 }

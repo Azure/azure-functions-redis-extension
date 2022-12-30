@@ -11,7 +11,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for managing connections and listening to a given Azure Redis Cache.
     /// </summary>
-    internal sealed class RedisListener : IListener
+    internal sealed class RedisPubSubListener : IListener
     {
         internal const string KEYSPACE_TEMPLATE = "__keyspace@*__:{0}";
         internal const string KEYEVENT_TEMPLATE = "__keyevent@*__:{0}";
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal RedisTriggerType triggerType;
         internal IConnectionMultiplexer multiplexer;
 
-        public RedisListener(string connectionString, RedisTriggerType triggerType, string trigger, ITriggeredFunctionExecutor executor)
+        public RedisPubSubListener(string connectionString, RedisTriggerType triggerType, string trigger, ITriggeredFunctionExecutor executor)
         {
             this.connectionString = connectionString;
             this.triggerType = triggerType;
@@ -120,7 +120,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 TriggerType = triggerType,
                 Trigger = trigger,
-                Message = message
+                Message = new string[] { message }
             };
 
             await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = callBack }, cancellationToken);

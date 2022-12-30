@@ -9,11 +9,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Provides trigger binding, variables configured in local.settings.json are being retrieved here.
     /// </summary>
-    internal class RedisStreamsTriggerBindingProvider : ITriggerBindingProvider
+    internal class RedisListsTriggerBindingProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration configuration;
 
-        public RedisStreamsTriggerBindingProvider(IConfiguration configuration)
+        public RedisListsTriggerBindingProvider(IConfiguration configuration)
         {
             this.configuration = configuration;
         }
@@ -26,7 +26,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             
             ParameterInfo parameter = context.Parameter;
-            RedisStreamsTriggerAttribute attribute = parameter.GetCustomAttribute<RedisStreamsTriggerAttribute>(inherit: false); 
+            RedisListsTriggerAttribute attribute = parameter.GetCustomAttribute<RedisListsTriggerAttribute>(inherit: false); 
 
             if (attribute == null)
             {
@@ -34,14 +34,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             string connectionString = attribute.ConnectionString;
-            string keys = attribute.Keys;
-            string consumerGroup = attribute.StreamConsumerGroup;
-            string consumerName = attribute.StreamConsumerName;
-            int count = attribute.Count;
             int pollingInterval = attribute.PollingInterval;
-            bool deleteAfterProcess = attribute.DeleteAfterProcess;
+            int count = attribute.Count;
+            string keys = attribute.Keys;
+            bool listPopFromBeginning = attribute.ListPopFromBeginning;
 
-            return Task.FromResult<ITriggerBinding>(new RedisStreamsTriggerBinding(connectionString, pollingInterval, keys, count, consumerGroup, consumerName, deleteAfterProcess));
+            return Task.FromResult<ITriggerBinding>(new RedisListsTriggerBinding(connectionString, pollingInterval, keys, count, listPopFromBeginning));
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Azure.WebJobs.Extensions.Redis
+﻿using StackExchange.Redis;
+
+namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
     /// This model gets returned when the function is triggered.
@@ -7,6 +9,6 @@
     {
         public RedisTriggerType TriggerType { get; set; }
         public string Trigger { get; set; }
-        public string Message { get; set; }
+        public string[] Message { get; set; }
     }
 }
