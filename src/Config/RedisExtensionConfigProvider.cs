@@ -25,23 +25,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // trigger
 #pragma warning disable CS0618
+            // trigger
             FluentBindingRule<RedisTriggerAttribute> triggerRule = context.AddBindingRule<RedisTriggerAttribute>();
-#pragma warning restore CS0618
             triggerRule.BindToTrigger<RedisMessageModel>(new RedisTriggerBindingProvider(configuration));
 
-            // input connection multiplexer binding
-#pragma warning disable CS0618
+            // connection multiplexer binding
             FluentBindingRule<RedisConnectionAttribute> connectionRule = context.AddBindingRule<RedisConnectionAttribute>();
-#pragma warning restore CS0618
             connectionRule.BindToInput(new RedisConnectionConverter(configuration));
 
-            // input connection multiplexer binding
-#pragma warning disable CS0618
+            // command binding
             FluentBindingRule<RedisCommandAttribute> commandRule = context.AddBindingRule<RedisCommandAttribute>();
-#pragma warning restore CS0618
             commandRule.BindToInput(new RedisCommandConverter(configuration));
+
+            // script binding
+            FluentBindingRule<RedisScriptAttribute> scriptRule = context.AddBindingRule<RedisScriptAttribute>();
+            scriptRule.BindToInput(new RedisScriptConverter(configuration));
+#pragma warning restore CS0618
         }
     }
 }

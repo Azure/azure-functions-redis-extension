@@ -33,7 +33,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         }
 
         [FunctionName("KeyeventTriggerConnectionBinding")]
-        public static void KeyeventTriggerInputBinding(
+        public static void KeyeventTriggerConnectionBinding(
             [RedisTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeyEvent, Trigger = "set")] RedisMessageModel result,
             [RedisConnection(ConnectionString = localhost)] IConnectionMultiplexer connectionMultiplexer,
             ILogger logger)
@@ -44,9 +44,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         }
 
         [FunctionName("KeyspaceTriggerCommandBinding")]
-        public static void KeyspaceTriggerInputBinding(
+        public static void KeyspaceTriggerCommandBinding(
             [RedisTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "keytest")] RedisMessageModel result,
             [RedisCommand(ConnectionString = localhost, RedisCommand = "get", Arguments = "keytest")] RedisResult value,
+            ILogger logger)
+        {
+            logger.LogInformation($"Triggered on {result.Message} event for key {result.Trigger}");
+            logger.LogInformation($"Value of key {result.Message} = {value}");
+        }
+
+        [FunctionName("KeyspaceTriggerScriptBinding")]
+        public static void KeyspaceTriggerScriptBinding(
+            [RedisTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "scriptTest")] RedisMessageModel result,
+            [RedisScript(ConnectionString = localhost, LuaScript = "return redis.call('GET', KEYS[1])", Keys = "scriptTest")] RedisResult value,
             ILogger logger)
         {
             logger.LogInformation($"Triggered on {result.Message} event for key {result.Trigger}");
