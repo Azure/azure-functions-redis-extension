@@ -11,14 +11,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     internal static class IntegrationTestHelpers
     {
-        internal static Process StartFunction(string functionName)
+        internal static Process StartFunction(string functionName, int port)
         {
             Process functionsProcess = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = GetFunctionsFileName(),
-                    Arguments = $"start --verbose --functions {functionName}",
+                    Arguments = $"start --verbose --functions {functionName} --port {port}",
                     WindowStyle = ProcessWindowStyle.Hidden,
                     WorkingDirectory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
                     RedirectStandardOutput = true,

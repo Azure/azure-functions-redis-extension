@@ -80,7 +80,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ConnectionBinding))]
         public static void ConnectionBinding(
-            [RedisTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.PubSub, Trigger = pubsubChannel)] RedisMessageModel _,
+            [RedisTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.PubSub, Trigger = pubsubChannel)] RedisMessageModel model,
             [RedisConnection(ConnectionString = connectionString)] IConnectionMultiplexer multiplexer,
             ILogger logger)
         {
@@ -89,7 +89,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(CommandBinding))]
         public static void CommandBinding(
-            [RedisTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.PubSub, Trigger = pubsubChannel)] RedisMessageModel _,
+            [RedisTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.PubSub, Trigger = pubsubChannel)] RedisMessageModel model,
             [RedisCommand(ConnectionString = connectionString, RedisCommand = "get", Arguments = bindingKey)] RedisResult result,
             ILogger logger)
         {
@@ -99,7 +99,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ScriptBinding))]
         public static void ScriptBinding(
-            [RedisTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.PubSub, Trigger = pubsubChannel)] RedisMessageModel _,
+            [RedisTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.PubSub, Trigger = pubsubChannel)] RedisMessageModel model,
             [RedisScript(ConnectionString = connectionString)] RedisResult result,
             ILogger logger)
         {
