@@ -41,6 +41,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation(JsonSerializer.Serialize(result));
             logger.LogInformation($"Triggered on {result.Trigger} for key {result.Message}");
             logger.LogInformation($"Value of key {result.Message} = {connectionMultiplexer.GetDatabase().StringGet(result.Message)}");
+            connectionMultiplexer.Close();
+            connectionMultiplexer.Dispose();
         }
 
         [FunctionName("KeyspaceTriggerCommandBinding")]
