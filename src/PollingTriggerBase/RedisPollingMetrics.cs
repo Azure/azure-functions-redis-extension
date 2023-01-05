@@ -4,6 +4,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal class RedisPollingMetrics : ScaleMetrics
     {
-        public long Count { get; set; }
+        public long Remaining { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,8 +15,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for polling a cache.
     /// </summary>
-    internal abstract class RedisPollingListenerBase : IListener, IScaleMonitor<RedisPollingMetrics>
+    internal abstract class RedisPollingListenerBase : IListener, IScaleMonitor, IScaleMonitor<RedisPollingMetrics>
     {
+        private const int MINIMUM_SAMPLES = 5;
         internal string connectionString;
         internal TimeSpan pollingInterval;
         internal int messagesPerWorker;
@@ -151,17 +154,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private ScaleStatus GetScaleStatusCore(int workerCount, RedisPollingMetrics[] metrics)
         {
             // don't scale up or down if we don't have enough metrics
-            if (metrics is null)
+            if (metrics is null || metrics.Length < MINIMUM_SAMPLES)
             {
                 return new ScaleStatus { Vote = ScaleVote.None };
             }
 
-            if (workerCount * messagesPerWorker < metrics.Last().Count)
+            double average = metrics.Skip(metrics.Length - MINIMUM_SAMPLES).Select(metric => metric.Remaining).Average();
+
+            if (workerCount * messagesPerWorker < average)
             {
                 return new ScaleStatus { Vote = ScaleVote.ScaleOut };
             }
 
-            if ((workerCount - 1) * messagesPerWorker > metrics.Last().Count)
+            if ((workerCount - 1) * messagesPerWorker > average)
             {
                 return new ScaleStatus { Vote = ScaleVote.ScaleIn };
             }

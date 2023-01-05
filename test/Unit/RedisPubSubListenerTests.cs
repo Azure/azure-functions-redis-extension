@@ -4,6 +4,7 @@ using Microsoft.WindowsAzure.Storage.Blob.Protocol;
 using StackExchange.Redis;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
@@ -14,20 +15,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         private const string trigger = "trigger";
 
         [Fact]
-        public void StartAsync_CreatesConnectionMultiplexer()
+        public async void StartAsync_CreatesConnectionMultiplexerAsync()
         {
             RedisPubSubListener listener = new RedisPubSubListener(connectionString, RedisTriggerType.PubSub, trigger, A.Fake<ITriggeredFunctionExecutor>());
-            listener.StartAsync(new CancellationToken());
+            await listener.StartAsync(new CancellationToken());
             Assert.NotNull(listener.multiplexer);
             Assert.Equal(connectionString, listener.multiplexer.Configuration, ignoreCase: true);
         }
 
         [Fact]
-        public void StopAsync_ClosesAndDisposesConnectionMultiplexer()
+        public async void StopAsync_ClosesAndDisposesConnectionMultiplexer()
         {
             RedisPubSubListener listener = new RedisPubSubListener(connectionString, RedisTriggerType.PubSub, trigger, A.Fake<ITriggeredFunctionExecutor>());
             listener.multiplexer = A.Fake<IConnectionMultiplexer>();
-            listener.StopAsync(new CancellationToken());
+            await listener.StopAsync(new CancellationToken());
             A.CallTo(() => listener.multiplexer.Close(A<bool>._)).MustHaveHappened();
             A.CallTo(() => listener.multiplexer.Dispose()).MustHaveHappened();
         }

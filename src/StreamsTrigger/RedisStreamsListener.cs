@@ -56,7 +56,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             var metrics = new RedisPollingMetrics
             {
-                Count = keys.Sum((key) => multiplexer.GetDatabase().StreamLength(key)),
+                Remaining = keys.Sum((key) => multiplexer.GetDatabase().StreamLength(key)),
                 Timestamp = DateTime.UtcNow,
             };
 
