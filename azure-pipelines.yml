@@ -14,10 +14,7 @@ trigger:
 variables:
   # It is a release build if it is triggered by pushing a tag.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
-
-  prefix: $[format('0.{0:yyyy}.{0:MMdd}', pipeline.startTime)]
-  version: $[format('{0}.{1}', variables.prefix, counter(variables.prefix, 1))] # e.g. 0.2001.0203.4
-  fileVersion: $[variables.version]
+  releaseVersion: ${{ replace([variables['Build.SourceBranchName'], 'v', '') }}
 
 jobs:
   # - job: test
@@ -59,7 +56,7 @@ jobs:
         displayName: Build
         inputs:
           command: build
-          arguments: --configuration Release -property:Version=$(fileVersion)
+          arguments: --configuration Release -property:Version=$(releaseVersion)
 
       # - task: EsrpCodeSigning@2
       #   displayName: Sign .dll
