@@ -1,7 +1,23 @@
+pr:
+  branches:
+    include:
+      - main
+
 trigger:
   branches:
     include:
       - main
+  tags:
+    include:
+      - v*.*.*
+
+variables:
+  # It is a release build if it is triggered by pushing a tag.
+  isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+
+  prefix: $[format('0.{0:yyyy}.{0:MMdd}', pipeline.startTime)]
+  version: $[format('{0}.{1}', variables.prefix, counter(variables.prefix, 1))] # e.g. 0.2001.0203.4
+  fileVersion: $[variables.version]
 
 jobs:
   - job: buildExtension
@@ -24,19 +40,21 @@ jobs:
           script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
 
       - task: DotNetCoreCLI@2
-        displayName: Build
-        inputs:
-          command: build
-          arguments: --configuration Release
-
-      - task: DotNetCoreCLI@2
         displayName: Test
         inputs:
           command: test
           arguments: --configuration Debug
 
+      - task: DotNetCoreCLI@2
+        displayName: Build
+        condition: eq(variables.isReleaseBuild, 'True')
+        inputs:
+          command: build
+          arguments: --configuration Release -property:Version=$(fileVersion)
+
       - task: EsrpCodeSigning@2
         displayName: Sign .dll
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
           folderPath: src/bin/Release/netstandard2.0
@@ -67,6 +85,7 @@ jobs:
             ]
       - task: DotNetCoreCLI@2
         displayName: Pack
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: pack
           searchPatternPack: src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj
@@ -78,6 +97,7 @@ jobs:
 
       - task: EsrpCodeSigning@2
         displayName: Sign .nupkg
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
             connectedServiceName: 'redis-codesign'
             folderPath: $(Build.ArtifactStagingDirectory)
@@ -103,12 +123,14 @@ jobs:
 
       - task: DeleteFiles@1
         displayName: Cleanup Directory
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           sourceFolder: $(Build.ArtifactStagingDirectory)
           contents: CodeSignSummary*.md
 
       - task: PublishBuildArtifacts@1
         displayName: Publish
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
