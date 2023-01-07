@@ -33,6 +33,9 @@ jobs:
       - script: npm install -g azure-functions-core-tools
         displayName: 'Install Azure Functions Core Tools'
 
+      - script: npm root -g
+        displayName: 'npm root'
+        
       - task: Bash@3
         displayName: Download and start redis server, enable all keyspace/keyevent notifications
         inputs:
