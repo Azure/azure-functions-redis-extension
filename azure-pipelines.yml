@@ -20,8 +20,8 @@ variables:
   fileVersion: $[variables.version]
 
 jobs:
-  - job: buildExtension
-    displayName: WebJobs extension
+  - job: test
+    displayName: Build Debug, Test
     steps:
       - task: UseDotNet@2
         displayName: Install .NET SDK
@@ -33,9 +33,6 @@ jobs:
       - script: npm install -g azure-functions-core-tools
         displayName: 'Install Azure Functions Core Tools'
 
-      - script: npm root -g
-        displayName: 'npm root'
-        
       - task: Bash@3
         displayName: Download and start redis server, enable all keyspace/keyevent notifications
         inputs:
@@ -48,16 +45,18 @@ jobs:
           command: test
           arguments: --configuration Debug
 
+  - job: build
+    displayName: Build Release, Generate & Sign Nuget Package
+    condition: eq(variables.isReleaseBuild, 'True')
+    steps:
       - task: DotNetCoreCLI@2
         displayName: Build
-        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: build
           arguments: --configuration Release -property:Version=$(fileVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign .dll
-        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
           folderPath: src/bin/Release/netstandard2.0
@@ -88,7 +87,6 @@ jobs:
             ]
       - task: DotNetCoreCLI@2
         displayName: Pack
-        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: pack
           searchPatternPack: src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj
@@ -100,7 +98,6 @@ jobs:
 
       - task: EsrpCodeSigning@2
         displayName: Sign .nupkg
-        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
             connectedServiceName: 'redis-codesign'
             folderPath: $(Build.ArtifactStagingDirectory)
@@ -108,32 +105,30 @@ jobs:
             signConfigType: inlineSignParams
             inlineOperation: |
               [
-                  {
-                    "KeyCode": "CP-401405",
-                    "OperationCode": "NuGetSign",
-                    "Parameters": {},
-                    "ToolName": "sign",
-                    "ToolVersion": "1.0"
-                  },
-                  {
-                    "KeyCode": "CP-401405",
-                    "OperationCode": "NuGetVerify",
-                    "Parameters": {},
-                    "ToolName": "sign",
-                    "ToolVersion": "1.0"
-                  }
+                {
+                  "KeyCode": "CP-401405",
+                  "OperationCode": "NuGetSign",
+                  "Parameters": {},
+                  "ToolName": "sign",
+                  "ToolVersion": "1.0"
+                },
+                {
+                  "KeyCode": "CP-401405",
+                  "OperationCode": "NuGetVerify",
+                  "Parameters": {},
+                  "ToolName": "sign",
+                  "ToolVersion": "1.0"
+                }
               ]
 
       - task: DeleteFiles@1
         displayName: Cleanup Directory
-        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           sourceFolder: $(Build.ArtifactStagingDirectory)
           contents: CodeSignSummary*.md
 
       - task: PublishBuildArtifacts@1
         displayName: Publish
-        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
