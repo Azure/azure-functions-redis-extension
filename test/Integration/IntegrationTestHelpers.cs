@@ -89,13 +89,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             if (string.IsNullOrEmpty(nodeModulesPath))
             {
                 nodeModulesPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                    ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\")
-                    : @"/usr/local/lib/node_modules/";
+                    ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules")
+                    : @"/usr/local/lib/node_modules";
             }
 
             nodeModulesPath += RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? @"azure-functions-core-tools\bin\func.exe"
-                : @"azure-functions-core-tools/bin/func";
+                ? @"/azure-functions-core-tools\bin\func.exe"
+                : @"/azure-functions-core-tools/bin/func";
 
             if (!File.Exists(nodeModulesPath))
             {
