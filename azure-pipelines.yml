@@ -17,10 +17,10 @@ variables:
   minorVersion: 1
   majorMinorVersion: $[ join('.', variables['majorVersion'], variables['minorVersion']) ]
   fullVersion: $[ join('.', variables['majorMinorVersion'], counter(variables['majorMinorVersion'], 0)) ]
-  ${{ if parameters['previewBuild'] }}
+  ${{ if parameters['previewBuild'] }}:
     releaseVersion: ${{ join('-', variables['version'], 'prefix') }}
-  ${{ else }}
-    releaseVersion: version
+  ${{ else }}:
+    releaseVersion: fullVersion
 
   # It is a release build if it is triggered by the main branch.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
