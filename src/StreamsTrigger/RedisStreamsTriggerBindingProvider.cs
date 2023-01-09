@@ -38,7 +38,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             int messagesPerWorker = attribute.MessagesPerWorker;
             string consumerGroup = attribute.StreamConsumerGroup;
             string consumerName = attribute.StreamConsumerName;
-            int count = attribute.Count;
+            int count = attribute.BatchSize;
             int pollingInterval = attribute.PollingInterval;
 
             return Task.FromResult<ITriggerBinding>(new RedisStreamsTriggerBinding(connectionString, pollingInterval, messagesPerWorker, keys, count, consumerGroup, consumerName));

@@ -11,7 +11,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public string ConnectionString { get; set; }
 
         /// <summary>
-        /// How often to poll the stream or list in milliseconds.
+        /// How often to poll redis in milliseconds.
         /// </summary>
         public int PollingInterval { get; set; } = 5000;
 
@@ -27,8 +27,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public string Keys { get; set; }
 
         /// <summary>
-        /// Number of elements to pull from the list at one time.
+        /// Number of elements to pull from redis at one time.
         /// </summary>
-        public int Count { get; set; } = 100;
+        public int BatchSize { get; set; } = 100;
     }
 }

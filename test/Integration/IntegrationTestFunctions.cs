@@ -142,7 +142,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamsTrigger_WithGroup_MultipleKeys))]
         public static void StreamsTrigger_WithGroup_MultipleKeys(
-            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamMultipleKeys, StreamConsumerGroup = consumerGroup, StreamConsumerName = consumerName, Count = 3, PollingInterval = pollingInterval)] RedisMessageModel result,
+            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamMultipleKeys, StreamConsumerGroup = consumerGroup, StreamConsumerName = consumerName, BatchSize = 3, PollingInterval = pollingInterval)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));

@@ -36,7 +36,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string connectionString = attribute.ConnectionString;
             int pollingInterval = attribute.PollingInterval;
             int messagesPerWorker = attribute.MessagesPerWorker;
-            int count = attribute.Count;
+            int count = attribute.BatchSize;
             string keys = attribute.Keys;
             bool listPopFromBeginning = attribute.ListPopFromBeginning;
 
