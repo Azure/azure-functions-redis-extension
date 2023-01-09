@@ -106,7 +106,7 @@ jobs:
         inputs:
           command: pack
           searchPatternPack: src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj
-          arguments: -property:Version=$(releaseVersion)
+          custom: -property:Version=$(releaseVersion)
           configurationToPack: Release
           outputDir: $(Build.ArtifactStagingDirectory)
           nobuild: true
