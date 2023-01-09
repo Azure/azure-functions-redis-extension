@@ -1,11 +1,24 @@
-trigger:
+pr:
   branches:
     include:
       - main
 
+trigger:
+  branches:
+    include:
+      - main
+  tags:
+    include:
+      - v*.*.*
+
+variables:
+  # It is a release build if it is triggered by pushing a tag.
+  isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  releaseVersion: ${{ replace(variables['Build.SourceBranchName'], 'v', '') }}
+
 jobs:
-  - job: buildExtension
-    displayName: WebJobs extension
+  - job: test
+    displayName: Build Debug, Test
     steps:
       - task: UseDotNet@2
         displayName: Install .NET SDK
@@ -18,22 +31,36 @@ jobs:
         displayName: 'Install Azure Functions Core Tools'
 
       - task: Bash@3
+        displayName: Set npm installation path
+        inputs:
+          targetType: 'inline'
+          script: 'echo "##vso[task.setvariable variable=nodeModulesPath]$(npm root -g)"'
+
+      - task: Bash@3
         displayName: Download and start redis server, enable all keyspace/keyevent notifications
         inputs:
           targetType: 'inline'
           script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
 
       - task: DotNetCoreCLI@2
-        displayName: Build
-        inputs:
-          command: build
-          arguments: --configuration Release
-
-      - task: DotNetCoreCLI@2
         displayName: Test
+        env:
+          NODE_MODULES_PATH: '$(nodeModulesPath)'
         inputs:
           command: test
           arguments: --configuration Debug
+
+  - job: build
+    displayName: Build Release, Generate & Sign Nuget Package
+    condition: eq(variables.isReleaseBuild, 'True')
+    steps:
+      - task: DotNetCoreCLI@2
+        displayName: Build
+        env:
+          NODE_MODULES_PATH: '$(nodeModulesPath)'
+        inputs:
+          command: build
+          arguments: --configuration Release -property:Version=$(releaseVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign .dll
@@ -79,27 +106,27 @@ jobs:
       - task: EsrpCodeSigning@2
         displayName: Sign .nupkg
         inputs:
-            connectedServiceName: 'redis-codesign'
-            folderPath: $(Build.ArtifactStagingDirectory)
-            pattern: Microsoft.Azure.WebJobs.Extensions.Redis.*.nupkg
-            signConfigType: inlineSignParams
-            inlineOperation: |
-              [
-                  {
-                    "KeyCode": "CP-401405",
-                    "OperationCode": "NuGetSign",
-                    "Parameters": {},
-                    "ToolName": "sign",
-                    "ToolVersion": "1.0"
-                  },
-                  {
-                    "KeyCode": "CP-401405",
-                    "OperationCode": "NuGetVerify",
-                    "Parameters": {},
-                    "ToolName": "sign",
-                    "ToolVersion": "1.0"
-                  }
-              ]
+          connectedServiceName: 'redis-codesign'
+          folderPath: $(Build.ArtifactStagingDirectory)
+          pattern: Microsoft.Azure.WebJobs.Extensions.Redis.*.nupkg
+          signConfigType: inlineSignParams
+          inlineOperation: |
+            [
+              {
+                "KeyCode": "CP-401405",
+                "OperationCode": "NuGetSign",
+                "Parameters": {},
+                "ToolName": "sign",
+                "ToolVersion": "1.0"
+              },
+              {
+                "KeyCode": "CP-401405",
+                "OperationCode": "NuGetVerify",
+                "Parameters": {},
+                "ToolName": "sign",
+                "ToolVersion": "1.0"
+              }
+            ]
 
       - task: DeleteFiles@1
         displayName: Cleanup Directory

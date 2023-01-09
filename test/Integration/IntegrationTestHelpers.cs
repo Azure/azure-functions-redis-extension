@@ -85,14 +85,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         private static string GetFunctionsFileName()
         {
-            string filepath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
-                : @"/usr/local/lib/node_modules/azure-functions-core-tools/bin/func";
-            if (!File.Exists(filepath))
+            string nodeModulesPath = Environment.GetEnvironmentVariable("NODE_MODULES_PATH");
+            if (string.IsNullOrEmpty(nodeModulesPath))
             {
-                throw new FileNotFoundException($"Azure Functions Core Tools not found at {filepath}");
+                nodeModulesPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules")
+                    : @"/usr/local/lib/node_modules";
             }
-            return filepath;
+
+            nodeModulesPath += RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? @"/azure-functions-core-tools\bin\func.exe"
+                : @"/azure-functions-core-tools/bin/func";
+
+            if (!File.Exists(nodeModulesPath))
+            {
+                throw new FileNotFoundException($"Azure Functions Core Tools not found at {nodeModulesPath}");
+            }
+            return nodeModulesPath;
         }
     }
 }
