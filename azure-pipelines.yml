@@ -14,7 +14,7 @@ trigger:
 variables:
   # It is a release build if it is triggered by pushing a tag.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
-  isPreviewBuild: ${{ endsWith(variables['Build.SourceBranchName'], 'preview' }}
+  isPreviewBuild: ${{ endsWith(variables['Build.SourceBranchName'], 'preview') }}
   releaseVersion: ${{ split(variables['Build.SourceBranchName'], '-')[0] }}
 
 jobs:
