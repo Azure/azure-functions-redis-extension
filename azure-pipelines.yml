@@ -15,10 +15,10 @@ trigger:
 variables:
   majorVersion: 0
   minorVersion: 1
-  majorMinorVersion: $[ join('.', variables['majorVersion'], variables['minorVersion']) ]
-  fullVersion: $[ join('.', variables['majorMinorVersion'], counter(variables['majorMinorVersion'], 0)) ]
+  majorMinorVersion: $[ format('{0}.{1}', variables['majorVersion'], variables['minorVersion']) ]
+  fullVersion: $[ format('{0}.{1}', variables['majorMinorVersion'], counter(variables['majorMinorVersion'], 0)) ]
   ${{ if parameters['previewBuild'] }}:
-    releaseVersion: ${{ join('-', variables['version'], 'prefix') }}
+    releaseVersion: $[ format('{0}-{1}', variables['fullVersion'], 'preview' ]
   ${{ else }}:
     releaseVersion: fullVersion
 
