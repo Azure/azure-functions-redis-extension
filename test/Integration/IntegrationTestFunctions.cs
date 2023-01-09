@@ -19,6 +19,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         public const string streamMultipleKeys = "streamKey1 streamKey2 streamKey3";
         public const string consumerGroup = "consumerGroup";
         public const string consumerName = "consumerName";
+        public const int pollingInterval = 100;
         public const int count = 100;
 
         [FunctionName(nameof(PubSubTrigger_SingleChannel))]
@@ -117,7 +118,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamsTrigger_WithoutGroup_SingleKey))]
         public static void StreamsTrigger_WithoutGroup_SingleKey(
-            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamSingleKey)] RedisMessageModel result,
+            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamSingleKey, PollingInterval = pollingInterval)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -125,7 +126,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamsTrigger_WithoutGroup_MultipleKeys))]
         public static void StreamsTrigger_WithoutGroup_MultipleKeys(
-            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamMultipleKeys, Count = 3, PollingInterval = 10000)] RedisMessageModel result,
+            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamMultipleKeys, PollingInterval = pollingInterval)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -133,7 +134,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamsTrigger_WithGroup_SingleKey))]
         public static void StreamsTrigger_WithGroup_SingleKey(
-            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamSingleKey, StreamConsumerGroup = consumerGroup, StreamConsumerName = consumerName)] RedisMessageModel result,
+            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamSingleKey, StreamConsumerGroup = consumerGroup, StreamConsumerName = consumerName, PollingInterval = pollingInterval)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -141,7 +142,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamsTrigger_WithGroup_MultipleKeys))]
         public static void StreamsTrigger_WithGroup_MultipleKeys(
-            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamMultipleKeys, StreamConsumerGroup = consumerGroup, StreamConsumerName = consumerName, Count = 3, PollingInterval = 10000)] RedisMessageModel result,
+            [RedisStreamsTrigger(ConnectionString = connectionString, Keys = streamMultipleKeys, StreamConsumerGroup = consumerGroup, StreamConsumerName = consumerName, Count = 3, PollingInterval = pollingInterval)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));

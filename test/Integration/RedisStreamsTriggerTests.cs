@@ -12,8 +12,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public class RedisStreamsTriggerTests
     {
         [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_WithoutGroup_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c e", "b d f")]
-        public void StreamsTrigger_SuccessfullyTriggers(string functionName, string keys, string names, string values)
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_WithoutGroup_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d")]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_WithoutGroup_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f")]
+        public async void StreamsTrigger_SuccessfullyTriggers(string functionName, string keys, string names, string values)
         {
             bool success = false;
             string[] keyArray = keys.Split(' ');
@@ -28,23 +29,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
-                { $"Executed '{functionName}' (Succeeded", 1},
+                { $"Executed '{functionName}' (Succeeded", keyArray.Length },
             };
 
-            foreach (NameValueEntry entry in nameValueEntries)
-            {
-                counts.Add($"{entry.Name},{entry.Value}", 1);
-            }
-
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
-            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
+            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7073))
             {
                 TaskCompletionSource<bool> functionCompleted = new TaskCompletionSource<bool>();
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts, functionCompleted);
 
                 foreach (string key in keyArray)
                 {
-                    multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
+                    await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
                 }
 
                 success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));

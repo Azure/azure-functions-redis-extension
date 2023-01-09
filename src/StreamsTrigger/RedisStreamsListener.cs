@@ -29,6 +29,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<bool> PollAsync(CancellationToken cancellationToken)
         {
+
             IDatabase db = multiplexer.GetDatabase();
             RedisStream[] streams = String.IsNullOrEmpty(consumerGroup) 
                 ? await db.StreamReadAsync(positions, count) 
@@ -36,6 +37,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             for (int i = 0; i < streams.Length; i++)
             {
+                List<Task> functionExecutions = new List<Task>();
                 foreach (StreamEntry entry in streams[i].Entries)
                 {
                     var triggerValue = new RedisMessageModel
@@ -45,8 +47,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                         Message = JsonSerializer.Serialize(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()))
                     };
 
-                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                    functionExecutions.Add(executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken));
                 }
+
+                Task.WhenAll(functionExecutions).Wait();
                 await db.StreamDeleteAsync(streams[i].Key, streams[i].Entries.Select(entry => entry.Id).ToArray());
             }
             return streams.Sum(stream => stream.Entries.Length) == 0;

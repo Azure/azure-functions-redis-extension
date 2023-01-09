@@ -35,7 +35,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.connectionString = connectionString;
             this.pollingInterval = TimeSpan.FromMilliseconds(pollingInterval);
             this.messagesPerWorker = messagesPerWorker;
-            this.keys = keys.Split('_').Select(key => new RedisKey(key)).ToArray();
+            this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
             this.count = count;
             this.executor = executor;
         }

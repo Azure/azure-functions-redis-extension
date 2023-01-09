@@ -11,77 +11,93 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     {
         public const string localhost = "127.0.0.1:6379";
 
-        [FunctionName("PubSubTrigger")]
+        [FunctionName(nameof(PubSubTrigger))]
         public static void PubSubTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.PubSub, Trigger = "pubsubTest")] RedisMessageModel result,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.PubSub, Trigger = "pubsubTest")] RedisMessageModel model,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
+            logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
-        [FunctionName("KeyspaceTrigger")]
+        [FunctionName(nameof(KeyspaceTrigger))]
         public static void KeyspaceTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "keyspaceTest")] RedisMessageModel result,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "keyspaceTest")] RedisMessageModel model,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
+            logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
-        [FunctionName("KeyeventTrigger")]
+        [FunctionName(nameof(KeyeventTrigger))]
         public static void KeyeventTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeyEvent, Trigger = "del")] RedisMessageModel result,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeyEvent, Trigger = "del")] RedisMessageModel model,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
+            logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
-        [FunctionName("KeyeventTriggerConnectionBinding")]
+        [FunctionName(nameof(KeyeventTriggerConnectionBinding))]
         public static void KeyeventTriggerConnectionBinding(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeyEvent, Trigger = "set")] RedisMessageModel result,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeyEvent, Trigger = "set")] RedisMessageModel model,
             [RedisConnection(ConnectionString = localhost)] IConnectionMultiplexer connectionMultiplexer,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
-            logger.LogInformation($"Triggered on {result.Trigger} for key {result.Message}");
-            logger.LogInformation($"Value of key {result.Message} = {connectionMultiplexer.GetDatabase().StringGet(result.Message)}");
+            logger.LogInformation(JsonSerializer.Serialize(model));
+            logger.LogInformation($"Triggered on {model.Trigger} for key {model.Message}");
+            logger.LogInformation($"Value of key {model.Message} = {connectionMultiplexer.GetDatabase().StringGet(model.Message)}");
             connectionMultiplexer.Close();
             connectionMultiplexer.Dispose();
         }
 
-        [FunctionName("KeyspaceTriggerCommandBinding")]
+        [FunctionName(nameof(KeyspaceTriggerCommandBinding))]
         public static void KeyspaceTriggerCommandBinding(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "keytest")] RedisMessageModel result,
-            [RedisCommand(ConnectionString = localhost, RedisCommand = "get", Arguments = "keytest")] RedisResult value,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "keytest")] RedisMessageModel model,
+            [RedisCommand(ConnectionString = localhost, RedisCommand = "get", Arguments = "keytest")] RedisResult result,
             ILogger logger)
         {
-            logger.LogInformation($"Triggered on {result.Message} event for key {result.Trigger}");
-            logger.LogInformation($"Value of key {result.Message} = {value}");
+            logger.LogInformation($"Triggered on {model.Message} event for key {model.Trigger}");
+            logger.LogInformation($"Value of key {model.Message} = {result}");
         }
 
-        [FunctionName("KeyspaceTriggerScriptBinding")]
+        [FunctionName(nameof(KeyspaceTriggerScriptBinding))]
         public static void KeyspaceTriggerScriptBinding(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "scriptTest")] RedisMessageModel result,
-            [RedisScript(ConnectionString = localhost, LuaScript = "return redis.call('GET', KEYS[1])", Keys = "scriptTest")] RedisResult value,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "scriptTest")] RedisMessageModel model,
+            [RedisScript(ConnectionString = localhost, LuaScript = "return redis.call('GET', KEYS[1])", Keys = "scriptTest")] RedisResult result,
             ILogger logger)
         {
-            logger.LogInformation($"Triggered on {result.Message} event for key {result.Trigger}");
-            logger.LogInformation($"Value of key {result.Message} = {value}");
+            logger.LogInformation($"Triggered on {model.Message} event for key {model.Trigger}");
+            logger.LogInformation($"Value of key {model.Message} = {result}");
         }
 
-        [FunctionName("StreamsTrigger")]
+        [FunctionName(nameof(StreamsTrigger))]
         public static void StreamsTrigger(
-            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest")]
-            RedisMessageModel result, ILogger logger)
+            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest")] RedisMessageModel model,
+            ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
+            logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
-        [FunctionName("ListsTrigger")]
-        public static void ListsTrigger(
-            [RedisListsTrigger(ConnectionString = localhost, Keys = "listTest")]
-            RedisMessageModel result, ILogger logger)
+        [FunctionName(nameof(StreamsMultipleTriggers))]
+        public static void StreamsMultipleTriggers(
+            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest1 streamTest2")] RedisMessageModel model,
+            ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
+            logger.LogInformation(JsonSerializer.Serialize(model));
+        }
+
+        [FunctionName(nameof(ListsTrigger))]
+        public static void ListsTrigger(
+            [RedisListsTrigger(ConnectionString = localhost, Keys = "listTest")] RedisMessageModel model,
+            ILogger logger)
+        {
+            logger.LogInformation(JsonSerializer.Serialize(model));
+        }
+
+        [FunctionName(nameof(ListsMultipleTrigger))]
+        public static void ListsMultipleTrigger(
+            [RedisListsTrigger(ConnectionString = localhost, Keys = "listTest1 listTest2")] RedisMessageModel model,
+            ILogger logger)
+        {
+            logger.LogInformation(JsonSerializer.Serialize(model));
         }
     }
 }

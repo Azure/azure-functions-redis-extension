@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,6 +43,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             IDatabase db = multiplexer.GetDatabase();
             bool triggered = false;
+            List<Task> functionExecutions = new List<Task>();
             if (version >= new Version("7.0"))
             {
                 var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, count) : await db.ListRightPopAsync(keys, count);
@@ -54,7 +56,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                         Trigger = result.Key,
                         Message = value
                     };
-                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                    functionExecutions.Add(executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken));
                 }
             }
             else if (version >= new Version("6.2"))
@@ -69,7 +71,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                         Trigger = keys[0],
                         Message = value
                     };
-                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                    functionExecutions.Add(executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken));
                 }
             }
             else
@@ -87,6 +89,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }
             }
+            Task.WhenAll(functionExecutions).Wait();
             return !triggered;
         }
 
