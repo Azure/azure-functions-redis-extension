@@ -106,7 +106,8 @@ jobs:
         displayName: Pack
         inputs:
           command: custom
-          custom: pack $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj -property:Configuration=Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory) --no-build
+          custom: pack
+          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj -property:Configuration=Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory) --no-build
 
       - task: EsrpCodeSigning@2
         displayName: Sign .nupkg
