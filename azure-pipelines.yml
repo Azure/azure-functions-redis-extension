@@ -14,7 +14,8 @@ trigger:
 variables:
   # It is a release build if it is triggered by pushing a tag.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
-  releaseVersion: ${{ replace(variables['Build.SourceBranchName'], 'v', '') }}
+  isPreviewBuild: ${{ endsWith(variables['Build.SourceBranchName'], 'preview' }}
+  releaseVersion: ${{ split(variables['Build.SourceBranchName'], '-')[0] }}
 
 jobs:
   - job: test
@@ -52,7 +53,7 @@ jobs:
 
   - job: build
     displayName: Build Release, Generate & Sign Nuget Package
-    condition: eq(variables.isReleaseBuild, 'True')
+    # condition: eq(variables.isReleaseBuild, 'True')
     steps:
       - task: DotNetCoreCLI@2
         displayName: Build
@@ -97,6 +98,7 @@ jobs:
         inputs:
           command: pack
           searchPatternPack: src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj
+          arguments: -property:Version=$(releaseVersion)
           configurationToPack: Release
           outputDir: $(Build.ArtifactStagingDirectory)
           nobuild: true
