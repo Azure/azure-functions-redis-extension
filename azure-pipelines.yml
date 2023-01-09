@@ -71,42 +71,42 @@ jobs:
           command: build
           arguments: --configuration Release -property:Version=$(releaseVersion)
 
-      - task: EsrpCodeSigning@2
-        displayName: Sign .dll
-        inputs:
-          connectedServiceName: 'redis-codesign'
-          folderPath: src/bin/Release/netstandard2.0
-          pattern: Microsoft.Azure.WebJobs.Extensions.Redis.dll
-          signConfigType: inlineSignParams
-          inlineOperation: |
-            [
-              {
-                "KeyCode": "CP-230012",
-                "OperationCode": "SigntoolSign",
-                "Parameters": {
-                  "OpusName": "Microsoft",
-                  "OpusInfo": "http://www.microsoft.com",
-                  "FileDigest": "/fd \"SHA256\"",
-                  "PageHash": "/NPH",
-                  "TimeStamp": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
-                },
-                "ToolName": "sign",
-                "ToolVersion": "1.0"
-              },
-              {
-                "KeyCode": "CP-230012",
-                "OperationCode": "SigntoolVerify",
-                "Parameters": {},
-                "ToolName": "sign",
-                "ToolVersion": "1.0"
-              }
-            ]
+      # - task: EsrpCodeSigning@2
+      #   displayName: Sign .dll
+      #   inputs:
+      #     connectedServiceName: 'redis-codesign'
+      #     folderPath: src/bin/Release/netstandard2.0
+      #     pattern: Microsoft.Azure.WebJobs.Extensions.Redis.dll
+      #     signConfigType: inlineSignParams
+      #     inlineOperation: |
+      #       [
+      #         {
+      #           "KeyCode": "CP-230012",
+      #           "OperationCode": "SigntoolSign",
+      #           "Parameters": {
+      #             "OpusName": "Microsoft",
+      #             "OpusInfo": "http://www.microsoft.com",
+      #             "FileDigest": "/fd \"SHA256\"",
+      #             "PageHash": "/NPH",
+      #             "TimeStamp": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+      #           },
+      #           "ToolName": "sign",
+      #           "ToolVersion": "1.0"
+      #         },
+      #         {
+      #           "KeyCode": "CP-230012",
+      #           "OperationCode": "SigntoolVerify",
+      #           "Parameters": {},
+      #           "ToolName": "sign",
+      #           "ToolVersion": "1.0"
+      #         }
+      #       ]
+
       - task: DotNetCoreCLI@2
         displayName: Pack
         inputs:
           command: custom
-          custom: pack -property:Configuration=Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory) --no-build
-          searchPatternPack: src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj
+          custom: pack $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj -property:Configuration=Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory) --no-build
 
       - task: EsrpCodeSigning@2
         displayName: Sign .nupkg
