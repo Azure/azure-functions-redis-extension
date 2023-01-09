@@ -104,14 +104,9 @@ jobs:
       - task: DotNetCoreCLI@2
         displayName: Pack
         inputs:
-          command: pack
+          command: custom
+          custom: pack -property:Configuration=Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory) --no-build
           searchPatternPack: src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj
-          custom: -property:Version=$(releaseVersion)
-          configurationToPack: Release
-          outputDir: $(Build.ArtifactStagingDirectory)
-          nobuild: true
-          includesymbols: true
-          verbosityPack: minimal
 
       - task: EsrpCodeSigning@2
         displayName: Sign .nupkg
