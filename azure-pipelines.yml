@@ -1,20 +1,29 @@
+parameters:
+  - name: previewBuild
+    type: boolean
+    default: true
+
 pr:
   branches:
     include:
       - main
-
 trigger:
   branches:
     include:
       - main
-  tags:
-    include:
-      - v*.*.*
 
 variables:
-  # It is a release build if it is triggered by pushing a tag.
-  isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
-  releaseVersion: ${{ replace(variables['Build.SourceBranchName'], 'v', '') }}
+  majorVersion: 0
+  minorVersion: 1
+  majorMinorVersion: $[ format('{0}.{1}', variables['majorVersion'], variables['minorVersion']) ]
+  fullVersion: $[ format('{0}.{1}', variables['majorMinorVersion'], counter(variables['majorMinorVersion'], 0)) ]
+  ${{ if parameters['previewBuild'] }}:
+    releaseVersion: $[ format('{0}-{1}', variables['fullVersion'], 'preview') ]
+  ${{ else }}:
+    releaseVersion: fullVersion
+
+  # It is a release build if it is triggered by the main branch.
+  isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
 
 jobs:
   - job: test
@@ -92,16 +101,13 @@ jobs:
                 "ToolVersion": "1.0"
               }
             ]
+
       - task: DotNetCoreCLI@2
         displayName: Pack
         inputs:
-          command: pack
-          searchPatternPack: src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj
-          configurationToPack: Release
-          outputDir: $(Build.ArtifactStagingDirectory)
-          nobuild: true
-          includesymbols: true
-          verbosityPack: minimal
+          command: custom
+          custom: pack
+          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj -property:Configuration=Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory) --no-build
 
       - task: EsrpCodeSigning@2
         displayName: Sign .nupkg
