@@ -36,8 +36,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string connectionString = attribute.ConnectionString;
             string keys = attribute.Keys;
             int messagesPerWorker = attribute.MessagesPerWorker;
-            string consumerGroup = attribute.StreamConsumerGroup;
-            string consumerName = attribute.StreamConsumerName;
+            string consumerGroup = attribute.ConsumerGroup;
+            string consumerName = attribute.ConsumerName;
             int count = attribute.BatchSize;
             int pollingInterval = attribute.PollingInterval;
 

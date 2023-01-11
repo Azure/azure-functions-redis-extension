@@ -29,7 +29,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<bool> PollAsync(CancellationToken cancellationToken)
         {
-
             IDatabase db = multiplexer.GetDatabase();
             RedisStream[] streams = String.IsNullOrEmpty(consumerGroup) 
                 ? await db.StreamReadAsync(positions, count) 

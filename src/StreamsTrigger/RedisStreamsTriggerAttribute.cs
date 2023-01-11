@@ -13,11 +13,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Gives the name of the consumer group that the function will use when reading from the stream.
         /// </summary>
-        public string StreamConsumerGroup { get; set; } = null;
+        public string ConsumerGroup { get; set; } = null;
 
         /// <summary>
         /// The consumer name that the function will use when reading from the stream.
         /// </summary>
-        public string StreamConsumerName { get; set; } = null;
+        public string ConsumerName { get; set; } = null;
     }
 }
