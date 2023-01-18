@@ -11,13 +11,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     public class RedisStreamsTriggerAttribute : RedisPollingTriggerAttributeBase
     {
         /// <summary>
-        /// Gives the name of the consumer group that the function will use when reading from the stream.
+        /// If true, the function will delete the stream entries after processing.
         /// </summary>
-        public string ConsumerGroup { get; set; } = null;
-
-        /// <summary>
-        /// The consumer name that the function will use when reading from the stream.
-        /// </summary>
-        public string ConsumerName { get; set; } = null;
+        public string DeleteAfterProcess { get; set; } = "false";
     }
 }

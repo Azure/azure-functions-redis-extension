@@ -15,8 +15,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool listPopFromBeginning;
 
-        public RedisListsListener(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int count, bool listPopFromBeginning, ITriggeredFunctionExecutor executor)
-            : base(connectionString, pollingInterval, messagesPerWorker, keys, count, executor)
+        public RedisListsListener(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor)
+            : base(connectionString, pollingInterval, messagesPerWorker, keys, batchSize, executor)
         {
             this.listPopFromBeginning = listPopFromBeginning;
         }
@@ -34,7 +34,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 // count option only introduced in 6.2 and higher
                 // changing values here to ensure proper scaling logic
-                count = 1;
+                batchSize = 1;
                 messagesPerWorker = 10;
             }
         }
@@ -46,7 +46,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             List<Task> functionExecutions = new List<Task>();
             if (version >= new Version("7.0"))
             {
-                var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, count) : await db.ListRightPopAsync(keys, count);
+                var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, batchSize) : await db.ListRightPopAsync(keys, batchSize);
                 triggered = result.Values.Length > 0;
                 foreach (RedisValue value in result.Values)
                 {
@@ -61,7 +61,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             else if (version >= new Version("6.2"))
             {
-                var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], count) : await db.ListRightPopAsync(keys[0], count);
+                var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], batchSize) : await db.ListRightPopAsync(keys[0], batchSize);
                 triggered = result.Length > 0;
                 foreach (RedisValue value in result)
                 {

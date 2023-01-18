@@ -98,12 +98,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Closes redis cache multiplexer connection.
         /// </summary>
-        internal async void CloseMultiplexer(IConnectionMultiplexer existingMultiplexer)
+        internal void CloseMultiplexer(IConnectionMultiplexer existingMultiplexer)
         {
             try
             {
-                await existingMultiplexer.CloseAsync();
-                await existingMultiplexer.DisposeAsync();
+                existingMultiplexer.Close();
+                existingMultiplexer.Dispose();
             }
             catch (Exception)
             {

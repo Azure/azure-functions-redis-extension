@@ -12,7 +12,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(PubSubTrigger))]
         public static void PubSubTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.PubSub, Trigger = "pubsubTest")] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = nameof(RedisTriggerType.PubSub), Trigger = "pubsubTest")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(KeyspaceTrigger))]
         public static void KeyspaceTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "keyspaceTest")] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = nameof(RedisTriggerType.KeySpace), Trigger = "keyspaceTest")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -28,7 +28,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(KeyeventTrigger))]
         public static void KeyeventTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeyEvent, Trigger = "del")] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = nameof(RedisTriggerType.KeyEvent), Trigger = "del")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -36,7 +36,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(KeyeventTriggerConnectionBinding))]
         public static void KeyeventTriggerConnectionBinding(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeyEvent, Trigger = "set")] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = nameof(RedisTriggerType.KeyEvent), Trigger = "set")] RedisMessageModel model,
             [RedisConnection(ConnectionString = localhost)] IConnectionMultiplexer connectionMultiplexer,
             ILogger logger)
         {
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(KeyspaceTriggerCommandBinding))]
         public static void KeyspaceTriggerCommandBinding(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "keytest")] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = nameof(RedisTriggerType.KeySpace), Trigger = "keytest")] RedisMessageModel model,
             [RedisCommand(ConnectionString = localhost, RedisCommand = "get", Arguments = "keytest")] RedisResult result,
             ILogger logger)
         {
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(KeyspaceTriggerScriptBinding))]
         public static void KeyspaceTriggerScriptBinding(
-            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = RedisTriggerType.KeySpace, Trigger = "scriptTest")] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = localhost, TriggerType = nameof(RedisTriggerType.KeySpace), Trigger = "scriptTest")] RedisMessageModel model,
             [RedisScript(ConnectionString = localhost, LuaScript = "return redis.call('GET', KEYS[1])", Keys = "scriptTest")] RedisResult result,
             ILogger logger)
         {
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(StreamsTrigger))]
         public static void StreamsTrigger(
-            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest")] RedisMessageModel model,
+            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest", PollingInterval = "1000")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));

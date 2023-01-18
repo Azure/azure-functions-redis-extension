@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal TimeSpan pollingInterval;
         internal int messagesPerWorker;
         internal RedisKey[] keys;
-        internal int count;
+        internal int batchSize;
         internal ITriggeredFunctionExecutor executor;
         internal IConnectionMultiplexer multiplexer;
         internal Version version;
@@ -30,13 +30,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
 
-        public RedisPollingListenerBase(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int count, ITriggeredFunctionExecutor executor)
+        public RedisPollingListenerBase(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int batchSize, ITriggeredFunctionExecutor executor)
         {
             this.connectionString = connectionString;
             this.pollingInterval = TimeSpan.FromMilliseconds(pollingInterval);
             this.messagesPerWorker = messagesPerWorker;
             this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
-            this.count = count;
+            this.batchSize = batchSize;
             this.executor = executor;
         }
 
@@ -55,6 +55,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 isConnected = true;
                 version = multiplexer.GetServers()[0].Version;
+                BeforePolling();
                 _ = Task.Run(() => Loop(cancellationToken));
             }
             else
@@ -81,6 +82,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             CloseMultiplexer(multiplexer);
         }
+
+        public virtual void BeforePolling() { }
 
         /// <summary>
         /// Implementation of the logic used to poll the cache.
@@ -121,12 +124,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Closes redis cache multiplexer connection.
         /// </summary>
-        private static async void CloseMultiplexer(IConnectionMultiplexer existingMultiplexer)
+        private static void CloseMultiplexer(IConnectionMultiplexer existingMultiplexer)
         {
             try
             {
-                await existingMultiplexer.CloseAsync();
-                await existingMultiplexer.DisposeAsync();
+                existingMultiplexer.Close();
+                existingMultiplexer.Dispose();
             }
             catch (Exception)
             {

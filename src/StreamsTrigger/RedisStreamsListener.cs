@@ -16,43 +16,47 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal sealed class RedisStreamsListener : RedisPollingListenerBase
     {
         internal StreamPosition[] positions;
-        internal string consumerGroup;
-        internal string consumerName;
+        internal bool deleteAfterProcess;
 
-        public RedisStreamsListener(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int count, string consumerGroup, string consumerName, ITriggeredFunctionExecutor executor)
-            : base(connectionString, pollingInterval, messagesPerWorker, keys, count, executor)
+        public RedisStreamsListener(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int batchSize, bool deleteAfterProcess, ITriggeredFunctionExecutor executor)
+            : base(connectionString, pollingInterval, messagesPerWorker, keys, batchSize, executor)
         {
-            this.consumerGroup = consumerGroup;
-            this.consumerName = consumerName;
+            this.deleteAfterProcess = deleteAfterProcess;
             this.positions = this.keys.Select((key) => new StreamPosition(key, 0)).ToArray();
         }
 
         public override async Task<bool> PollAsync(CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            RedisStream[] streams = String.IsNullOrEmpty(consumerGroup) 
-                ? await db.StreamReadAsync(positions, count) 
-                : await db.StreamReadGroupAsync(positions, consumerGroup, consumerName, count);
+            RedisStream[] streams = await db.StreamReadAsync(positions, batchSize);
 
-            for (int i = 0; i < streams.Length; i++)
+            Parallel.For(0, streams.Length, async i =>
             {
-                List<Task> functionExecutions = new List<Task>();
-                foreach (StreamEntry entry in streams[i].Entries)
+                if (streams[i].Entries.Length > 0)
                 {
-                    var triggerValue = new RedisMessageModel
+                    Parallel.ForEach(streams[i].Entries, async entry =>
                     {
-                        TriggerType = RedisTriggerType.Streams,
-                        Trigger = streams[i].Key,
-                        Message = JsonSerializer.Serialize(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()))
-                    };
+                        var triggerValue = new RedisMessageModel
+                        {
+                            TriggerType = RedisTriggerType.Streams,
+                            Trigger = streams[i].Key,
+                            Message = JsonSerializer.Serialize(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()))
+                        };
 
-                    functionExecutions.Add(executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken));
+                        await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                    });
+                    
+                    if (deleteAfterProcess)
+                    {
+                        await db.StreamDeleteAsync(streams[i].Key, streams[i].Entries.Select(entry => entry.Id).ToArray());
+                    }
+                    else
+                    {
+                        positions[i] = new StreamPosition(streams[i].Key, streams[i].Entries.Last().Id);
+                    }
                 }
-
-                Task.WhenAll(functionExecutions).Wait();
-                await db.StreamDeleteAsync(streams[i].Key, streams[i].Entries.Select(entry => entry.Id).ToArray());
-            }
-            return streams.Sum(stream => stream.Entries.Length) == 0;
+            });
+            return streams.Sum(stream => stream.Entries.Length) == batchSize;
         }
 
         public override Task<RedisPollingMetrics> GetMetricsAsync()

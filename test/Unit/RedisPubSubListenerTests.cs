@@ -1,10 +1,7 @@
 ﻿using FakeItEasy;
 using Microsoft.Azure.WebJobs.Host.Executors;
-using Microsoft.WindowsAzure.Storage.Blob.Protocol;
 using StackExchange.Redis;
-using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
@@ -29,8 +26,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             RedisPubSubListener listener = new RedisPubSubListener(connectionString, RedisTriggerType.PubSub, trigger, A.Fake<ITriggeredFunctionExecutor>());
             listener.multiplexer = A.Fake<IConnectionMultiplexer>();
             await listener.StopAsync(new CancellationToken());
-            A.CallTo(() => listener.multiplexer.CloseAsync(A<bool>._)).MustHaveHappened();
-            A.CallTo(() => listener.multiplexer.DisposeAsync()).MustHaveHappened();
+            A.CallTo(() => listener.multiplexer.Close(A<bool>._)).MustHaveHappened();
+            A.CallTo(() => listener.multiplexer.Dispose()).MustHaveHappened();
         }
     }
 }
