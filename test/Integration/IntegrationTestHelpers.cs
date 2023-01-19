@@ -78,7 +78,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
                 if (counts.Values.Sum() == 0)
                 {
-                    functionExecuted.SetResult(true);
+                    functionExecuted.TrySetResult(true);
                 }
             };
         }
