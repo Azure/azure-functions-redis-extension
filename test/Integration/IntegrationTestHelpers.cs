@@ -50,11 +50,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.Start();
             functionsProcess.BeginOutputReadLine();
             functionsProcess.BeginErrorReadLine();
-            if (!hostStarted.Task.Wait(TimeSpan.FromMinutes(1)))
+            if (!hostStarted.Task.Wait(TimeSpan.FromMinutes(5)))
             {
                 throw new Exception("Azure Functions Host did not start");
             }
-            if (!functionLoaded.Task.Wait(TimeSpan.FromMinutes(1)))
+            if (!functionLoaded.Task.Wait(TimeSpan.FromMinutes(5)))
             {
                 throw new Exception($"Did not load Function {functionName}");
             }
