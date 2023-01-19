@@ -10,11 +10,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
 {
     public class RedisPollingListenerBaseTests
     {
-        private const string connectionString = "127.0.0.1:6379,abortConnect=false";
-        private const int defaultPollingInterval = 1000;
+        private const string connectionString = "127.0.0.1:6379";
+        private const int defaultPollingInterval = 100;
         private const int defaultMessagesPerWorker = 10;
         private const int defaultCount = 10;
-        private const string keys = "a b c d e f g";
+        private const string keys = "a";
 
         private static readonly RedisPollingMetrics[] increasingMetrics = new RedisPollingMetrics[] {
             new RedisPollingMetrics { Timestamp = DateTime.Now.AddSeconds(-9), Remaining = 10 },

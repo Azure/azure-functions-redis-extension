@@ -8,7 +8,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
 {
     public class RedisPubSubListenerTests
     {
-        private const string connectionString = "127.0.0.1:6379,abortConnect=false";
+        private const string connectionString = "127.0.0.1:6379";
         private const string trigger = "trigger";
 
         [Fact]
