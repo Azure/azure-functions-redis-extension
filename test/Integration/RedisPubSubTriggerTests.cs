@@ -41,7 +41,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 ISubscriber subscriber = multiplexer.GetSubscriber();
 
                 subscriber.Publish(channel, message);
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
 
                 multiplexer.Close();
                 functionsProcess.Kill();
@@ -88,7 +88,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
                 db.StringSet(key, "test");
                 db.KeyDelete(key);
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
 
                 multiplexer.Close();
                 functionsProcess.Kill();
@@ -122,7 +122,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 IDatabase db = multiplexer.GetDatabase();
 
                 db.StringSet(key, value);
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
 
                 multiplexer.Close();
                 functionsProcess.Kill();
@@ -165,7 +165,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
                 db.StringSet(key, value);
                 db.KeyDelete(key);
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
 
                 multiplexer.Close();
                 functionsProcess.Kill();

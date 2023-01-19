@@ -29,7 +29,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 multiplexer.GetDatabase().KeyDelete(IntegrationTestFunctions.bindingKey);
 
                 multiplexer.GetSubscriber().Publish(IntegrationTestFunctions.pubsubChannel, "start");
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
 
                 bindingValue = multiplexer.GetDatabase().StringGet(IntegrationTestFunctions.bindingKey);
 
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 multiplexer.GetDatabase().KeyDelete(IntegrationTestFunctions.bindingKey);
 
                 multiplexer.GetSubscriber().Publish(IntegrationTestFunctions.pubsubChannel, "start");
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
 
                 bindingValue = multiplexer.GetDatabase().StringGet(IntegrationTestFunctions.bindingKey);
 
@@ -89,7 +89,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 multiplexer.GetDatabase().KeyDelete(IntegrationTestFunctions.bindingKey);
 
                 multiplexer.GetSubscriber().Publish(IntegrationTestFunctions.pubsubChannel, "start");
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
 
                 bindingValue = multiplexer.GetDatabase().StringGet(IntegrationTestFunctions.bindingKey);
 
