@@ -68,19 +68,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         internal static DataReceivedEventHandler CounterHandlerCreator(Dictionary<string, int> counts, TaskCompletionSource<bool> functionExecuted)
         {
-            bool set = false;
             return (object sender, DataReceivedEventArgs e) =>
             {
                 foreach (string key in counts.Keys.ToList())
-                if (e.Data.Contains(key))
                 {
-                    counts[key] -= 1;
-                }
+                    if (e.Data.Contains(key))
+                    {
+                        counts[key] -= 1;
+                    }
 
-                if (!set && counts.Values.Sum() == 0)
-                {
-                    functionExecuted.SetResult(true);
-                    set = true;
+                    if (counts.Values.Sum() == 0)
+                    {
+                        try
+                        {
+                            functionExecuted.SetResult(true);
+                        }
+                        catch (Exception) { }
+                    }
                 }
             };
         }
