@@ -43,12 +43,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             IDatabase db = multiplexer.GetDatabase();
             bool triggered = false;
-            List<Task> functionExecutions = new List<Task>();
             if (version >= new Version("7.0"))
             {
                 var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, batchSize) : await db.ListRightPopAsync(keys, batchSize);
                 triggered = result.Values.Length > 0;
-                foreach (RedisValue value in result.Values)
+                foreach(RedisValue value in result.Values)
                 {
                     RedisMessageModel triggerValue = new RedisMessageModel
                     {
@@ -56,14 +55,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                         Trigger = result.Key,
                         Message = value
                     };
-                    functionExecutions.Add(executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken));
-                }
+                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                };
             }
             else if (version >= new Version("6.2"))
             {
                 var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], batchSize) : await db.ListRightPopAsync(keys[0], batchSize);
                 triggered = result.Length > 0;
-                foreach (RedisValue value in result)
+                foreach(RedisValue value in result)
                 {
                     RedisMessageModel triggerValue = new RedisMessageModel
                     {
@@ -71,8 +70,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                         Trigger = keys[0],
                         Message = value
                     };
-                    functionExecutions.Add(executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken));
-                }
+                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                };
             }
             else
             {
@@ -89,7 +88,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }
             }
-            Task.WhenAll(functionExecutions).Wait();
             return !triggered;
         }
 

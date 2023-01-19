@@ -30,11 +30,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             IDatabase db = multiplexer.GetDatabase();
             RedisStream[] streams = await db.StreamReadAsync(positions, batchSize);
 
-            Parallel.For(0, streams.Length, async i =>
+            for (int i = 0; i < streams.Length; i++)
             {
                 if (streams[i].Entries.Length > 0)
                 {
-                    Parallel.ForEach(streams[i].Entries, async entry =>
+                    foreach (StreamEntry entry in streams[i].Entries)
                     {
                         var triggerValue = new RedisMessageModel
                         {
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                         };
 
                         await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
-                    });
+                    };
                     
                     if (deleteAfterProcess)
                     {
@@ -55,7 +55,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                         positions[i] = new StreamPosition(streams[i].Key, streams[i].Entries.Last().Id);
                     }
                 }
-            });
+            };
             return streams.Sum(stream => stream.Entries.Length) == batchSize;
         }
 

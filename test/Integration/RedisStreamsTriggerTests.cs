@@ -43,7 +43,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
                 }
 
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
 
                 multiplexer.Close();
                 functionsProcess.Kill();
