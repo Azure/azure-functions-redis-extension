@@ -74,12 +74,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 if (e.Data.Contains(key))
                 {
                     counts[key] -= 1;
+                    if (counts.Values.Sum() == 0)
+                    {
+                        functionExecuted.SetResult(true);
+                    }
                 }
 
-                if (counts.Values.Sum() == 0)
-                {
-                    functionExecuted.TrySetResult(true);
-                }
             };
         }
 
