@@ -30,7 +30,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             TaskCompletionSource<bool> hostStarted = new TaskCompletionSource<bool>();
             void hostStartupHandler(object sender, DataReceivedEventArgs e)
             {
-                if (e.Data.Contains($"Host started"))
+                if (e.Data?.Contains($"Host started") ?? false)
                 {
                     hostStarted.SetResult(true);
                 }
@@ -40,23 +40,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             TaskCompletionSource<bool> functionLoaded = new TaskCompletionSource<bool>();
             void functionLoadedHandler(object sender, DataReceivedEventArgs e)
             {
-                if (e.Data.Contains($"Generating 1 job function(s)"))
+                if (e.Data?.Contains($"Generating 1 job function(s)") ?? false)
                 {
                     functionLoaded.SetResult(true);
                 }
             }
             functionsProcess.OutputDataReceived += functionLoadedHandler;
 
-
-
             functionsProcess.Start();
             functionsProcess.BeginOutputReadLine();
             functionsProcess.BeginErrorReadLine();
-            if (!hostStarted.Task.Wait(TimeSpan.FromSeconds(60)))
+            if (!hostStarted.Task.Wait(TimeSpan.FromMinutes(1)))
             {
                 throw new Exception("Azure Functions Host did not start");
             }
-            if (!functionLoaded.Task.Wait(TimeSpan.FromSeconds(60)))
+            if (!functionLoaded.Task.Wait(TimeSpan.FromMinutes(1)))
             {
                 throw new Exception($"Did not load Function {functionName}");
             }
@@ -72,7 +70,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 foreach (string key in counts.Keys.ToList())
                 {
-                    if (e is not null && e.Data is not null && e.Data.Contains(key))
+                    if (e.Data?.Contains(key) ?? false)
                     {
                         counts[key] -= 1;
                     }
