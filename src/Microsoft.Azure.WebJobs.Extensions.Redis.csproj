@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.33" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.70" />
     <InternalsVisibleTo Include="Microsoft.Azure.WebJobs.Extensions.Redis.Tests" />
   </ItemGroup>
