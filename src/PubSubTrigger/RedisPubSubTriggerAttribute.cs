@@ -20,7 +20,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// The type of notification that the function will trigger on.
         /// </summary>
-        public RedisTriggerType TriggerType { get; set; } = RedisTriggerType.PubSub;
+        [AutoResolve]
+        public string TriggerType { get; set; } = "PubSub";
 
         /// <summary>
         /// The key, event, pubsub channel, or stream that the function will trigger on.
