@@ -11,7 +11,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for managing connections and listening to a given Azure Redis Cache.
     /// </summary>
-    internal sealed class RedisListener : IListener
+    internal sealed class RedisPubSubListener : IListener
     {
         internal const string KEYSPACE_TEMPLATE = "__keyspace@*__:{0}";
         internal const string KEYEVENT_TEMPLATE = "__keyevent@*__:{0}";
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal RedisTriggerType triggerType;
         internal IConnectionMultiplexer multiplexer;
 
-        public RedisListener(string connectionString, RedisTriggerType triggerType, string trigger, ITriggeredFunctionExecutor executor)
+        public RedisPubSubListener(string connectionString, RedisTriggerType triggerType, string trigger, ITriggeredFunctionExecutor executor)
         {
             this.connectionString = connectionString;
             this.triggerType = triggerType;
@@ -35,29 +35,29 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            multiplexer = InitializeConnectionMultiplexer(connectionString);
-            if (multiplexer.IsConnected)
+            if (multiplexer is null)
             {
-                switch (triggerType)
-                {
-                    case RedisTriggerType.KeySpace: 
-                        EnableKeySpace(multiplexer, cancellationToken);
-                        break;
-                    case RedisTriggerType.KeyEvent: 
-                        EnableKeyEvent(multiplexer, cancellationToken);
-                        break;
-                    case RedisTriggerType.PubSub:
-                        EnablePubSub(multiplexer, cancellationToken);
-                        break;
-                    case RedisTriggerType.Stream:
-                        throw new NotImplementedException("Stream triggers are not implemented yet.");
-                    default: 
-                        break;
-                }
+                multiplexer = InitializeConnectionMultiplexer(connectionString);
             }
-            else
+
+            if (!multiplexer.IsConnected)
             {
                 throw new ArgumentException("Failed to connect to cache.");
+            }
+
+            switch (triggerType)
+            {
+                case RedisTriggerType.PubSub:
+                    EnablePubSub(multiplexer, cancellationToken);
+                    break;
+                case RedisTriggerType.KeySpace:
+                    EnableKeySpace(multiplexer, cancellationToken);
+                    break;
+                case RedisTriggerType.KeyEvent:
+                    EnableKeyEvent(multiplexer, cancellationToken);
+                    break;
+                default:
+                    throw new ArgumentException("RedisPubSubTrigger only supportsPubSub, KeySpace, and KeyEvent trigger types.");
             }
             return Task.CompletedTask;
         }

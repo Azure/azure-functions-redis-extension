@@ -27,9 +27,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
 #pragma warning disable CS0618
-            FluentBindingRule<RedisTriggerAttribute> rule = context.AddBindingRule<RedisTriggerAttribute>();
+            FluentBindingRule<RedisPubSubTriggerAttribute> rule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
 #pragma warning restore CS0618
-            rule.BindToTrigger<RedisMessageModel>(new RedisTriggerBindingProvider(configuration));
+            rule.BindToTrigger<RedisMessageModel>(new RedisPubSubTriggerBindingProvider(configuration));
             rule.AddConverter<RedisMessageModel, string>(args => JsonSerializer.Serialize(args));
         }
     }

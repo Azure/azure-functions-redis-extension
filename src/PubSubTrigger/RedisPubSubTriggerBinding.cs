@@ -11,13 +11,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Trigger Binding, manages and binds context to listener.
     /// </summary>
-    internal class RedisTriggerBinding : ITriggerBinding
+    internal class RedisPubSubTriggerBinding : ITriggerBinding
     {
         private readonly string connectionString;
         private readonly RedisTriggerType triggerType;
         private readonly string trigger;
 
-        public RedisTriggerBinding(string connectionString, RedisTriggerType triggerType, string trigger) 
+        public RedisPubSubTriggerBinding(string connectionString, RedisTriggerType triggerType, string trigger) 
         {
             this.connectionString = connectionString;
             this.triggerType = triggerType;
@@ -41,7 +41,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException("context");
             }
 
-            return Task.FromResult<IListener>(new RedisListener(connectionString, triggerType, trigger, context.Executor));
+            return Task.FromResult<IListener>(new RedisPubSubListener(connectionString, triggerType, trigger, context.Executor));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

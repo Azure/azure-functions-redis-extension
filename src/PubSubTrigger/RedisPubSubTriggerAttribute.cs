@@ -9,7 +9,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Trigger binding attributes
     /// </summary>
-    public class RedisTriggerAttribute : Attribute
+    public class RedisPubSubTriggerAttribute : Attribute
     {
         /// <summary>
         /// Cache connection string.
@@ -27,16 +27,5 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         [AutoResolve]
         public string Trigger { get; set; }
-    }
-
-    /// <summary>
-    /// The different types of notifications that the function will trigger on.
-    /// </summary>
-    public enum RedisTriggerType
-    {
-        KeySpace,
-        KeyEvent,
-        PubSub,
-        Stream
     }
 }

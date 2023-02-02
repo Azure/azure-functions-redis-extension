@@ -9,11 +9,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Provides trigger binding, variables configured in local.settings.json are being retrieved here.
     /// </summary>
-    internal class RedisTriggerBindingProvider : ITriggerBindingProvider
+    internal class RedisPubSubTriggerBindingProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration configuration;
 
-        public RedisTriggerBindingProvider(IConfiguration configuration)
+        public RedisPubSubTriggerBindingProvider(IConfiguration configuration)
         {
             this.configuration = configuration;
         }
@@ -26,7 +26,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             
             ParameterInfo parameter = context.Parameter;
-            RedisTriggerAttribute attribute = parameter.GetCustomAttribute<RedisTriggerAttribute>(inherit: false); 
+            RedisPubSubTriggerAttribute attribute = parameter.GetCustomAttribute<RedisPubSubTriggerAttribute>(inherit: false);
 
             if (attribute == null)
             {
@@ -37,13 +37,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             RedisTriggerType triggerType = attribute.TriggerType;
             string trigger = ResolveTrigger(attribute);
 
-            return Task.FromResult<ITriggerBinding>(new RedisTriggerBinding(connectionString, triggerType, trigger));
+            return Task.FromResult<ITriggerBinding>(new RedisPubSubTriggerBinding(connectionString, triggerType, trigger));
         }
 
         /// <summary>
         /// Resolves connection string from 'CacheConnection' trigger input parameter.
         /// </summary>
-        public string ResolveConnectionString(RedisTriggerAttribute attributeContext) 
+        public string ResolveConnectionString(RedisPubSubTriggerAttribute attributeContext)
         {
             return ResolveString(attributeContext.ConnectionString, nameof(attributeContext.ConnectionString));
         }
@@ -51,7 +51,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Resolves channel name from 'ChannelName' trigger input parameter.
         /// </summary>
-        public string ResolveTrigger(RedisTriggerAttribute attributeContext) 
+        public string ResolveTrigger(RedisPubSubTriggerAttribute attributeContext) 
         {
             return ResolveString(attributeContext.Trigger, nameof(attributeContext.Trigger));
         }
