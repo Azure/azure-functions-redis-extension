@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json;
 using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Configuration;
@@ -30,7 +29,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             FluentBindingRule<RedisPubSubTriggerAttribute> rule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
 #pragma warning restore CS0618
             rule.BindToTrigger<RedisMessageModel>(new RedisPubSubTriggerBindingProvider(configuration));
-            rule.AddConverter<RedisMessageModel, string>(args => JsonSerializer.Serialize(args));
         }
     }
 }
