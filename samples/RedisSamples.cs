@@ -30,5 +30,37 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
+
+        [FunctionName(nameof(StreamsTrigger))]
+        public static void StreamsTrigger(
+            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest", PollingInterval = "1000")] RedisMessageModel model,
+            ILogger logger)
+        {
+            logger.LogInformation(JsonSerializer.Serialize(model));
+        }
+
+        [FunctionName(nameof(StreamsMultipleTriggers))]
+        public static void StreamsMultipleTriggers(
+            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest1 streamTest2")] RedisMessageModel model,
+            ILogger logger)
+        {
+            logger.LogInformation(JsonSerializer.Serialize(model));
+        }
+
+        [FunctionName(nameof(ListsTrigger))]
+        public static void ListsTrigger(
+            [RedisListsTrigger(ConnectionString = localhost, Keys = "listTest")] RedisMessageModel model,
+            ILogger logger)
+        {
+            logger.LogInformation(JsonSerializer.Serialize(model));
+        }
+
+        [FunctionName(nameof(ListsMultipleTrigger))]
+        public static void ListsMultipleTrigger(
+            [RedisListsTrigger(ConnectionString = localhost, Keys = "listTest1 listTest2")] RedisMessageModel model,
+            ILogger logger)
+        {
+            logger.LogInformation(JsonSerializer.Serialize(model));
+        }
     }
 }
