@@ -33,11 +33,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Executes enabled functions, primary listener method.
         /// </summary>
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             if (multiplexer is null)
             {
-                multiplexer = InitializeConnectionMultiplexer(connectionString);
+                multiplexer = await InitializeConnectionMultiplexerAsync(connectionString);
             }
 
             if (!multiplexer.IsConnected)
@@ -59,36 +59,35 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 default:
                     throw new ArgumentException("RedisPubSubTrigger only supportsPubSub, KeySpace, and KeyEvent trigger types.");
             }
-            return Task.CompletedTask;
+            return;
         }
 
         /// <summary>
         /// Triggers disconnect from cache when cancellation token is invoked.
         /// </summary>
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            CloseMultiplexer(multiplexer);
-            return Task.CompletedTask;
+            await CloseMultiplexerAsync(multiplexer);
         }
 
-        public void Cancel()
+        public async void Cancel()
         {
-            CloseMultiplexer(multiplexer);
+            await CloseMultiplexerAsync(multiplexer);
         }
 
-        public void Dispose()
+        public async void Dispose()
         {
-            CloseMultiplexer(multiplexer);
+            await CloseMultiplexerAsync(multiplexer);
         }
 
         /// <summary>
         /// Creates redis cache multiplexer connection.
         /// </summary>
-        private static IConnectionMultiplexer InitializeConnectionMultiplexer(string connectionString)
+        private static async Task<IConnectionMultiplexer> InitializeConnectionMultiplexerAsync(string connectionString)
         {
             try
             {
-                return ConnectionMultiplexer.Connect(connectionString);
+                return await ConnectionMultiplexer.ConnectAsync(connectionString);
             }
             catch (Exception)
             {
@@ -100,12 +99,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Closes redis cache multiplexer connection.
         /// </summary>
-        internal void CloseMultiplexer(IConnectionMultiplexer existingMultiplexer)
+        internal async Task CloseMultiplexerAsync(IConnectionMultiplexer existingMultiplexer)
         {
             try
             {
-                existingMultiplexer.Close();
-                existingMultiplexer.Dispose();
+                await existingMultiplexer.CloseAsync();
+                await existingMultiplexer.DisposeAsync();
             }
             catch (Exception)
             {

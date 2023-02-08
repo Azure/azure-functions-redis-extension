@@ -7,7 +7,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 
     /// <summary>
-    /// Trigger binding attributes
+    /// Trigger binding attributes.
     /// </summary>
     public class RedisPubSubTriggerAttribute : Attribute
     {
@@ -23,7 +23,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public RedisTriggerType TriggerType { get; set; } = RedisTriggerType.PubSub;
 
         /// <summary>
-        /// The key, event, pubsub channel, or stream that the function will trigger on.
+        /// The pubsub channel, key, or event that the function will trigger on.
         /// </summary>
         [AutoResolve]
         public string Trigger { get; set; }
