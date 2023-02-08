@@ -113,7 +113,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         /// <summary>
-        /// Process message from channel by building a RedisMessageModel & triggering the function.
+        /// Process message from channel by building a RedisMessageModel and triggering the function.
         /// </summary>
         internal async Task ProcessMessageAsync(RedisTriggerType triggerType, string trigger, string message, CancellationToken cancellationtoken)
         {
