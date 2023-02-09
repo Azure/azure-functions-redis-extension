@@ -16,7 +16,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public void Constructor_NullContext_ThrowsException()
         {
-            RedisTriggerBindingProvider bindingProvider = new RedisTriggerBindingProvider(testConfig);
+            RedisPubSubTriggerBindingProvider bindingProvider = new RedisPubSubTriggerBindingProvider(testConfig);
             //var expectedException = Record.ExceptionAsync(() => bindingProvider.TryCreateAsync(null));
             Assert.ThrowsAsync<ArgumentNullException>(() => bindingProvider.TryCreateAsync(null));
             //Assert.IsType<ArgumentNullException>(expectedException);
@@ -28,8 +28,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData("testCacheConnectionString", "testCacheConnectionString")]
         public void ResolveConnectionString_ValidConnectionString_ReturnsResolvedConnectionString(string cacheConnectionString, string expectedResult)
         {
-            RedisTriggerBindingProvider triggerProvider = new RedisTriggerBindingProvider(testConfig);
-            RedisTriggerAttribute unresolvedRedisTriggerAttribute = new RedisTriggerAttribute
+            RedisPubSubTriggerBindingProvider triggerProvider = new RedisPubSubTriggerBindingProvider(testConfig);
+            RedisPubSubTriggerAttribute unresolvedRedisTriggerAttribute = new RedisPubSubTriggerAttribute
             {
                 ConnectionString = cacheConnectionString
             };
@@ -42,8 +42,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public void ResolveConnectionString_InvalidConnectionStringKey_ThrowsArgumentException()
         {
-            RedisTriggerBindingProvider triggerProvider = new RedisTriggerBindingProvider(testConfig);
-            RedisTriggerAttribute unresolvedRedisTriggerAttribute = new RedisTriggerAttribute
+            RedisPubSubTriggerBindingProvider triggerProvider = new RedisPubSubTriggerBindingProvider(testConfig);
+            RedisPubSubTriggerAttribute unresolvedRedisTriggerAttribute = new RedisPubSubTriggerAttribute
             {
                 ConnectionString = "%invalidConnectionStringKey%"
             };
@@ -57,8 +57,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public void ResolveConnectionString_EmptyConnectionString_ThrowsArgumentNullException()
         {
-            RedisTriggerBindingProvider triggerProvider = new RedisTriggerBindingProvider(testConfig);
-            RedisTriggerAttribute unresolvedRedisTriggerAttribute = new RedisTriggerAttribute
+            RedisPubSubTriggerBindingProvider triggerProvider = new RedisPubSubTriggerBindingProvider(testConfig);
+            RedisPubSubTriggerAttribute unresolvedRedisTriggerAttribute = new RedisPubSubTriggerAttribute
             {
                 ConnectionString = ""
             };
@@ -74,8 +74,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData("testChannelName", "testChannelName")]
         public void ResolveTrigger_ValidTrigger_ReturnsResolvedTrigger(string channelName, string expectedResult)
         {
-            RedisTriggerBindingProvider triggerProvider = new RedisTriggerBindingProvider(testConfig);
-            RedisTriggerAttribute unresolvedRedisTriggerAttribute = new RedisTriggerAttribute
+            RedisPubSubTriggerBindingProvider triggerProvider = new RedisPubSubTriggerBindingProvider(testConfig);
+            RedisPubSubTriggerAttribute unresolvedRedisTriggerAttribute = new RedisPubSubTriggerAttribute
             {
                 Trigger = channelName
             };
@@ -88,8 +88,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public void ResolveTrigger_InvalidTrigger_ThrowsArgumentException()
         {
-            RedisTriggerBindingProvider triggerProvider = new RedisTriggerBindingProvider(testConfig);
-            RedisTriggerAttribute unresolvedRedisTriggerAttribute = new RedisTriggerAttribute
+            RedisPubSubTriggerBindingProvider triggerProvider = new RedisPubSubTriggerBindingProvider(testConfig);
+            RedisPubSubTriggerAttribute unresolvedRedisTriggerAttribute = new RedisPubSubTriggerAttribute
             {
                 Trigger = "%invalidChannelNameKey%"
             };
@@ -103,8 +103,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public void ResolveTrigger_EmptyTrigger_ThrowsArgumentNullException()
         {
-            RedisTriggerBindingProvider triggerProvider = new RedisTriggerBindingProvider(testConfig);
-            RedisTriggerAttribute unresolvedRedisTriggerAttribute = new RedisTriggerAttribute
+            RedisPubSubTriggerBindingProvider triggerProvider = new RedisPubSubTriggerBindingProvider(testConfig);
+            RedisPubSubTriggerAttribute unresolvedRedisTriggerAttribute = new RedisPubSubTriggerAttribute
             {
                 Trigger = ""
             };

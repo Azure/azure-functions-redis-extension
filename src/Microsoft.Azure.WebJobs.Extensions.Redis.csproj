@@ -8,7 +8,8 @@
     <Description>Azure redis cache extension for azure functions.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Azure, Azure Redis Cache, Redis, Redis Cache, Azure Redis Cache Extension, Azure Functions</PackageTags>
-    <RepositoryUrl>https://github.com/microsoft/Azure-functions-AzureRedisCache-Extension</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Azure/azure-functions-redis-extension</RepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyVersion></AssemblyVersion>
   </PropertyGroup>

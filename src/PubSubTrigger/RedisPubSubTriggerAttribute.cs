@@ -3,13 +3,12 @@ using Microsoft.Azure.WebJobs.Description;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
+    /// <summary>
+    /// Triggers on a PubSub channel, keyspace notification, or keyevent notification.
+    /// </summary>
     [Binding]
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
-
-    /// <summary>
-    /// Trigger binding attributes
-    /// </summary>
-    public class RedisTriggerAttribute : Attribute
+    public class RedisPubSubTriggerAttribute : Attribute
     {
         /// <summary>
         /// Cache connection string.
@@ -23,20 +22,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public RedisTriggerType TriggerType { get; set; } = RedisTriggerType.PubSub;
 
         /// <summary>
-        /// The key, event, pubsub channel, or stream that the function will trigger on.
+        /// The pubsub channel, key, or event that the function will trigger on.
         /// </summary>
         [AutoResolve]
         public string Trigger { get; set; }
-    }
-
-    /// <summary>
-    /// The different types of notifications that the function will trigger on.
-    /// </summary>
-    public enum RedisTriggerType
-    {
-        KeySpace,
-        KeyEvent,
-        PubSub,
-        Stream
     }
 }
