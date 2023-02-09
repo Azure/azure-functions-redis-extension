@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Xunit;
 using FakeItEasy;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +13,5 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             RedisPubSubTriggerBindingProvider bindingProvider = new RedisPubSubTriggerBindingProvider(A.Fake<IConfiguration>());
             Assert.ThrowsAsync<ArgumentNullException>(() => bindingProvider.TryCreateAsync(null));
         }
-
     }
 }

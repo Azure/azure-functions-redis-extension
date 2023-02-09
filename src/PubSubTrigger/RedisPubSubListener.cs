@@ -9,7 +9,7 @@ using StackExchange.Redis;
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// Responsible for managing connections and listening to a given Azure Redis Cache.
+    /// Responsible for managing connections and listening to a given Redis instance.
     /// </summary>
     internal sealed class RedisPubSubListener : IListener
     {
@@ -33,11 +33,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Executes enabled functions, primary listener method.
         /// </summary>
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             if (multiplexer is null)
             {
-                multiplexer = InitializeConnectionMultiplexer(connectionString);
+                multiplexer = await InitializeConnectionMultiplexerAsync(connectionString);
             }
 
             if (!multiplexer.IsConnected)
@@ -48,47 +48,46 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             switch (triggerType)
             {
                 case RedisTriggerType.PubSub:
-                    EnablePubSub(multiplexer, cancellationToken);
+                    await EnablePubSubAsync(multiplexer, cancellationToken);
                     break;
                 case RedisTriggerType.KeySpace:
-                    EnableKeySpace(multiplexer, cancellationToken);
+                    await EnableKeySpaceAsync(multiplexer, cancellationToken);
                     break;
                 case RedisTriggerType.KeyEvent:
-                    EnableKeyEvent(multiplexer, cancellationToken);
+                    await EnableKeyEventAsync(multiplexer, cancellationToken);
                     break;
                 default:
-                    throw new ArgumentException("RedisPubSubTrigger only supportsPubSub, KeySpace, and KeyEvent trigger types.");
+                    throw new ArgumentException("RedisPubSubTrigger only supports PubSub, KeySpace, and KeyEvent trigger types.");
             }
-            return Task.CompletedTask;
+            return;
         }
 
         /// <summary>
         /// Triggers disconnect from cache when cancellation token is invoked.
         /// </summary>
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            CloseMultiplexer(multiplexer);
-            return Task.CompletedTask;
+            await CloseMultiplexerAsync(multiplexer);
         }
 
-        public void Cancel()
+        public async void Cancel()
         {
-            CloseMultiplexer(multiplexer);
+            await CloseMultiplexerAsync(multiplexer);
         }
 
-        public void Dispose()
+        public async void Dispose()
         {
-            CloseMultiplexer(multiplexer);
+            await CloseMultiplexerAsync(multiplexer);
         }
 
         /// <summary>
         /// Creates redis cache multiplexer connection.
         /// </summary>
-        private static IConnectionMultiplexer InitializeConnectionMultiplexer(string connectionString)
+        private static async Task<IConnectionMultiplexer> InitializeConnectionMultiplexerAsync(string connectionString)
         {
             try
             {
-                return ConnectionMultiplexer.Connect(connectionString);
+                return await ConnectionMultiplexer.ConnectAsync(connectionString);
             }
             catch (Exception)
             {
@@ -100,12 +99,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Closes redis cache multiplexer connection.
         /// </summary>
-        internal void CloseMultiplexer(IConnectionMultiplexer existingMultiplexer)
+        internal async Task CloseMultiplexerAsync(IConnectionMultiplexer existingMultiplexer)
         {
             try
             {
-                existingMultiplexer.Close();
-                existingMultiplexer.Dispose();
+                await existingMultiplexer.CloseAsync();
+                await existingMultiplexer.DisposeAsync();
             }
             catch (Exception)
             {
@@ -114,7 +113,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         /// <summary>
-        /// Process message from channel by building a RedisMessageModel & triggering the function.
+        /// Process message from channel by building a RedisMessageModel and triggering the function.
         /// </summary>
         internal async Task ProcessMessageAsync(RedisTriggerType triggerType, string trigger, string message, CancellationToken cancellationtoken)
         {
@@ -131,22 +130,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Subscribes to keyspace notification channel.
         /// </summary>
-        internal void EnableKeySpace(IConnectionMultiplexer multiplexer, CancellationToken cancellationToken)
+        internal async Task EnableKeySpaceAsync(IConnectionMultiplexer multiplexer, CancellationToken cancellationToken)
         {
-            multiplexer.GetSubscriber().Subscribe(String.Format(KEYSPACE_TEMPLATE, trigger)).OnMessage(async (msg) =>
+            ChannelMessageQueue channel = await multiplexer.GetSubscriber().SubscribeAsync(String.Format(KEYSPACE_TEMPLATE, trigger));
+            channel.OnMessage(async (msg) =>
             {
                 string rawChannel = msg.Channel;
-                string keyspace = rawChannel.Substring(rawChannel.IndexOf(':') + 1);
-                await ProcessMessageAsync(triggerType, keyspace, msg.Message, cancellationToken);
+                string key = rawChannel.Substring(rawChannel.IndexOf(':') + 1);
+                await ProcessMessageAsync(triggerType, key, msg.Message, cancellationToken);
             });
         }
 
         /// <summary>
         /// Subscribes to keyevent notification channel.
         /// </summary>
-        internal void EnableKeyEvent(IConnectionMultiplexer multiplexer, CancellationToken cancellationToken)
+        internal async Task EnableKeyEventAsync(IConnectionMultiplexer multiplexer, CancellationToken cancellationToken)
         {
-            multiplexer.GetSubscriber().Subscribe(String.Format(KEYEVENT_TEMPLATE, trigger)).OnMessage(async (msg) =>
+            ChannelMessageQueue channel = await multiplexer.GetSubscriber().SubscribeAsync(String.Format(KEYEVENT_TEMPLATE, trigger));
+            channel.OnMessage(async (msg) =>
             {
                 string rawChannel = msg.Channel;
                 string keyevent = rawChannel.Substring(rawChannel.IndexOf(':') + 1);
@@ -157,9 +158,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Subscribes to pubsub channel.
         /// </summary>
-        internal void EnablePubSub(IConnectionMultiplexer multiplexer, CancellationToken cancellationToken)
+        internal async Task EnablePubSubAsync(IConnectionMultiplexer multiplexer, CancellationToken cancellationToken)
         {
-            multiplexer.GetSubscriber().Subscribe(trigger).OnMessage(async (msg) =>
+            ChannelMessageQueue channel = await multiplexer.GetSubscriber().SubscribeAsync(trigger);
+            channel.OnMessage(async (msg) =>
             {
                 await ProcessMessageAsync(triggerType, msg.Channel, msg.Message, cancellationToken);
             });
