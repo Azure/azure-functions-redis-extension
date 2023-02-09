@@ -57,7 +57,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     await EnableKeyEventAsync(multiplexer, cancellationToken);
                     break;
                 default:
-                    throw new ArgumentException("RedisPubSubTrigger only supportsPubSub, KeySpace, and KeyEvent trigger types.");
+                    throw new ArgumentException("RedisPubSubTrigger only supports PubSub, KeySpace, and KeyEvent trigger types.");
             }
             return;
         }
