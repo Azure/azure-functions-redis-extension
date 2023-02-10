@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RepositoryUrl>https://github.com/Azure/azure-functions-redis-extension</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
