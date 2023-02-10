@@ -3,7 +3,6 @@ using Microsoft.Azure.WebJobs.Description;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-
     /// <summary>
     /// Triggers on a PubSub channel, keyspace notification, or keyevent notification.
     /// </summary>
@@ -18,15 +17,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public string ConnectionString { get; set; }
 
         /// <summary>
-        /// The type of notification that the function will trigger on.
+        /// The channel that the trigger will listen to.
         /// </summary>
         [AutoResolve]
-        public string TriggerType { get; set; } = "PubSub";
-
-        /// <summary>
-        /// The pubsub channel, key, or event that the function will trigger on.
-        /// </summary>
-        [AutoResolve]
-        public string Trigger { get; set; }
+        public string Channel { get; set; }
     }
 }

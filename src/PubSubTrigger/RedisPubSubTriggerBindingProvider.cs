@@ -34,10 +34,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             string connectionString = RedisUtilities.ResolveString(configuration, attribute.ConnectionString, "ConnectionString");
-            RedisTriggerType triggerType = RedisUtilities.ResolveTriggerType(configuration, attribute.TriggerType, "TriggerType");
-            string trigger = RedisUtilities.ResolveString(configuration, attribute.Trigger, "Trigger");
+            string channel = RedisUtilities.ResolveString(configuration, attribute.Channel, "Channel");
 
-            return Task.FromResult<ITriggerBinding>(new RedisPubSubTriggerBinding(connectionString, triggerType, trigger));
+            return Task.FromResult<ITriggerBinding>(new RedisPubSubTriggerBinding(connectionString, channel));
         }
     }
 }

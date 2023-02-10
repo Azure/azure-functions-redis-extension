@@ -23,7 +23,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             bool success = false;
             RedisMessageModel expectedReturn = new RedisMessageModel
             {
-                TriggerType = RedisTriggerType.PubSub,
                 Trigger = channel,
                 Message = message
             };
@@ -50,26 +49,25 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_SingleKey), IntegrationTestFunctions.keyspaceKey)]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_MultipleKeys), IntegrationTestFunctions.keyspaceKey)]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_MultipleKeys), IntegrationTestFunctions.keyspaceKey + "suffix")]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceKey)]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceKey + "suffix")]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), "prefix" + IntegrationTestFunctions.keyspaceKey)]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_SingleKey), IntegrationTestFunctions.keyspaceChannel)]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_MultipleKeys), IntegrationTestFunctions.keyspaceChannel)]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_MultipleKeys), IntegrationTestFunctions.keyspaceChannel + "suffix")]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceChannel)]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceChannel + "suffix")]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), "prefix" + IntegrationTestFunctions.keyspaceChannel)]
         [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), "separate")]
-        public void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string key)
+        public void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string channel)
         {
+            string key = channel.Replace("__keyspace@0__:", "");
             bool success = false;
             RedisMessageModel expectedSetReturn = new RedisMessageModel
             {
-                TriggerType = RedisTriggerType.KeySpace,
-                Trigger = key,
+                Trigger = channel,
                 Message = "set"
             };
             RedisMessageModel expectedDelReturn = new RedisMessageModel
             {
-                TriggerType = RedisTriggerType.KeySpace,
-                Trigger = key,
+                Trigger = channel,
                 Message = "del"
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
@@ -104,8 +102,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             string value = "value";
             RedisMessageModel expectedReturn = new RedisMessageModel
             {
-                TriggerType = RedisTriggerType.KeyEvent,
-                Trigger = IntegrationTestFunctions.keyeventEvent,
+                Trigger = IntegrationTestFunctions.keyeventChannel,
                 Message = key
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
@@ -138,13 +135,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             string value = "value";
             RedisMessageModel expectedSetReturn = new RedisMessageModel
             {
-                TriggerType = RedisTriggerType.KeyEvent,
                 Trigger = "set",
                 Message = key
             };
             RedisMessageModel expectedDelReturn = new RedisMessageModel
             {
-                TriggerType = RedisTriggerType.KeyEvent,
                 Trigger = "del",
                 Message = key
             };

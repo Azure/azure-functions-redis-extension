@@ -1,7 +1,7 @@
-﻿using Xunit;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
+using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
 {
@@ -40,33 +40,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         public void ResolveString_EmptyString_ThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => RedisUtilities.ResolveString(testConfig, "", ""));
-        }
-
-        [Theory]
-        [InlineData("%pubsubkey%", RedisTriggerType.PubSub)]
-        [InlineData("%keyspacekey%", RedisTriggerType.KeySpace)]
-        [InlineData("%keyeventkey%", RedisTriggerType.KeyEvent)]
-        public void ResolveTriggerType_ValidTriggerType_ReturnsResolvedTriggerType(string cacheString, RedisTriggerType expectedResult)
-        {
-            Assert.Equal(expectedResult, RedisUtilities.ResolveTriggerType(testConfig, cacheString, ""));
-        }
-
-        [Fact]
-        public void ResolveTriggerType_InvalidKey_ThrowsArgumentException()
-        {
-            Assert.Throws<ArgumentException>(() => RedisUtilities.ResolveTriggerType(testConfig, "%invalidStringKey%", ""));
-        }
-
-        [Fact]
-        public void ResolveTriggerType_InvalidTriggerType_ThrowsInvalidCastException()
-        {
-            Assert.Throws<InvalidCastException>(() => RedisUtilities.ResolveTriggerType(testConfig, "%randomKey%", ""));
-        }
-
-        [Fact]
-        public void ResolveTriggerType_EmptyTriggerType_ThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => RedisUtilities.ResolveTriggerType(testConfig, "", ""));
         }
 
         [Theory]

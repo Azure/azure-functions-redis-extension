@@ -5,15 +5,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal static class RedisUtilities
     {
-        public static RedisTriggerType ResolveTriggerType(IConfiguration configuration, string toResolve, string error)
-        {
-            if (Enum.TryParse<RedisTriggerType>(ResolveString(configuration, toResolve, error), out RedisTriggerType result))
-            {
-                return result;
-            }
-            throw new InvalidCastException($"Invalid {error} - key exists in config but not a RedisTriggerType");
-        }
-
         public static bool ResolveBool(IConfiguration configuration, string toResolve, string error)
         {
             if (bool.TryParse(ResolveString(configuration, toResolve, error), out bool result))
