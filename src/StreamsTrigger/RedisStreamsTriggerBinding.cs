@@ -19,15 +19,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly int messagesPerWorker;
         private readonly string keys;
         private readonly int count;
+        private readonly string consumerGroup;
         private readonly bool deleteAfterProcess;
 
-        public RedisStreamsTriggerBinding(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int count, bool deleteAfterProcess)
+        public RedisStreamsTriggerBinding(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int count, string consumerGroup, bool deleteAfterProcess)
         {
             this.connectionString = connectionString;
             this.pollingInterval = pollingInterval;
             this.messagesPerWorker = messagesPerWorker;
             this.keys = keys;
             this.count = count;
+            this.consumerGroup = consumerGroup;
             this.deleteAfterProcess = deleteAfterProcess;
         }
 
@@ -48,7 +50,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException("context");
             }
 
-            return Task.FromResult<IListener>(new RedisStreamsListener(connectionString, pollingInterval, messagesPerWorker, keys, count, deleteAfterProcess, context.Executor));
+            return Task.FromResult<IListener>(new RedisStreamsListener(connectionString, pollingInterval, messagesPerWorker, keys, count, consumerGroup, deleteAfterProcess, context.Executor));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

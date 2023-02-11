@@ -75,8 +75,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             RedisPollingListenerBase listener = new RedisListsListener(connectionString, defaultPollingInterval, defaultMessagesPerWorker, keys, defaultCount, false, A.Fake<ITriggeredFunctionExecutor>());
             listener.multiplexer = A.Fake<IConnectionMultiplexer>();
             await listener.StopAsync(new CancellationToken());
-            A.CallTo(() => listener.multiplexer.Close(A<bool>._)).MustHaveHappened();
-            A.CallTo(() => listener.multiplexer.Dispose()).MustHaveHappened();
+            A.CallTo(() => listener.multiplexer.CloseAsync(A<bool>._)).MustHaveHappened();
+            A.CallTo(() => listener.multiplexer.DisposeAsync()).MustHaveHappened();
         }
 
         [Theory]

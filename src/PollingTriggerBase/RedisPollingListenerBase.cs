@@ -25,8 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal int batchSize;
         internal ITriggeredFunctionExecutor executor;
         internal IConnectionMultiplexer multiplexer;
-        internal Version version;
-        private bool isConnected = false;
+        internal Version serverVersion;
 
         public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
 
@@ -45,64 +44,37 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         public virtual async Task StartAsync(CancellationToken cancellationToken)
         {
-            if (isConnected)
+            if (multiplexer is null)
             {
-                return;
+                multiplexer = await InitializeConnectionMultiplexerAsync(connectionString);
             }
 
-            multiplexer = await InitializeConnectionMultiplexerAsync(connectionString);
-            if (multiplexer.IsConnected)
-            {
-                isConnected = true;
-                version = multiplexer.GetServers()[0].Version;
-                BeforePolling();
-                _ = Task.Run(() => Loop(cancellationToken));
-            }
-            else
+            if (!multiplexer.IsConnected)
             {
                 throw new ArgumentException("Failed to connect to cache.");
             }
+
+            serverVersion = multiplexer.GetServers()[0].Version;
+            BeforePolling();
+            _ = Task.Run(() => Loop(cancellationToken));
         }
 
         /// <summary>
         /// Triggers disconnect from cache when cancellation token is invoked.
         /// </summary>
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            CloseMultiplexer(multiplexer);
-            return Task.CompletedTask;
+            await CloseMultiplexerAsync(multiplexer);
         }
 
-        public void Cancel()
+        public async void Cancel()
         {
-            CloseMultiplexer(multiplexer);
+            await CloseMultiplexerAsync(multiplexer);
         }
 
-        public void Dispose()
+        public async void Dispose()
         {
-            CloseMultiplexer(multiplexer);
-        }
-
-        public virtual void BeforePolling() { }
-
-        /// <summary>
-        /// Implementation of the logic used to poll the cache.
-        /// </summary>
-        /// <returns>If there should be a delay before the next poll.</returns>
-        public abstract Task<bool> PollAsync(CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Main loop thread.
-        /// </summary>
-        private async Task Loop(CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                if (await PollAsync(cancellationToken))
-                {
-                    await Task.Delay(pollingInterval);
-                }
-            }
+            await CloseMultiplexerAsync(multiplexer);
         }
 
         /// <summary>
@@ -124,16 +96,44 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Closes redis cache multiplexer connection.
         /// </summary>
-        private static void CloseMultiplexer(IConnectionMultiplexer existingMultiplexer)
+        internal async Task CloseMultiplexerAsync(IConnectionMultiplexer existingMultiplexer)
         {
             try
             {
-                existingMultiplexer.Close();
-                existingMultiplexer.Dispose();
+                BeforeClosing();
+                await existingMultiplexer.CloseAsync();
+                await existingMultiplexer.DisposeAsync();
             }
             catch (Exception)
             {
                 throw new Exception("Failed to close connection to cache.");
+            }
+        }
+
+        /// <summary>
+        /// Any Redis commands necessary to run after the connection is created but before the polling starts.
+        /// </summary>
+        public virtual void BeforePolling() { }
+
+        /// <summary>
+        /// Implementation of the logic used to poll the cache.
+        /// </summary>
+        public abstract Task PollAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Any Redis commands necessart to run before the connection is terminated.
+        /// </summary>
+        public virtual void BeforeClosing() { }
+
+        /// <summary>
+        /// Main loop thread.
+        /// </summary>
+        private async Task Loop(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await PollAsync(cancellationToken);
+                await Task.Delay(pollingInterval);
             }
         }
 

@@ -24,13 +24,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
             await base.StartAsync(cancellationToken);
-            if (version < new Version("7.0") && keys.Length > 1)
+            if (serverVersion < new Version("7.0") && keys.Length > 1)
             {
                 // lmpop is 7.0 and higher, so function will only be able to trigger on a single key
-                throw new ArgumentException($"The cache's {version} is lower than 7.0, and does not support lmpop");
+                throw new ArgumentException($"The cache's {serverVersion} is lower than 7.0, and does not support lmpop");
             }
 
-            if (version < new Version("6.2"))
+            if (serverVersion < new Version("6.2"))
             {
                 // count option only introduced in 6.2 and higher
                 // changing values here to ensure proper scaling logic
@@ -39,34 +39,29 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        public override async Task<bool> PollAsync(CancellationToken cancellationToken)
+        public override async Task PollAsync(CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            bool triggered = false;
-            if (version >= new Version("7.0"))
+            if (serverVersion >= new Version("7.0"))
             {
                 var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, batchSize) : await db.ListRightPopAsync(keys, batchSize);
-                triggered = result.Values.Length > 0;
                 foreach(RedisValue value in result.Values)
                 {
                     RedisMessageModel triggerValue = new RedisMessageModel
                     {
-                        TriggerType = RedisTriggerType.List,
                         Trigger = result.Key,
                         Message = value
                     };
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 };
             }
-            else if (version >= new Version("6.2"))
+            else if (serverVersion >= new Version("6.2"))
             {
                 var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], batchSize) : await db.ListRightPopAsync(keys[0], batchSize);
-                triggered = result.Length > 0;
                 foreach(RedisValue value in result)
                 {
                     RedisMessageModel triggerValue = new RedisMessageModel
                     {
-                        TriggerType = RedisTriggerType.List,
                         Trigger = keys[0],
                         Message = value
                     };
@@ -78,17 +73,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0]) : await db.ListRightPopAsync(keys[0]);
                 if (!result.IsNullOrEmpty)
                 {
-                    triggered = true;
                     RedisMessageModel triggerValue = new RedisMessageModel
                     {
-                        TriggerType = RedisTriggerType.List,
                         Trigger = keys[0],
                         Message = result
                     };
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }
             }
-            return !triggered;
         }
 
         public override Task<RedisPollingMetrics> GetMetricsAsync()
