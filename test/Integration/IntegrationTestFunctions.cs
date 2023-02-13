@@ -12,8 +12,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         public const string all = "*";
         public const string listSingleKey = "listSingleKey";
         public const string listMultipleKeys = "listKey1 listKey2 listKey3";
-        public const string pollingInterval = "100";
-        public const string count = "100";
+        public const int pollingInterval = 100;
+        public const int count = 100;
 
         [FunctionName(nameof(PubSubTrigger_SingleChannel))]
         public static void PubSubTrigger_SingleChannel(

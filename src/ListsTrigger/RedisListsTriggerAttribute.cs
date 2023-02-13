@@ -7,7 +7,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// Streams trigger binding attributes.
     /// </summary>
     [Binding]
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
+    [AttributeUsage(AttributeTargets.Parameter)]
     public class RedisListsTriggerAttribute : RedisPollingTriggerAttributeBase
     {
         /// <summary>
@@ -15,6 +15,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// True (default) = pop elements from the front of the list.
         /// False = pop elements from the end of the list.
         /// </summary>
-        public string ListPopFromBeginning { get; set; } = "true";
+        public bool ListPopFromBeginning { get; set; } = true;
     }
 }

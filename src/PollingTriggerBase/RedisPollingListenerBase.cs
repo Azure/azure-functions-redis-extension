@@ -19,9 +19,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         private const int MINIMUM_SAMPLES = 5;
         internal string connectionString;
+        internal RedisKey[] keys;
         internal TimeSpan pollingInterval;
         internal int messagesPerWorker;
-        internal RedisKey[] keys;
         internal int batchSize;
         internal ITriggeredFunctionExecutor executor;
         internal IConnectionMultiplexer multiplexer;
@@ -29,12 +29,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
 
-        public RedisPollingListenerBase(string connectionString, int pollingInterval, int messagesPerWorker, string keys, int batchSize, ITriggeredFunctionExecutor executor)
+        public RedisPollingListenerBase(string connectionString, string keys, int pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor)
         {
             this.connectionString = connectionString;
+            this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
             this.pollingInterval = TimeSpan.FromMilliseconds(pollingInterval);
             this.messagesPerWorker = messagesPerWorker;
-            this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
             this.batchSize = batchSize;
             this.executor = executor;
         }
