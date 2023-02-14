@@ -46,7 +46,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (multiplexer is null)
             {
-                multiplexer = await InitializeConnectionMultiplexerAsync(connectionString);
+                multiplexer = await ConnectionMultiplexer.ConnectAsync(connectionString);
             }
 
             if (!multiplexer.IsConnected)
@@ -75,22 +75,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public async void Dispose()
         {
             await CloseMultiplexerAsync(multiplexer);
-        }
-
-        /// <summary>
-        /// Creates redis cache multiplexer connection.
-        /// </summary>
-        private static async Task<IConnectionMultiplexer> InitializeConnectionMultiplexerAsync(string connectionString)
-        {
-            try
-            {
-                return await ConnectionMultiplexer.ConnectAsync(connectionString);
-            }
-            catch (Exception)
-            {
-                throw new Exception("Failed to create connection to cache.");
-            }
-
         }
 
         /// <summary>
