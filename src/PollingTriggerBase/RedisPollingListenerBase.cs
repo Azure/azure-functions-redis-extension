@@ -29,11 +29,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
 
-        public RedisPollingListenerBase(string connectionString, string keys, int pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor)
+        public RedisPollingListenerBase(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor)
         {
             this.connectionString = connectionString;
             this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
-            this.pollingInterval = TimeSpan.FromMilliseconds(pollingInterval);
+            this.pollingInterval = pollingInterval;
             this.messagesPerWorker = messagesPerWorker;
             this.batchSize = batchSize;
             this.executor = executor;

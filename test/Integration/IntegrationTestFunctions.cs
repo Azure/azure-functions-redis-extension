@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System;
 using System.Text.Json;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
@@ -12,7 +13,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         public const string all = "*";
         public const string listSingleKey = "listSingleKey";
         public const string listMultipleKeys = "listKey1 listKey2 listKey3";
-        public const int pollingInterval = 100;
         public const int count = 100;
 
         [FunctionName(nameof(PubSubTrigger_SingleChannel))]
@@ -81,7 +81,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListsTrigger_SingleKey))]
         public static void ListsTrigger_SingleKey(
-            [RedisListsTrigger(ConnectionString = connectionString, Keys = listSingleKey, PollingInterval = pollingInterval)] RedisMessageModel result,
+            [RedisListsTrigger(ConnectionString = connectionString, Keys = listSingleKey)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -89,7 +89,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListsTrigger_MultipleKeys))]
         public static void ListsTrigger_MultipleKeys(
-            [RedisListsTrigger(ConnectionString = connectionString, Keys = listMultipleKeys, PollingInterval = pollingInterval)] RedisMessageModel result,
+            [RedisListsTrigger(ConnectionString = connectionString, Keys = listMultipleKeys)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));

@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool listPopFromBeginning;
 
-        public RedisListsListener(string connectionString, string keys, int pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor)
+        public RedisListsListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor)
             : base(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor)
         {
             this.listPopFromBeginning = listPopFromBeginning;
@@ -27,15 +27,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (serverVersion < new Version("7.0") && keys.Length > 1)
             {
                 // lmpop is 7.0 and higher, so function will only be able to trigger on a single key
-                throw new ArgumentException($"The cache's {serverVersion} is lower than 7.0, and does not support lmpop");
-            }
-
-            if (serverVersion < new Version("6.2"))
-            {
-                // count option only introduced in 6.2 and higher
-                // changing values here to ensure proper scaling logic
-                batchSize = 1;
-                messagesPerWorker = 10;
+                throw new ArgumentException($"The cache's version {serverVersion} is lower than 7.0, and does not support lmpop");
             }
         }
 

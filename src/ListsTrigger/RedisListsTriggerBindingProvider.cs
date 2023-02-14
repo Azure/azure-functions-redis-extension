@@ -37,7 +37,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string keys = RedisUtilities.ResolveString(configuration, attribute.Keys, "Keys");
             int messagesPerWorker = attribute.MessagesPerWorker;
             int batchSize = attribute.BatchSize;
-            int pollingInterval = attribute.PollingInterval;
+            TimeSpan pollingInterval = attribute.PollingInterval;
             bool listPopFromBeginning = attribute.ListPopFromBeginning;
 
             return Task.FromResult<ITriggerBinding>(new RedisListsTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, listPopFromBeginning));

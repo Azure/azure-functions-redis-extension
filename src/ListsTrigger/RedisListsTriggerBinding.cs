@@ -15,14 +15,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisListsTriggerBinding : ITriggerBinding
     {
         private readonly string connectionString;
-        private readonly int pollingInterval;
+        private readonly TimeSpan pollingInterval;
         private readonly int messagesPerWorker;
         private readonly string keys;
         private readonly int count;
         private readonly bool listPopFromBeginning;
 
 
-        public RedisListsTriggerBinding(string connectionString, string keys, int pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning)
+        public RedisListsTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning)
         {
             this.connectionString = connectionString;
             this.keys = keys;

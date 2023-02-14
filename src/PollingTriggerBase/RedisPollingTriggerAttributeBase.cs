@@ -16,23 +16,27 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         /// <summary>
         /// Keys to read from, space-delimited.
+        /// All keys will be read from at the same time, using the <a href="https://redis.io/commands/xread/">XREAD</a> or <a href="https://redis.io/commands/lmpop/">LMPOP</a> commands.
         /// </summary>
         [AutoResolve]
         public string Keys { get; set; }
 
         /// <summary>
-        /// How often to poll redis in milliseconds.
+        /// How often to poll Redis.
         /// </summary>
-        public int PollingInterval { get; set; } = 5000;
+        public TimeSpan PollingInterval { get; set; } = TimeSpan.FromSeconds(1);
 
         /// <summary>
-        /// How many messages should be assigned to a worker at a time.
         /// Used to determine how many workers the function should scale to.
+        /// For example, if the number of <see cref="MessagesPerWorker">MessagesPerWorker</see> is 10,
+        /// and there are 1500 elements remaining in the list,
+        /// the functions host will attempt to scale up to 150 instances.
         /// </summary>
         public int MessagesPerWorker { get; set; } = 1000;
 
         /// <summary>
-        /// Number of elements to pull from redis at one time.
+        /// Number of elements to pull from Redis at one time.
+        /// This is done using the COUNT argument in <a href="https://redis.io/commands/xread/">XREAD</a> for streams and <a href="https://redis.io/commands/lpop/">LPOP</a> for lists.
         /// </summary>
         public int BatchSize { get; set; } = 100;
     }
