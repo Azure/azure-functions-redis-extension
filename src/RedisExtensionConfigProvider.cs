@@ -22,6 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         ///
         /// </summary>
         /// <param name="configuration"></param>
+        /// <param name="logger"></param>
         public RedisExtensionConfigProvider(IConfiguration configuration, ILogger logger)
         {
             this.configuration = configuration;
