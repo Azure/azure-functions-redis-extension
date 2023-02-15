@@ -14,13 +14,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal sealed class RedisPubSubListener : IListener
     {
         internal ITriggeredFunctionExecutor executor;
-        internal string connectionString;
+        internal IRedisService redisService;
         internal string channel;
-        internal IConnectionMultiplexer multiplexer;
 
-        public RedisPubSubListener(string connectionString, string channel, ITriggeredFunctionExecutor executor)
+        public RedisPubSubListener(IRedisService redisService, string channel, ITriggeredFunctionExecutor executor)
         {
-            this.connectionString = connectionString;
+            this.redisService = redisService;
             this.channel = channel;
             this.executor = executor;
         }
@@ -28,20 +27,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Executes enabled functions, primary listener method.
         /// </summary>
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            if (multiplexer is null)
-            {
-                multiplexer = await InitializeConnectionMultiplexerAsync(connectionString);
-            }
-
-            if (!multiplexer.IsConnected)
-            {
-                throw new ArgumentException("Failed to connect to cache.");
-            }
-
-            ChannelMessageQueue channelMessageQeueue = await multiplexer.GetSubscriber().SubscribeAsync(channel);
-            channelMessageQeueue.OnMessage(async (msg) =>
+            redisService.Connect();
+            redisService.Subscribe(channel, async (msg) =>
             {
                 var callBack = new RedisMessageModel
                 {
@@ -51,57 +40,26 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
                 await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = callBack }, cancellationToken);
             });
-            return;
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Triggers disconnect from cache when cancellation token is invoked.
         /// </summary>
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
-            await CloseMultiplexerAsync(multiplexer);
+            redisService.Close();
+            return Task.CompletedTask;
         }
 
-        public async void Cancel()
+        public void Cancel()
         {
-            await CloseMultiplexerAsync(multiplexer);
+            redisService.Close();
         }
 
-        public async void Dispose()
+        public void Dispose()
         {
-            await CloseMultiplexerAsync(multiplexer);
-        }
-
-        /// <summary>
-        /// Creates redis cache multiplexer connection.
-        /// </summary>
-        private static async Task<IConnectionMultiplexer> InitializeConnectionMultiplexerAsync(string connectionString)
-        {
-            try
-            {
-                return await ConnectionMultiplexer.ConnectAsync(connectionString);
-            }
-            catch (Exception)
-            {
-                throw new Exception("Failed to create connection to cache.");
-            }
-
-        }
-
-        /// <summary>
-        /// Closes redis cache multiplexer connection.
-        /// </summary>
-        internal async Task CloseMultiplexerAsync(IConnectionMultiplexer existingMultiplexer)
-        {
-            try
-            {
-                await existingMultiplexer.CloseAsync();
-                await existingMultiplexer.DisposeAsync();
-            }
-            catch (Exception)
-            {
-                throw new Exception("Failed to close connection to cache.");
-            }
+            redisService.Close();
         }
     }
 }

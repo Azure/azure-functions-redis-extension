@@ -13,12 +13,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     internal class RedisPubSubTriggerBinding : ITriggerBinding
     {
-        private readonly string connectionString;
+        private readonly IRedisService service;
         private readonly string channel;
 
-        public RedisPubSubTriggerBinding(string connectionString, string channel)
+        public RedisPubSubTriggerBinding(IRedisService service, string channel)
         {
-            this.connectionString = connectionString;
+            this.service = service;
             this.channel = channel;
         }
 
@@ -39,7 +39,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException("context");
             }
 
-            return Task.FromResult<IListener>(new RedisPubSubListener(connectionString, channel, context.Executor));
+            return Task.FromResult<IListener>(new RedisPubSubListener(service, channel, context.Executor));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

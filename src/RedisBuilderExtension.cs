@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs.Extensions.Redis.Services;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -21,7 +20,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             builder.AddExtension<RedisExtensionConfigProvider>();
-            builder.Services.AddSingleton<IRedisConnectionMultiplexerService, CachedRedisConnectionMultiplexerService>();
             return builder;
         }
     }
