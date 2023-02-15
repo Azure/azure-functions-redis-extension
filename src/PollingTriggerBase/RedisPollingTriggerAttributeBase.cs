@@ -22,9 +22,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public string Keys { get; set; }
 
         /// <summary>
-        /// How often to poll Redis.
+        /// How often to poll Redis in ms.
         /// </summary>
-        public TimeSpan PollingInterval { get; set; } = TimeSpan.FromSeconds(1);
+        public int PollingInterval { get; set; } = 1000;
 
         /// <summary>
         /// Used to determine how many workers the function should scale to.
