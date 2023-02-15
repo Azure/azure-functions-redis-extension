@@ -14,14 +14,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisPubSubTriggerBinding : ITriggerBinding
     {
         private readonly string connectionString;
-        private readonly RedisTriggerType triggerType;
-        private readonly string trigger;
+        private readonly string channel;
 
-        public RedisPubSubTriggerBinding(string connectionString, RedisTriggerType triggerType, string trigger) 
+        public RedisPubSubTriggerBinding(string connectionString, string channel)
         {
             this.connectionString = connectionString;
-            this.triggerType = triggerType;
-            this.trigger = trigger;
+            this.channel = channel;
         }
 
         public Type TriggerValueType => typeof(RedisMessageModel);
@@ -41,7 +39,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException("context");
             }
 
-            return Task.FromResult<IListener>(new RedisPubSubListener(connectionString, triggerType, trigger, context.Executor));
+            return Task.FromResult<IListener>(new RedisPubSubListener(connectionString, channel, context.Executor));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

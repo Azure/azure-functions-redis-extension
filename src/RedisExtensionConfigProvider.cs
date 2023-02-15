@@ -12,7 +12,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     public class RedisExtensionConfigProvider : IExtensionConfigProvider
     {
         private readonly IConfiguration configuration;
-
         /// <summary>
         /// Adds Redis triggers and bindings to the extension context.
         /// </summary>

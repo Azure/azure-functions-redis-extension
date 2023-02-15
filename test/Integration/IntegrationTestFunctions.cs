@@ -7,13 +7,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         public const string connectionString = "127.0.0.1:6379";
         public const string pubsubChannel = "testChannel";
-        public const string keyspaceKey = "testKey";
-        public const string keyeventEvent = "set";
+        public const string keyspaceChannel = "__keyspace@0__:testKey";
+        public const string keyeventChannel = "__keyevent@0__:set";
         public const string all = "*";
 
         [FunctionName(nameof(PubSubTrigger_SingleChannel))]
         public static void PubSubTrigger_SingleChannel(
-            [RedisPubSubTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.PubSub, Trigger = pubsubChannel)] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = pubsubChannel)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -21,23 +21,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(PubSubTrigger_MultipleChannels))]
         public static void PubSubTrigger_MultipleChannels(
-        [RedisPubSubTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.PubSub, Trigger = pubsubChannel + all)] RedisMessageModel model,
-        ILogger logger)
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = pubsubChannel + all)] RedisMessageModel model,
+            ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
         [FunctionName(nameof(PubSubTrigger_AllChannels))]
         public static void PubSubTrigger_AllChannels(
-        [RedisPubSubTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.PubSub, Trigger = all)] RedisMessageModel model,
-        ILogger logger)
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = all)] RedisMessageModel model,
+            ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
         [FunctionName(nameof(KeySpaceTrigger_SingleKey))]
         public static void KeySpaceTrigger_SingleKey(
-            [RedisPubSubTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.KeySpace, Trigger = keyspaceKey)] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = keyspaceChannel)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -45,23 +45,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(KeySpaceTrigger_MultipleKeys))]
         public static void KeySpaceTrigger_MultipleKeys(
-        [RedisPubSubTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.KeySpace, Trigger = keyspaceKey + all)] RedisMessageModel model,
-        ILogger logger)
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = keyspaceChannel + all)] RedisMessageModel model,
+            ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
         [FunctionName(nameof(KeySpaceTrigger_AllKeys))]
         public static void KeySpaceTrigger_AllKeys(
-        [RedisPubSubTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.KeySpace, Trigger = all)] RedisMessageModel model,
-        ILogger logger)
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = all)] RedisMessageModel model,
+            ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
         [FunctionName(nameof(KeyEventTrigger_SingleEvent))]
         public static void KeyEventTrigger_SingleEvent(
-            [RedisPubSubTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.KeyEvent, Trigger = keyeventEvent)] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = keyeventChannel)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(KeyEventTrigger_AllEvents))]
         public static void KeyEventTrigger_AllEvents(
-            [RedisPubSubTrigger(ConnectionString = connectionString, TriggerType = RedisTriggerType.KeyEvent, Trigger = all)] RedisMessageModel model,
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = all)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
