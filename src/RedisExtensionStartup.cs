@@ -1,6 +1,5 @@
-﻿using Microsoft.Azure.WebJobs.Extensions.Redis;
-using Microsoft.Azure.WebJobs.Hosting;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Azure.WebJobs.Hosting;
+using Microsoft.Azure.WebJobs.Extensions.Redis;
 
 [assembly: WebJobsStartup(typeof(RedisExtensionStartup))]
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
