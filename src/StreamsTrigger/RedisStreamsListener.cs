@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Executors;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 
@@ -12,15 +13,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for managing connections and listening to a given Azure Redis Cache.
     /// </summary>
-    internal sealed class RedisStreamsListener : RedisPollingListenerBase
+    internal sealed class RedisStreamsListener : RedisPollingTriggerBaseListener
     {
         internal bool deleteAfterProcess;
         internal string consumerGroup;
         internal StreamPosition[] positions;
         internal string consumerName;
 
-        public RedisStreamsListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor)
-            : base(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor)
+        public RedisStreamsListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
         {
             this.consumerGroup = consumerGroup;
             this.deleteAfterProcess = deleteAfterProcess;
@@ -93,9 +94,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        public override Task<RedisPollingMetrics> GetMetricsAsync()
+        public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            var metrics = new RedisPollingMetrics
+            var metrics = new RedisPollingTriggerBaseMetrics
             {
                 Remaining = keys.Sum((key) => multiplexer.GetDatabase().StreamLength(key)),
                 Timestamp = DateTime.UtcNow,

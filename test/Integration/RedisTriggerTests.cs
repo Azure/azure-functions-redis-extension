@@ -33,7 +33,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { JsonSerializer.Serialize(expectedReturn), 1},
             };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.localhost))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -76,7 +76,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { JsonSerializer.Serialize(expectedDelReturn), 1},
             };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.localhost))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -109,7 +109,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { JsonSerializer.Serialize(expectedReturn), 1},
             };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.localhost))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(nameof(IntegrationTestFunctions.KeyEventTrigger_SingleEvent), 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -148,7 +148,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { JsonSerializer.Serialize(expectedDelReturn), 1},
             };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.localhost))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(nameof(IntegrationTestFunctions.KeyEventTrigger_AllEvents), 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -178,7 +178,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { $"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length },
             };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.localhost))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -208,7 +208,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length);
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.localhost))
             using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
             using (Process functionsProcess2 = IntegrationTestHelpers.StartFunction(functionName, 7072))
             using (Process functionsProcess3 = IntegrationTestHelpers.StartFunction(functionName, 7073))
@@ -253,7 +253,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { $"Executed '{functionName}' (Succeeded", keyArray.Length },
             };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.localhost))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -290,7 +290,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length);
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.localhost))
             using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
             using (Process functionsProcess2 = IntegrationTestHelpers.StartFunction(functionName, 7072))
             using (Process functionsProcess3 = IntegrationTestHelpers.StartFunction(functionName, 7073))

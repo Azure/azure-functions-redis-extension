@@ -4,17 +4,29 @@ using Microsoft.Azure.WebJobs.Description;
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// Triggers on a PubSub channel, keyspace notification, or keyevent notification.
+    /// Attribute used to bind parameters to a Redis PubSub trigger message.
     /// </summary>
-    [Binding]
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class RedisPubSubTriggerAttribute : Attribute
+    [Binding]
+    public sealed class RedisPubSubTriggerAttribute : Attribute
     {
         /// <summary>
-        /// Cache connection string.
+        /// Initializes a new <see cref="RedisPubSubTriggerAttribute"/>.
+        /// </summary>
+        /// <param name="connectionStringSetting">Redis connection string setting.</param>
+        /// <param name="channel">Redis pubsub channel name.</param>
+        public RedisPubSubTriggerAttribute(string connectionStringSetting, string channel)
+        {
+            ConnectionStringSetting = connectionStringSetting;
+            Channel = channel;
+        }
+
+        /// <summary>
+        /// Redis connection string setting.
+        /// This setting will be used to resolve the actual connection string from the configuration.
         /// </summary>
         [ConnectionString]
-        public string ConnectionString { get; set; }
+        public string ConnectionStringSetting { get; set; }
 
         /// <summary>
         /// The channel that the trigger will listen to.

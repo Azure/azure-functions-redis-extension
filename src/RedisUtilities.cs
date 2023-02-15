@@ -1,52 +1,51 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Azure.WebJobs.Host;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal static class RedisUtilities
     {
-        public static bool ResolveBool(IConfiguration configuration, string toResolve, string error)
+        public static string ResolveString(INameResolver nameResolver, string setting, string settingName, ILogger logger)
         {
-            if (bool.TryParse(ResolveString(configuration, toResolve, error), out bool result))
+            if (nameResolver.TryResolveWholeString(setting, out string resolvedString))
             {
-                return result;
-            }
-            throw new InvalidCastException($"Invalid {error} - key exists in config but not a bool");
-        }
-
-        public static int ResolveInt(IConfiguration configuration, string toResolve, string error)
-        {
-            if (int.TryParse(ResolveString(configuration, toResolve, error), out int result))
-            {
-                if (result < 1)
-                {
-                    throw new ArgumentException($"Invalid {error} - less than 1");
-                }
-                return result;
-            }
-            throw new InvalidCastException($"Invalid {error} - key exists in config but not an int");
-        }
-
-        public static string ResolveString(IConfiguration configuration, string toResolve, string error)
-        {
-            if (string.IsNullOrEmpty(toResolve))
-            {
-                throw new ArgumentNullException($"Empty {error} key");
-            }
-
-            // get string from config using input as key
-            if (toResolve.StartsWith("%") && toResolve.EndsWith("%"))
-            {
-                string configKey = toResolve.Substring(1, toResolve.Length - 2);
-                string resolvedString = configuration.GetConnectionStringOrSetting(configKey);
-                if (string.IsNullOrEmpty(resolvedString))
-                {
-                    throw new ArgumentException($"Invalid {error} - key does not exist in the config");
-                }
+                logger?.LogDebug($"The {nameof(INameResolver)} provided resolved {settingName} '{settingName}' as '{resolvedString}'.");
                 return resolvedString;
             }
+            
+            if (!string.IsNullOrWhiteSpace(settingName))
+            {
+                logger?.LogDebug($"Using the provided {settingName} value '{setting}'.");
+            }
 
-            return toResolve;
+            logger?.LogError($"{settingName} is null or empty.");
+            throw new ArgumentNullException(settingName);
+        }
+
+        public static string ResolveConnectionString(IConfiguration configuration, string connectionStringSetting, ILogger logger)
+        {
+            if (string.IsNullOrWhiteSpace(connectionStringSetting))
+            {
+                logger?.LogError($"{nameof(connectionStringSetting)} is null or empty.");
+                throw new ArgumentNullException(nameof(connectionStringSetting));
+            }
+
+            if (configuration is null)
+            {
+                logger?.LogError($"{nameof(configuration)} is null.");
+                throw new ArgumentException(nameof(configuration));
+            }
+
+            string connectionString = configuration.GetConnectionStringOrSetting(connectionStringSetting);
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                logger?.LogError($"{nameof(connectionStringSetting)} '{connectionStringSetting}' does not exist as a connection string or value in the configuration.");
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            return connectionString;
         }
     }
 }

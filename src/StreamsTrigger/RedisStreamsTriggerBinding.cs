@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -20,8 +21,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly int count;
         private readonly string consumerGroup;
         private readonly bool deleteAfterProcess;
+        private readonly ILogger logger;
 
-        public RedisStreamsTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, string consumerGroup, bool deleteAfterProcess)
+        public RedisStreamsTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, string consumerGroup, bool deleteAfterProcess, ILogger logger)
         {
             this.connectionString = connectionString;
             this.keys = keys;
@@ -30,6 +32,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.count = count;
             this.consumerGroup = consumerGroup;
             this.deleteAfterProcess = deleteAfterProcess;
+            this.logger = logger;
         }
 
         public Type TriggerValueType => typeof(RedisMessageModel);
@@ -44,12 +47,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
         {
-            if (context == null)
+            if (context is null)
             {
+                logger?.LogCritical($"Provided {nameof(TriggerBindingProviderContext)} is null.");
                 throw new ArgumentNullException("context");
             }
 
-            return Task.FromResult<IListener>(new RedisStreamsListener(connectionString, keys, pollingInterval, messagesPerWorker, count, consumerGroup, deleteAfterProcess, context.Executor));
+            return Task.FromResult<IListener>(new RedisStreamsListener(connectionString, keys, pollingInterval, messagesPerWorker, count, consumerGroup, deleteAfterProcess, context.Executor, logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

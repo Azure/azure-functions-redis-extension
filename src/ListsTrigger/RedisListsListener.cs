@@ -1,22 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Executors;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// Responsible for managing connections and listening to a given Azure Redis Cache.
+    /// Responsible for managing connections and listening to a given Redis instance.
     /// </summary>
-    internal sealed class RedisListsListener : RedisPollingListenerBase
+    internal sealed class RedisListsListener : RedisPollingTriggerBaseListener
     {
         internal bool listPopFromBeginning;
 
-        public RedisListsListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor)
-            : base(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor)
+        public RedisListsListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
         }
@@ -26,8 +26,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             await base.StartAsync(cancellationToken);
             if (serverVersion < new Version("7.0") && keys.Length > 1)
             {
-                // lmpop is 7.0 and higher, so function will only be able to trigger on a single key
-                throw new ArgumentException($"The cache's version {serverVersion} is lower than 7.0, and does not support lmpop");
+                logger?.LogError($"The Redis version {serverVersion} is lower than 7.0, and does not support LMPOP. Listening to only the first key '{keys[0]}'.");
+            }
+
+            if (serverVersion < new Version("6.2") && batchSize > 1)
+            {
+                logger?.LogError($"The Redis version {serverVersion} is lower than 6.2, and does not support the COUNT argument in LPOP. Reverting to a batchSize of 1.");
             }
         }
 
@@ -37,6 +41,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (serverVersion >= new Version("7.0"))
             {
                 var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, batchSize) : await db.ListRightPopAsync(keys, batchSize);
+                logger?.LogInformation($"Recieved {result.Values.Count()} elements from the lists.");
                 foreach(RedisValue value in result.Values)
                 {
                     RedisMessageModel triggerValue = new RedisMessageModel
@@ -50,7 +55,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             else if (serverVersion >= new Version("6.2"))
             {
                 var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], batchSize) : await db.ListRightPopAsync(keys[0], batchSize);
-                foreach(RedisValue value in result)
+                logger?.LogInformation($"Recieved {result.Length} elements from the list.");
+                foreach (RedisValue value in result)
                 {
                     RedisMessageModel triggerValue = new RedisMessageModel
                     {
@@ -65,6 +71,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 var result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0]) : await db.ListRightPopAsync(keys[0]);
                 if (!result.IsNullOrEmpty)
                 {
+                    logger?.LogInformation($"Recieved 1 element from the list.");
                     RedisMessageModel triggerValue = new RedisMessageModel
                     {
                         Trigger = keys[0],
@@ -75,9 +82,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        public override Task<RedisPollingMetrics> GetMetricsAsync()
+        public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            var metrics = new RedisPollingMetrics
+            var metrics = new RedisPollingTriggerBaseMetrics
             {
                 Remaining = keys.Sum((key) => multiplexer.GetDatabase().ListLength(key)),
                 Timestamp = DateTime.UtcNow,
