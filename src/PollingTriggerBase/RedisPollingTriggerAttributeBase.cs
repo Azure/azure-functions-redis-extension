@@ -24,7 +24,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// How often to poll Redis in ms.
         /// </summary>
-        public int PollingInterval { get; set; } = 1000;
+        public int PollingIntervalInMs { get; set; } = 1000;
 
         /// <summary>
         /// Used to determine how many workers the function should scale to.
