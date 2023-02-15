@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -30,7 +31,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 {
                     logger?.LogInformation("Connecting to Redis.");
                     multiplexer = ConnectionMultiplexer.Connect(connectionString);
-                    multiplexer.GetDatabase().ListLeftPush("FunctionKey", "one");
+                    multiplexer.GetDatabase().StringIncrement("AzureFunctionConnections");
                 }
                 else if (!multiplexer.IsConnected)
                 {
@@ -54,10 +55,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         
         public void Close()
         {
-            lock(lockObj)
+            lock (lockObj)
             {
-                count--;
-                if (count == 0)
+                if (--count == 0)
                 {
                     multiplexer.Close();
                     multiplexer.Dispose();
