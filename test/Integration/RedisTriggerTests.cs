@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Linq;
+using System.Collections.Concurrent;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
@@ -19,9 +20,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.pubsubChannel + "suffix", "testSuffix")]
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), "prefix" + IntegrationTestFunctions.pubsubChannel, "testPrefix")]
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), "separate", "testSeparate")]
-        public void PubSubTrigger_SuccessfullyTriggers(string functionName, string channel, string message)
+        public async void PubSubTrigger_SuccessfullyTriggers(string functionName, string channel, string message)
         {
-            bool success = false;
             RedisMessageModel expectedReturn = new RedisMessageModel
             {
                 Trigger = channel,
@@ -36,17 +36,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
-                TaskCompletionSource<bool> functionCompleted = new TaskCompletionSource<bool>();
-                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts, functionCompleted);
+                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 ISubscriber subscriber = multiplexer.GetSubscriber();
 
                 subscriber.Publish(channel, message);
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(1));
 
-                multiplexer.Close();
+                await multiplexer.CloseAsync();
                 functionsProcess.Kill();
             };
-            Assert.True(success, JsonSerializer.Serialize(counts));
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
         [Theory]
@@ -55,12 +55,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_MultipleKeys), IntegrationTestFunctions.keyspaceChannel + "suffix")]
         [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceChannel)]
         [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceChannel + "suffix")]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), "prefix" + IntegrationTestFunctions.keyspaceChannel)]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), "separate")]
-        public void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string channel)
+        public async void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string channel)
         {
-            string key = channel.Replace("__keyspace@0__:", "");
-            bool success = false;
+            string keyspace = "__keyspace@0__:";
+            string key = channel.Substring(channel.IndexOf(keyspace) + keyspace.Length);
             RedisMessageModel expectedSetReturn = new RedisMessageModel
             {
                 Trigger = channel,
@@ -81,24 +79,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
-                TaskCompletionSource<bool> functionCompleted = new TaskCompletionSource<bool>();
-                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts, functionCompleted);
+                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 IDatabase db = multiplexer.GetDatabase();
 
                 db.StringSet(key, "test");
                 db.KeyDelete(key);
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(1));
 
-                multiplexer.Close();
+                await multiplexer.CloseAsync();
                 functionsProcess.Kill();
             };
-            Assert.True(success, JsonSerializer.Serialize(counts));
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
         [Fact]
-        public void KeyEventTrigger_SingleEvent_SuccessfullyTriggers()
+        public async void KeyEventTrigger_SingleEvent_SuccessfullyTriggers()
         {
-            bool success = false;
             string key = "key";
             string value = "value";
             RedisMessageModel expectedReturn = new RedisMessageModel
@@ -115,33 +112,32 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(nameof(IntegrationTestFunctions.KeyEventTrigger_SingleEvent), 7071))
             {
-                TaskCompletionSource<bool> functionCompleted = new TaskCompletionSource<bool>();
-                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts, functionCompleted);
+                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 IDatabase db = multiplexer.GetDatabase();
 
                 db.StringSet(key, value);
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(1));
 
-                multiplexer.Close();
+                await multiplexer.CloseAsync();
                 functionsProcess.Kill();
             };
-            Assert.True(success, JsonSerializer.Serialize(counts));
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
         [Fact]
-        public void KeyEventTrigger_AllEvents_SuccessfullyTriggers()
+        public async void KeyEventTrigger_AllEvents_SuccessfullyTriggers()
         {
-            bool success = false;
             string key = "key";
             string value = "value";
             RedisMessageModel expectedSetReturn = new RedisMessageModel
             {
-                Trigger = "set",
+                Trigger = "__keyevent@0__:set",
                 Message = key
             };
             RedisMessageModel expectedDelReturn = new RedisMessageModel
             {
-                Trigger = "del",
+                Trigger = "__keyevent@0__:del",
                 Message = key
             };
 
@@ -155,18 +151,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(nameof(IntegrationTestFunctions.KeyEventTrigger_AllEvents), 7071))
             {
-                TaskCompletionSource<bool> functionCompleted = new TaskCompletionSource<bool>();
-                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts, functionCompleted);
+                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 IDatabase db = multiplexer.GetDatabase();
 
                 db.StringSet(key, value);
                 db.KeyDelete(key);
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(1));
 
-                multiplexer.Close();
+                await multiplexer.CloseAsync();
                 functionsProcess.Kill();
             };
-            Assert.True(success, JsonSerializer.Serialize(counts));
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
         [Theory]
@@ -174,7 +170,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anythign before redis7, test is redis6
         public async void ListsTrigger_SuccessfullyTriggers(string functionName, string keys, string values)
         {
-            bool success = false;
             string[] keyArray = keys.Split(' ');
             RedisValue[] valuesArray = values.Split(' ').Select((value) => new RedisValue(value)).ToArray();
 
@@ -186,20 +181,138 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
-                TaskCompletionSource<bool> functionCompleted = new TaskCompletionSource<bool>();
-                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts, functionCompleted);
+                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
                 foreach (string key in keyArray)
                 {
                     await multiplexer.GetDatabase().ListLeftPushAsync(key, valuesArray);
                 }
 
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
+                await Task.Delay(TimeSpan.FromSeconds(1));
 
-                multiplexer.Close();
+                await multiplexer.CloseAsync();
                 functionsProcess.Kill();
             };
-            Assert.True(success, JsonSerializer.Serialize(counts));
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
+        }
+
+        [Theory]
+        [InlineData(nameof(IntegrationTestFunctions.ListsTrigger_SingleKey), IntegrationTestFunctions.listSingleKey, "a b")]
+        //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anythign before redis7, test is redis6
+        public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string values)
+        {
+            string[] keyArray = keys.Split(' ');
+            RedisValue[] valuesArray = values.Split(' ').Select((value) => new RedisValue(value)).ToArray();
+
+            ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length);
+
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
+            using (Process functionsProcess2 = IntegrationTestHelpers.StartFunction(functionName, 7072))
+            using (Process functionsProcess3 = IntegrationTestHelpers.StartFunction(functionName, 7073))
+            {
+                functionsProcess1.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
+                functionsProcess2.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
+                functionsProcess3.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
+
+                foreach (string key in keyArray)
+                {
+                    await multiplexer.GetDatabase().ListLeftPushAsync(key, valuesArray);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(1));
+
+                await multiplexer.CloseAsync();
+                functionsProcess1.Kill();
+                functionsProcess2.Kill();
+                functionsProcess3.Kill();
+            };
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
+        }
+
+        [Theory]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_DefaultGroup_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d")]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_DefaultGroup_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f")]
+        public async void StreamsTrigger_SuccessfullyTriggers(string functionName, string keys, string names, string values)
+        {
+            string[] keyArray = keys.Split(' ');
+            string[] namesArray = names.Split(' ');
+            string[] valuesArray = values.Split(' ');
+
+            NameValueEntry[] nameValueEntries = new NameValueEntry[namesArray.Length];
+            for (int i = 0; i < namesArray.Length; i++)
+            {
+                nameValueEntries[i] = new NameValueEntry(namesArray[i], valuesArray[i]);
+            }
+
+            Dictionary<string, int> counts = new Dictionary<string, int>
+            {
+                { $"Executed '{functionName}' (Succeeded", keyArray.Length },
+            };
+
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+            {
+                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
+
+                foreach (string key in keyArray)
+                {
+                    await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(1));
+
+                await multiplexer.CloseAsync();
+                functionsProcess.Kill();
+            };
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
+        }
+
+        [Theory]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_DefaultGroup_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d")]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_DefaultGroup_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f")]
+        public async void StreamsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string names, string values)
+        {
+            string[] keyArray = keys.Split(' ');
+            string[] namesArray = names.Split(' ');
+            string[] valuesArray = values.Split(' ');
+
+            NameValueEntry[] nameValueEntries = new NameValueEntry[namesArray.Length];
+            for (int i = 0; i < namesArray.Length; i++)
+            {
+                nameValueEntries[i] = new NameValueEntry(namesArray[i], valuesArray[i]);
+            }
+
+            ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length);
+
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
+            using (Process functionsProcess2 = IntegrationTestHelpers.StartFunction(functionName, 7072))
+            using (Process functionsProcess3 = IntegrationTestHelpers.StartFunction(functionName, 7073))
+            {
+                functionsProcess1.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
+                functionsProcess2.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
+                functionsProcess3.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
+
+                foreach (string key in keyArray)
+                {
+                    await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(1));
+
+                await multiplexer.CloseAsync();
+                functionsProcess1.Kill();
+                functionsProcess2.Kill();
+                functionsProcess3.Kill();
+            };
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
     }
 }

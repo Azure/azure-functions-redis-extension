@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Concurrent;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
@@ -64,7 +65,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             return functionsProcess;
         }
 
-        internal static DataReceivedEventHandler CounterHandlerCreator(Dictionary<string, int> counts, TaskCompletionSource<bool> functionExecuted)
+        internal static DataReceivedEventHandler CounterHandlerCreator(IDictionary<string, int> counts)
         {
             return (object sender, DataReceivedEventArgs e) =>
             {
@@ -73,11 +74,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     if (e.Data?.Contains(key) ?? false)
                     {
                         counts[key] -= 1;
-                    }
-
-                    if (counts.Values.Sum() == 0)
-                    {
-                        functionExecuted.TrySetResult(true);
                     }
                 }
             };
