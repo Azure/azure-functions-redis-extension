@@ -25,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (context is null)
             {
                 logger?.LogCritical($"Provided {nameof(TriggerBindingProviderContext)} is null.");
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(TriggerBindingProviderContext));
             }
 
             RedisListsTriggerAttribute attribute = context.Parameter.GetCustomAttribute<RedisListsTriggerAttribute>(inherit: false);

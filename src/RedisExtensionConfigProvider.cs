@@ -37,7 +37,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (context is null)
             {
                 logger?.LogCritical($"Provided {nameof(ExtensionConfigContext)} is null.");
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(ExtensionConfigContext));
             }
 
 #pragma warning disable CS0618

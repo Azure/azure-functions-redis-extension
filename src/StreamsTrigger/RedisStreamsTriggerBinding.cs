@@ -49,8 +49,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (context is null)
             {
-                logger?.LogCritical($"Provided {nameof(TriggerBindingProviderContext)} is null.");
-                throw new ArgumentNullException("context");
+                logger?.LogCritical($"Provided {nameof(ListenerFactoryContext)} is null.");
+                throw new ArgumentNullException(nameof(ListenerFactoryContext));
             }
 
             return Task.FromResult<IListener>(new RedisStreamsListener(connectionString, keys, pollingInterval, messagesPerWorker, count, consumerGroup, deleteAfterProcess, context.Executor, logger));

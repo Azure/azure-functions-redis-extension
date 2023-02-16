@@ -25,6 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             this.consumerGroup = consumerGroup;
             this.deleteAfterProcess = deleteAfterProcess;
+
             this.positions = this.keys.Select((key) => new StreamPosition(key, StreamPosition.NewMessages)).ToArray();
             this.consumerName = Guid.NewGuid().ToString();
         }
@@ -38,15 +39,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 try
                 {
-                    if (!await db.StreamCreateConsumerGroupAsync(key, consumerGroup))
+                    logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}][Key:{key}] Attempting to create consumer group '{consumerGroup}'.");
+                    if (await db.StreamCreateConsumerGroupAsync(key, consumerGroup))
                     {
-                        throw new Exception($"Could not create consumer group for stream key {key}");
+                        logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}][Key:{key}] Successfully created consumer group '{consumerGroup}'.");
+                    }
+                    else
+                    {
+                        logger?.LogCritical($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}][Key:{key}] Could not create consumer group.");
+                        throw new Exception($"Could not create consumer group '{consumerGroup}' for stream key '{key}'.");
                     }
                 }
                 catch (RedisServerException e)
                 {
-                    // consumer group already exists
-                    if (!e.Message.Contains("BUSYGROUP"))
+                    if (e.Message.Contains("BUSYGROUP"))
+                    {
+                        logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}][Key:{key}] Consumer group '{consumerGroup}' has already been created.");
+                    }
+                    else
                     {
                         throw;
                     }
@@ -63,6 +73,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 if (streams[i].Entries.Length > 0)
                 {
+                    logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}][Key:{streams[i].Key}] Received {streams[i].Entries.Length} elements.");
                     foreach (StreamEntry entry in streams[i].Entries)
                     {
                         var triggerValue = new RedisMessageModel
@@ -75,6 +86,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     };
 
                     RedisValue[] entryIds = streams[i].Entries.Select(entry => entry.Id).ToArray();
+                    logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}][Key:{streams[i].Key}] Acknolwedging entries {entryIds}.");
                     await db.StreamAcknowledgeAsync(streams[i].Key, consumerGroup, entryIds);
 
                     if (deleteAfterProcess)
@@ -85,12 +97,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             };
         }
 
-        public override void BeforeClosing()
+        public override async void BeforeClosing()
         {
             IDatabase db = multiplexer.GetDatabase();
             foreach (RedisKey key in keys)
             {
-                db.StreamDeleteConsumerAsync(key, consumerGroup, consumerName);
+                logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}][Key:{key}] Deleting consumer group '{consumerGroup}'.");
+                long remainingMessages = await db.StreamDeleteConsumerAsync(key, consumerGroup, consumerName);
+                logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}][Key:{key}] There were {remainingMessages} remaing messages for the consumer.");
             }
         }
 
