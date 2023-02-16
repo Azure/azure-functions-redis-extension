@@ -62,7 +62,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(KeySpaceTrigger_AllKeys))]
         public static void KeySpaceTrigger_AllKeys(
-            [RedisPubSubTrigger(localhostSetting, all)] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, keyspaceChannelAll)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -78,7 +78,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(KeyEventTrigger_AllEvents))]
         public static void KeyEventTrigger_AllEvents(
-            [RedisPubSubTrigger(localhostSetting, all)] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, keyeventChannelAll)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
