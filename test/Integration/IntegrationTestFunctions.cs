@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
 using System.Text.Json;
 
@@ -18,6 +19,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         public const string streamSingleKey = "streamSingleKey";
         public const string streamMultipleKeys = "streamKey1 streamKey2 streamKey3";
         public const int pollingInterval = 100;
+        public const string bindingKey = "bindingKey";
+        public const string bindingValue = "bindingValue";
         public const int count = 100;
 
         [FunctionName(nameof(PubSubTrigger_SingleChannel))]
@@ -83,7 +86,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
-
         [FunctionName(nameof(ListsTrigger_SingleKey))]
         public static void ListsTrigger_SingleKey(
             [RedisListsTrigger(localhostSetting, listSingleKey, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
@@ -115,5 +117,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
         }
+
+        [FunctionName(nameof(CommandBinding))]
+        public static void CommandBinding(
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = pubsubChannel)] RedisMessageModel model,
+            [RedisCommand(ConnectionString = connectionString, RedisCommand = "set", Arguments = bindingKey + " " + bindingValue + "1")] RedisResult result,
+            ILogger logger)
+        {
+            logger.LogInformation(JsonSerializer.Serialize(model));
+        }
+
+        [FunctionName(nameof(ScriptBinding))]
+        public static void ScriptBinding(
+            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = pubsubChannel)] RedisMessageModel model,
+            [RedisScript(ConnectionString = connectionString, LuaScript = "return redis.call('SET', KEYS[1], ARGV[1])", Keys = bindingKey, Values = bindingValue + "2")] RedisResult result,
+            ILogger logger)
+        {
+            logger.LogInformation(JsonSerializer.Serialize(result));
+        }
+
     }
 }
