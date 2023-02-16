@@ -1,6 +1,4 @@
-﻿using StackExchange.Redis;
-
-namespace Microsoft.Azure.WebJobs.Extensions.Redis
+﻿namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
     /// This model gets returned when the function is triggered.
