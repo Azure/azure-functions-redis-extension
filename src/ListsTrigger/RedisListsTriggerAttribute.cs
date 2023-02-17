@@ -4,7 +4,7 @@ using Microsoft.Azure.WebJobs.Description;
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// Attribute used to bind parameters to a Redis list trigger message.
+    /// Redis lists trigger binding attributes.
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
     [Binding]

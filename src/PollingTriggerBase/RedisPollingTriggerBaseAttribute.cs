@@ -27,6 +27,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         /// <summary>
         /// Redis connection string setting.
+        /// This setting will be used to resolve the actual connection string from the appsettings.
         /// </summary>
         [ConnectionString]
         public string ConnectionStringSetting { get; }
@@ -38,7 +39,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public string Keys { get; }
 
         /// <summary>
-        /// How often to poll Redis in ms.
+        /// How often to poll Redis in milliseconds.
         /// </summary>
         public int PollingIntervalInMs { get; }
 
