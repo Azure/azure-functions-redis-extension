@@ -4,14 +4,14 @@ using Microsoft.Azure.WebJobs.Description;
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// Streams trigger binding attributes.
+    /// Redis streams trigger binding attributes.
     /// </summary>
     [Binding]
     [AttributeUsage(AttributeTargets.Parameter)]
     public class RedisStreamsTriggerAttribute : RedisPollingTriggerBaseAttribute
     {
         /// <summary>
-        /// 
+        /// Initializes a new <see cref="RedisStreamsTriggerAttribute"/>.
         /// </summary>
         /// <param name="connectionStringSetting"></param>
         /// <param name="keys"></param>

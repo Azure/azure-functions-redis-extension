@@ -4,7 +4,7 @@ using Microsoft.Azure.WebJobs.Description;
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// Attribute used to bind parameters to a Redis PubSub trigger message.
+    /// Redis pubsub trigger binding attributes.
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
     [Binding]
@@ -23,7 +23,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         /// <summary>
         /// Redis connection string setting.
-        /// This setting will be used to resolve the actual connection string from the configuration.
+        /// This setting will be used to resolve the actual connection string from the appsettings.
         /// </summary>
         [ConnectionString]
         public string ConnectionStringSetting { get; }
