@@ -12,10 +12,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisPubSubTriggerBindingProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration configuration;
+        private readonly INameResolver nameResolver;
 
-        public RedisPubSubTriggerBindingProvider(IConfiguration configuration)
+        public RedisPubSubTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver)
         {
             this.configuration = configuration;
+            this.nameResolver = nameResolver;
         }
 
         public Task<ITriggerBinding> TryCreateAsync(TriggerBindingProviderContext context)
@@ -33,8 +35,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
-            string connectionString = RedisUtilities.ResolveString(configuration, attribute.ConnectionStringSetting, "ConnectionString");
-            string channel = RedisUtilities.ResolveString(configuration, attribute.Channel, "Channel");
+            string connectionString = RedisUtilities.ResolveConnectionString(configuration, attribute.ConnectionStringSetting);
+            string channel = RedisUtilities.ResolveString(nameResolver, attribute.Channel, nameof(attribute.Channel));
 
             return Task.FromResult<ITriggerBinding>(new RedisPubSubTriggerBinding(connectionString, channel));
         }

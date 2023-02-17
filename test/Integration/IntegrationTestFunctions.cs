@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     public static class IntegrationTestFunctions
     {
-        public const string connectionString = "127.0.0.1:6379";
+        public const string localhostSetting = "redisLocalhost";
         public const string pubsubChannel = "testChannel";
         public const string keyspaceChannel = "__keyspace@0__:testKey";
         public const string keyeventChannel = "__keyevent@0__:set";
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(PubSubTrigger_SingleChannel))]
         public static void PubSubTrigger_SingleChannel(
-            [RedisPubSubTrigger(connectionString, pubsubChannel)] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, pubsubChannel)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -30,7 +30,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(PubSubTrigger_MultipleChannels))]
         public static void PubSubTrigger_MultipleChannels(
-            [RedisPubSubTrigger(connectionString, pubsubChannel + "*")] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, pubsubChannel + "*")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -38,7 +38,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(PubSubTrigger_AllChannels))]
         public static void PubSubTrigger_AllChannels(
-            [RedisPubSubTrigger(connectionString, all)] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, all)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -46,7 +46,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(KeySpaceTrigger_SingleKey))]
         public static void KeySpaceTrigger_SingleKey(
-            [RedisPubSubTrigger(connectionString, keyspaceChannel)] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, keyspaceChannel)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -54,7 +54,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(KeySpaceTrigger_MultipleKeys))]
         public static void KeySpaceTrigger_MultipleKeys(
-            [RedisPubSubTrigger(connectionString, keyspaceChannel + "*")] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, keyspaceChannel + "*")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -62,7 +62,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(KeySpaceTrigger_AllKeys))]
         public static void KeySpaceTrigger_AllKeys(
-            [RedisPubSubTrigger(connectionString, keyspaceChannelAll)] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, keyspaceChannelAll)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(KeyEventTrigger_SingleEvent))]
         public static void KeyEventTrigger_SingleEvent(
-            [RedisPubSubTrigger(connectionString, keyeventChannel)] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, keyeventChannel)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -78,7 +78,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(KeyEventTrigger_AllEvents))]
         public static void KeyEventTrigger_AllEvents(
-            [RedisPubSubTrigger(connectionString, keyeventChannelAll)] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, keyeventChannelAll)] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -86,7 +86,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListsTrigger_SingleKey))]
         public static void ListsTrigger_SingleKey(
-            [RedisListsTrigger(connectionString, listSingleKey, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
+            [RedisListsTrigger(localhostSetting, listSingleKey, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -94,7 +94,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListsTrigger_MultipleKeys))]
         public static void ListsTrigger_MultipleKeys(
-            [RedisListsTrigger(connectionString, listMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
+            [RedisListsTrigger(localhostSetting, listMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -102,7 +102,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamsTrigger_DefaultGroup_SingleKey))]
         public static void StreamsTrigger_DefaultGroup_SingleKey(
-            [RedisStreamsTrigger(connectionString, streamSingleKey, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
+            [RedisStreamsTrigger(localhostSetting, streamSingleKey, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
@@ -110,7 +110,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamsTrigger_DefaultGroup_MultipleKeys))]
         public static void StreamsTrigger_DefaultGroup_MultipleKeys(
-            [RedisStreamsTrigger(connectionString, streamMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
+            [RedisStreamsTrigger(localhostSetting, streamMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));
