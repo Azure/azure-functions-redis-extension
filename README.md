@@ -17,9 +17,9 @@ There are three triggers in the Azure Functions Redis Extension:
     cd RedisFunctions
     func init --worker-runtime dotnet
     ```
-1. Install the Redis Extension using `dotnet add package Microsoft.Azure.WebJobs.Extensions.Sql --prerelease`.
+1. Install the Redis Extension using `dotnet add package Microsoft.Azure.WebJobs.Extensions.Redis --prerelease`.
 For private preview, these are the following steps to add the nuget package to your project:
-   1. Create a `NuGet.Config` file in the project folder:
+   1. Create a `NuGet.Config` file in the project folder (`RedisFunctions` in the above step):
       ```
       <?xml version="1.0" encoding="utf-8"?>
       <configuration>
