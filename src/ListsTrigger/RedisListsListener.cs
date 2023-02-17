@@ -26,8 +26,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             await base.StartAsync(cancellationToken);
             if (serverVersion < new Version("7.0") && keys.Length > 1)
             {
-                // lmpop is 7.0 and higher, so function will only be able to trigger on a single key
-                throw new ArgumentException($"The cache's version {serverVersion} is lower than 7.0, and does not support lmpop");
+                // lmpop is 7.0 and higher, so function will only trigger on the first key in the given input
             }
         }
 
