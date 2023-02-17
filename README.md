@@ -28,16 +28,12 @@ For private preview, these are the following steps to add the nuget package to y
         </packageSources>
       </configuration>
       ```
-   2. Add the following line to the `<PropertyGroup>` section of the csproj.
+   1. Add the following line to the `<PropertyGroup>` section of the csproj.
       ```
       <RestoreSources>$(RestoreSources);./local-packages;https://api.nuget.org/v3/index.json</RestoreSources>
       ```
-   3. Create a folder `local-packages` within the project folder:
-      ```
-      mkdir local-packages
-      ```
-   4. Download the latest NuGet package from [GitHub Releases](https://github.com/Azure/azure-functions-redis-extension/releases) to this `local-packages` folder.
-   5. Install the package:
+   1. Create a folder `local-packages` within the project folder, and download the latest NuGet package from [GitHub Releases](https://github.com/Azure/azure-functions-redis-extension/releases) to this `local-packages` folder.
+   1. Install the package:
       ```
       dotnet add package Microsoft.Azure.WebJobs.Extensions.Redis --prerelease
       dotnet restore
