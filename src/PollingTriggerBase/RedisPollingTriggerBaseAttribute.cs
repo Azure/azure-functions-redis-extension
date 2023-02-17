@@ -39,7 +39,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public string Keys { get; }
 
         /// <summary>
-        /// How often to poll Redis in ms.
+        /// How often to poll Redis in milliseconds.
         /// </summary>
         public int PollingIntervalInMs { get; }
 
