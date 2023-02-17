@@ -1,17 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>Microsoft.Azure</Authors>
+    <AssemblyName>Microsoft.Azure.WebJobs.Extensions.Redis</AssemblyName>
+    <RootNamespace>Microsoft.Azure.WebJobs.Extensions.Redis</RootNamespace>
+
+    <PackageId>Microsoft.Azure.WebJobs.Extensions.Redis</PackageId>
+    <Authors>Microsoft</Authors>
     <Company>Microsoft</Company>
-    <Product>Azure Redis Cache Extension for Azure Functions</Product>
-    <Description>Azure redis cache extension for azure functions.</Description>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+
+    <Product>Redis Extension for Azure Functions</Product>
+    <Description>This package contains binding extensions for Redis.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>Azure, Azure Redis Cache, Redis, Redis Cache, Azure Redis Cache Extension, Azure Functions</PackageTags>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/Azure/azure-functions-redis-extension</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Azure/azure-functions-redis-extension</PackageProjectUrl>
+    <PackageTags>Microsoft Azure WebJobs AzureFunctions Redis</PackageTags>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>embedded</DebugType>
+
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <AssemblyVersion></AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
