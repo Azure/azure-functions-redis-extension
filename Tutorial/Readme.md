@@ -41,6 +41,8 @@ The following tutorial shows how to implement basic triggers with Azure Cache fo
 
 Create a new **Azure Cache for Redis** instance using the Azure portal or your preferred CLI tool. Any tier and SKU should work. We’ll use a _Standard C1_ instance, which is a good starting tier and SKU. 
 
+![Image](Media/CreateCache.png)
+
 The default settings should suffice. We’ll use a public endpoint for this demo, but you’ll likely want to use a private endpoint for anything in production. 
 The cache can take a bit to create, so feel free to move to the next section while this completes. 
 
