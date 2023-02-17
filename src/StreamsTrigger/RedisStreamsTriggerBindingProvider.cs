@@ -33,7 +33,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
-            string connectionString = RedisUtilities.ResolveString(configuration, attribute.ConnectionString, "ConnectionString");
+            string connectionString = RedisUtilities.ResolveString(configuration, attribute.ConnectionStringSetting, "ConnectionString");
             string keys = RedisUtilities.ResolveString(configuration, attribute.Keys, "Keys");
             int messagesPerWorker = attribute.MessagesPerWorker;
             int batchSize = attribute.BatchSize;
