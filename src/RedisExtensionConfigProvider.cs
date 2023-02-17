@@ -12,13 +12,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     public class RedisExtensionConfigProvider : IExtensionConfigProvider
     {
         private readonly IConfiguration configuration;
+        private readonly INameResolver nameResolver;
         /// <summary>
         /// Adds Redis triggers and bindings to the extension context.
         /// </summary>
         /// <param name="configuration"></param>
-        public RedisExtensionConfigProvider(IConfiguration configuration) 
+        public RedisExtensionConfigProvider(IConfiguration configuration, INameResolver nameResolver)
         {
             this.configuration = configuration;
+            this.nameResolver = nameResolver;
         }
 
         /// <summary>
@@ -33,13 +35,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
 #pragma warning disable CS0618
             FluentBindingRule<RedisPubSubTriggerAttribute> pubsubTriggerRule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
-            pubsubTriggerRule.BindToTrigger<RedisMessageModel>(new RedisPubSubTriggerBindingProvider(configuration));
+            pubsubTriggerRule.BindToTrigger<RedisMessageModel>(new RedisPubSubTriggerBindingProvider(configuration, nameResolver));
 
             FluentBindingRule<RedisListsTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListsTriggerAttribute>();
-            listsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisListsTriggerBindingProvider(configuration));
+            listsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisListsTriggerBindingProvider(configuration, nameResolver));
 
             FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
-            streamsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisStreamsTriggerBindingProvider(configuration));
+            streamsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver));
 #pragma warning restore CS0618
         }
     }
