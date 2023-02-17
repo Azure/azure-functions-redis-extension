@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Base attributes for all triggers that poll Redis.
     /// </summary>
-    public abstract class RedisPollingTriggerAttributeBase : Attribute
+    public abstract class RedisPollingTriggerBaseAttribute : Attribute
     {
         /// <summary>
         /// Cache connection string.
@@ -16,13 +16,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         /// <summary>
         /// Keys to read from, space-delimited.
-        /// All keys will be read from at the same time, using the <a href="https://redis.io/commands/xread/">XREAD</a> or <a href="https://redis.io/commands/lmpop/">LMPOP</a> commands.
         /// </summary>
         [AutoResolve]
         public string Keys { get; set; }
 
         /// <summary>
-        /// How often to poll Redis in ms.
+        /// How often to poll Redis in milliseconds.
         /// </summary>
         public int PollingIntervalInMs { get; set; } = 1000;
 
@@ -36,7 +35,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         /// <summary>
         /// Number of elements to pull from Redis at one time.
-        /// This is done using the COUNT argument in <a href="https://redis.io/commands/xread/">XREAD</a> for streams and <a href="https://redis.io/commands/lpop/">LPOP</a> for lists.
         /// </summary>
         public int BatchSize { get; set; } = 100;
     }

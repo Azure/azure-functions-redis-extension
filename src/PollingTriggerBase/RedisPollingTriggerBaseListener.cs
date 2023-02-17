@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for polling a cache.
     /// </summary>
-    internal abstract class RedisPollingListenerBase : IListener, IScaleMonitor, IScaleMonitor<RedisPollingMetrics>
+    internal abstract class RedisPollingTriggerBaseListener : IListener, IScaleMonitor, IScaleMonitor<RedisPollingTriggerBaseMetrics>
     {
         private const int MINIMUM_SAMPLES = 5;
         internal string connectionString;
@@ -29,7 +29,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
 
-        public RedisPollingListenerBase(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor)
+        public RedisPollingTriggerBaseListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor)
         {
             this.connectionString = connectionString;
             this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
@@ -126,19 +126,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return await this.GetMetricsAsync().ConfigureAwait(false);
         }
 
-        public abstract Task<RedisPollingMetrics> GetMetricsAsync();
+        public abstract Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync();
 
-        public ScaleStatus GetScaleStatus(ScaleStatusContext<RedisPollingMetrics> context)
+        public ScaleStatus GetScaleStatus(ScaleStatusContext<RedisPollingTriggerBaseMetrics> context)
         {
             return GetScaleStatusCore(context.WorkerCount, context.Metrics?.ToArray());
         }
 
         public ScaleStatus GetScaleStatus(ScaleStatusContext context)
         {
-            return GetScaleStatusCore(context.WorkerCount, context.Metrics?.Cast<RedisPollingMetrics>().ToArray());
+            return GetScaleStatusCore(context.WorkerCount, context.Metrics?.Cast<RedisPollingTriggerBaseMetrics>().ToArray());
         }
 
-        private ScaleStatus GetScaleStatusCore(int workerCount, RedisPollingMetrics[] metrics)
+        private ScaleStatus GetScaleStatusCore(int workerCount, RedisPollingTriggerBaseMetrics[] metrics)
         {
             // don't scale up or down if we don't have enough metrics
             if (metrics is null || metrics.Length < MINIMUM_SAMPLES)

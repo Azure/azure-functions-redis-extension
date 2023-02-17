@@ -11,7 +11,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for managing connections and listening to a given Azure Redis Cache.
     /// </summary>
-    internal sealed class RedisListsListener : RedisPollingListenerBase
+    internal sealed class RedisListsListener : RedisPollingTriggerBaseListener
     {
         internal bool listPopFromBeginning;
 
@@ -75,9 +75,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        public override Task<RedisPollingMetrics> GetMetricsAsync()
+        public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            var metrics = new RedisPollingMetrics
+            var metrics = new RedisPollingTriggerBaseMetrics
             {
                 Remaining = keys.Sum((key) => multiplexer.GetDatabase().ListLength(key)),
                 Timestamp = DateTime.UtcNow,
