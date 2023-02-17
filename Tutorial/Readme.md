@@ -48,12 +48,16 @@ The cache can take a bit to create, so feel free to move to the next section whi
 
 ### 2. Set up Visual Studio Code
 
-If you haven’t installed the functions extension for VS Code, do so by searching for _Azure Functions_ in the extensions menu and selecting Install. If you don’t have the C# extension installed, please install that as well. 
+If you haven’t installed the functions extension for VS Code, do so by searching for _Azure Functions_ in the extensions menu and selecting **Install**. If you don’t have the C# extension installed, please install that as well. 
+
+![Image](Media/InstallExtensions.png)
  
 Next, go to the **Azure** tab, and sign-in to your existing Azure account, or create a new one:
  
 Create a new local folder on your computer to hold the project that we’ll be building. I’ve named mine “AzureRedisFunctionDemo”
 In the Azure tab, create a new functions app by clicking on the lightning icon in the top right of the **Workspace** box in the lower left of the screen.
+
+![Image](Media/CreateFunctionProject.png)
 
 Select the new folder that you’ve created. This will start the creation of a new Azure Functions project. You’ll get several on-screen prompts. Select:
 
@@ -63,6 +67,8 @@ Select the new folder that you’ve created. This will start the creation of a n
 Note: If you don’t have the .NET Core SDK installed, you’ll be prompted to do so.
 
 The new project will be created:
+
+![Image](Media/VSCodeWorkspace.png)
 
 ### 3. Install Necessary NuGet packages
 
@@ -103,7 +109,11 @@ Next, we need to install the Microsoft.Azure.WebJobs.Extensions.Redis package. W
 Go to your newly created Azure Cache for Redis instance. Two steps need to be taken here. 
 First, we need to enable **keyspace notifications** on the cache to trigger on keys and commands. Go to your cache in the Azure portal and select the **Advanced settings** blade. Scroll down to the field labled _notify-keyspace-events_ and enter “KEA”. Then select Save at the top of the window. “KEA” is a configuration string that enables keyspace notifications for all keys and events. More information on keyspace configuration strings can be found [here](https://redis.io/docs/manual/keyspace-notifications/). 
 
+![Image](Media/KeyspaceNotifications.png)
+
 Second, go to the **Access keys** blade and write down/copy the Primary connection string field. We’ll use this to connect to the cache.  
+
+![Image](Media/AccessKeys.png)
 
 ### 5. Set up the example code
 
@@ -119,6 +129,8 @@ This example shows multiple different triggers:
 1.	_StreamsMultipleTrigger_, which looks for changes to streams “streamTest1 and streamTest2”
 
 To connect to your cache, take the connection string you copied from earlier and paste to replace the value of `localhost` at the top of the file. (This is “127.0.0.1:6379” by default).
+
+![Image](Media/ConnectionString.png)
  
 ### 6. Build and run the code locally
 Switch to the **Run and debug** tab in VS code and click on the green arrow to debug the code locally. If you don’t have Azure Functions core tools installed, you will be prompted to do so. In that case, you’ll need to restart VS Code after installing.
@@ -126,6 +138,7 @@ Switch to the **Run and debug** tab in VS code and click on the green arrow to d
 The code should build successfully, which you can track in the Terminal output. 
 To test the trigger functionality out, try creating and deleting the _keyspaceTest_ key. You can use any way you prefer to connect to the cache, but the easiest way will likely be to use the built-in Console tool in the Azure Cache for Redis portal. Bring up the cache instance in the Azure portal, and click the Console button to open it up.
  
+![Image](Media/Console.png)
 
 Once it is open, try the following commands:
 - SET keyspaceTest 1
@@ -134,11 +147,17 @@ Once it is open, try the following commands:
 - PUBLISH pubsubTest testMessage
 - LPUSH listTest test
 - XADD streamTest * name Clippy
- 
+
+![Image](Media/Console2.png)
+
 You should see the triggers activating in the terminal:
+
+![Image](Media/TriggersWorking.png)
  
 ### 6. Deploy Code to an Azure Function
-Create a new Azure function by going back to the Azure tab, expanding your subscription, and right clicking on Function App. Select Create a Function App in Azure…(Advanced). 
+Create a new Azure function by going back to the Azure tab, expanding your subscription, and right clicking on **Function App**. Select **Create a Function App in Azure…(Advanced)**.
+
+![Image](Media/CreateFunctionApp.png)
  
 You will see several prompts on information to configure the new functions app:
 - Enter a unique name
@@ -153,10 +172,14 @@ You will see several prompts on information to configure the new functions app:
 - Create a new Application Insights resource (we’ll use this to confirm the trigger is working)
 
 Wait a few minutes for the new Function App to be created. It will now show up in the drop down under **Function App** in your subscription. Right click on the new function app and select **Deploy to Function App…**
+
+![Image](Media/DeployToFunction.png)
  
 The app will build and start deploying. You can track progress in the **Output Window**
 .
 Once deployment is complete, open your Function App in the Azure Portal and select the **Log Stream** blade. Wait for log analytics to connect, and then use the Redis console to activate any of the triggers. You should see the triggers being logged here. 
+
+![Image](Media/LogStream.png)
 
 ## Conclusion
 We hope the above tutorial helps you get started using the Redis trigger functionality! Please email redisfunctionpreview@microsoft.com with any questions, suggestions, bugs, or feedback. We’re eager to hear what you think. 
