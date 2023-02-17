@@ -7,7 +7,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     {
         public const string localhostSetting = "redisLocalhost";
 
-        [FunctionName("PubSubTrigger")]
+        [FunctionName(nameof(PubSubTrigger))]
         public static void PubSubTrigger(
             [RedisPubSubTrigger(localhostSetting, "pubsubTest")] RedisMessageModel model,
             ILogger logger)
@@ -15,7 +15,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
-        [FunctionName("KeyspaceTrigger")]
+        [FunctionName(nameof(PubSubTriggerResolvedChannel))]
+        public static void PubSubTriggerResolvedChannel(
+            [RedisPubSubTrigger(localhostSetting, "%pubsubChannel%")] RedisMessageModel model,
+            ILogger logger)
+        {
+            logger.LogInformation(JsonSerializer.Serialize(model));
+        }
+
+        [FunctionName(nameof(KeyspaceTrigger))]
         public static void KeyspaceTrigger(
             [RedisPubSubTrigger(localhostSetting, "__keyspace@0__:keyspaceTest")] RedisMessageModel model,
             ILogger logger)
@@ -23,7 +31,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
-        [FunctionName("KeyeventTrigger")]
+        [FunctionName(nameof(KeyeventTrigger))]
         public static void KeyeventTrigger(
             [RedisPubSubTrigger(localhostSetting, "__keyevent@0__:del")] RedisMessageModel model,
             ILogger logger)
