@@ -8,7 +8,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     [Binding]
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class RedisListsTriggerAttribute : RedisPollingTriggerAttributeBase
+    public class RedisListsTriggerAttribute : RedisPollingTriggerBaseAttribute
     {
         /// <summary>
         /// Decides if the function will pop elements from the front or end of the list.

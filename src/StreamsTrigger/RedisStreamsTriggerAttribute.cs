@@ -8,7 +8,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     [Binding]
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class RedisStreamsTriggerAttribute : RedisPollingTriggerAttributeBase
+    public class RedisStreamsTriggerAttribute : RedisPollingTriggerBaseAttribute
     {
         /// <summary>
         /// Name of the consumer group to use when reading the streams.

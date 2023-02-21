@@ -2,7 +2,7 @@
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    internal class RedisPollingMetrics : ScaleMetrics
+    internal class RedisPollingTriggerBaseMetrics : ScaleMetrics
     {
         public long Remaining { get; set; }
     }
