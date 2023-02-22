@@ -3,10 +3,12 @@
 
 ## Introduction
 This repository contains the triggers and bindings to use in your [Azure Functions](https://learn.microsoft.com/azure/azure-functions/functions-get-started) and [WebJobs](https://learn.microsoft.com/azure/app-service/webjobs-sdk-how-to).
-There are three triggers in the Azure Functions Redis Extension:
+There are three triggers and two input bindings in the Azure Functions Redis Extension:
 - `RedisPubSubTrigger` triggers on [Redis pubsub messages](https://redis.io/docs/manual/pubsub/)
 - `RedisListsTrigger` triggers on [Redis lists](https://redis.io/docs/data-types/lists/)
 - `RedisStreamsTrigger` triggers on [Redis streams](https://redis.io/docs/data-types/streams/)
+- `RedisCommand` runs commands
+- `RedisScript` runs [Lua scripts](https://redis.io/docs/manual/programmability/eval-intro/)
 
 ## Getting Started
 1. [Set up an Azure Cache for Redis instance](https://learn.microsoft.com/azure/azure-cache-for-redis/quickstart-create-redis) or [install Redis locally](https://redis.io/download/).
@@ -129,7 +131,7 @@ public static void StreamsTrigger(
 }
 ```
 
-### Return Value
+### Trigger Return Value
 All triggers return a [`RedisMessageModel`](./src/Models/RedisMessageModel.cs) object that has two fields:
 ```c#
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -143,6 +145,57 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 ```
 - `Trigger`: The pubsub channel, list key, or stream key that the function is listening to.
 - `Message`: The pubsub message, list element, or stream element.
+
+### `RedisCommand`
+The `RedisCommand` binding runs an operation and returns the value.
+
+#### Inputs
+- `ConnectionString`: connection string to the redis cache (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `Command`: name of the command to be run.
+- `Args`: arguments for the command, space-delimited.
+
+#### Return Value
+- [`RedisResult`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisResult.cs) is a `StackExchange.Redis` class that contains the value from running the command.
+
+#### Sample
+The following sample listens to the keyspace notifications for the key "keytest" at a localhost Redis instance at "127.0.0.1:6379" and uses the command binding to get the value of the key.
+```c#
+[FunctionName(nameof(KeyspaceTriggerCommandBinding))]
+public static void KeyspaceTriggerCommandBinding(
+  [RedisPubSubTrigger(ConnectionString = "127.0.0.1:6379", Channel = "__keyspace@0__:keytest")] RedisMessageModel model,
+  [RedisCommand(ConnectionString = "127.0.0.1:6379", RedisCommand = "get", Arguments = "keytest")] RedisResult result,
+  ILogger logger)
+{
+  logger.LogInformation($"Triggered on {model.Message} event for key {model.Trigger}");
+  logger.LogInformation($"Value of key {model.Message} = {result}");
+}
+```
+
+### `RedisScript`
+The `RedisScript` binding runs a Lua script and returns the value.
+
+#### Inputs
+- `ConnectionString`: connection string to the redis cache (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `Script`: Lua script to be run.
+- (optional) `Keys`: keys for the command, space-delimited. These can be accessed from the script using `KEYS[0]`
+- (optional) `Args`: arguments for the command, space-delimited. These can be accessed from the script using `ARGV[0]`
+
+#### Return Value
+- [`RedisResult`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisResult.cs) is a `StackExchange.Redis` class that contains the value from running the script.
+
+#### Sample
+The following sample listens to the keyspace notifications for the key "scriptTest" at a localhost Redis instance at "127.0.0.1:6379" and uses the script binding to get the value of the key.
+```c#
+[FunctionName(nameof(KeyspaceTriggerScriptBinding))]
+public static void KeyspaceTriggerScriptBinding(
+  [RedisPubSubTrigger(ConnectionString = "127.0.0.1:6379", Channel = "__keyspace@0__:scriptTest")] RedisMessageModel model,
+  [RedisScript(ConnectionString = "127.0.0.1:6379", LuaScript = "return redis.call('GET', KEYS[1])", Keys = "scriptTest")] RedisResult result,
+  ILogger logger)
+{
+  logger.LogInformation($"Triggered on {model.Message} event for key {model.Trigger}");
+  logger.LogInformation($"Value of key {model.Message} = {result}");
+}
+```
 
 ## Known Issues
 - The `RedisPubSubTrigger` is not capable of listening to [keyspace notifications](https://redis.io/docs/manual/keyspace-notifications/) on clustered caches.

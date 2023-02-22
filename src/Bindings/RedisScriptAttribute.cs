@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// The script to be executed on the cache.
         /// </summary>
         [AutoResolve]
-        public string LuaScript { get; set; }
+        public string Script { get; set; }
 
         /// <summary>
         /// Space-delimited keys for the script.
@@ -32,6 +32,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// Space-delimited values for the script.
         /// </summary>
         [AutoResolve]
-        public string Values { get; set; }
+        public string Args { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public RedisResult Convert(RedisCommandAttribute input)
         {
-            return ConnectionMultiplexer.Connect(input.ConnectionString).GetDatabase().Execute(input.RedisCommand, args: input.Arguments.Split(' '));
+            return ConnectionMultiplexer.Connect(input.ConnectionString).GetDatabase().Execute(input.Command, args: input.Args.Split(' '));
         }
     }
 }

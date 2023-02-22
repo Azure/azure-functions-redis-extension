@@ -43,7 +43,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         [FunctionName(nameof(KeyspaceTriggerCommandBinding))]
         public static void KeyspaceTriggerCommandBinding(
             [RedisPubSubTrigger(ConnectionString = localhost, Channel = "__keyspace@0__:keytest")] RedisMessageModel model,
-            [RedisCommand(ConnectionString = localhost, RedisCommand = "get", Arguments = "keytest")] RedisResult result,
+            [RedisCommand(ConnectionString = localhost, Command = "get", Args = "keytest")] RedisResult result,
             ILogger logger)
         {
             logger.LogInformation($"Triggered on {model.Message} event for key {model.Trigger}");
@@ -53,7 +53,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         [FunctionName(nameof(KeyspaceTriggerScriptBinding))]
         public static void KeyspaceTriggerScriptBinding(
             [RedisPubSubTrigger(ConnectionString = localhost, Channel = "__keyspace@0__:scriptTest")] RedisMessageModel model,
-            [RedisScript(ConnectionString = localhost, LuaScript = "return redis.call('GET', KEYS[1])", Keys = "scriptTest")] RedisResult result,
+            [RedisScript(ConnectionString = localhost, Script = "return redis.call('GET', KEYS[1])", Keys = "scriptTest")] RedisResult result,
             ILogger logger)
         {
             logger.LogInformation($"Triggered on {model.Message} event for key {model.Trigger}");

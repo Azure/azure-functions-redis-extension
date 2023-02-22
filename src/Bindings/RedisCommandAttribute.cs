@@ -20,12 +20,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// The command to be executed on the cache.
         /// </summary>
         [AutoResolve]
-        public string RedisCommand { get; set; }
+        public string Command { get; set; }
 
         /// <summary>
-        /// Arguments for the <see cref="RedisCommand"/>.
+        /// Arguments for the <see cref="Command"/>.
         /// </summary>
         [AutoResolve]
-        public string Arguments { get; set; }
+        public string Args { get; set; }
     }
 }
