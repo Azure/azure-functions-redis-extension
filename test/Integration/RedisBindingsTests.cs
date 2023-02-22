@@ -5,15 +5,15 @@ using Xunit;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Linq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     public class RedisBindingsTests
     {
         [Fact]
-        public void RedisCommand_ReturnsCorrectValue()
+        public async void RedisCommand_ReturnsCorrectValue()
         {
-            bool success = false;
             string bindingValue = null;
             string functionName = nameof(IntegrationTestFunctions.CommandBinding);
             Dictionary<string, int> counts = new Dictionary<string, int>
@@ -24,12 +24,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7072))
             {
-                TaskCompletionSource<bool> functionCompleted = new TaskCompletionSource<bool>();
-                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts, functionCompleted);
+                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 multiplexer.GetDatabase().KeyDelete(IntegrationTestFunctions.bindingKey);
 
                 multiplexer.GetSubscriber().Publish(IntegrationTestFunctions.pubsubChannel, "start");
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
+                await Task.Delay(TimeSpan.FromSeconds(1));
 
                 bindingValue = multiplexer.GetDatabase().StringGet(IntegrationTestFunctions.bindingKey);
 
@@ -37,13 +36,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 functionsProcess.Kill();
             };
             Assert.Equal(IntegrationTestFunctions.bindingValue + "1", bindingValue);
-            Assert.True(success, JsonSerializer.Serialize(counts));
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
         [Fact]
-        public void RedisScript_ReturnsCorrectValue()
+        public async void RedisScript_SetsCorrectValue()
         {
-            bool success = false;
             string bindingValue = null;
             string functionName = nameof(IntegrationTestFunctions.ScriptBinding);
             Dictionary<string, int> counts = new Dictionary<string, int>
@@ -55,11 +54,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7072))
             {
                 TaskCompletionSource<bool> functionCompleted = new TaskCompletionSource<bool>();
-                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts, functionCompleted);
+                functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 multiplexer.GetDatabase().KeyDelete(IntegrationTestFunctions.bindingKey);
 
                 multiplexer.GetSubscriber().Publish(IntegrationTestFunctions.pubsubChannel, "start");
-                success = functionCompleted.Task.Wait(TimeSpan.FromSeconds(5));
+                await Task.Delay(TimeSpan.FromSeconds(1));
 
                 bindingValue = multiplexer.GetDatabase().StringGet(IntegrationTestFunctions.bindingKey);
 
@@ -67,7 +66,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 functionsProcess.Kill();
             };
             Assert.Equal(IntegrationTestFunctions.bindingValue + "2", bindingValue);
-            Assert.True(success, JsonSerializer.Serialize(counts));
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
     }
 }
