@@ -81,7 +81,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         internal static IConfiguration localsettings = new ConfigurationBuilder().AddJsonFile(Path.Combine(
-            new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, 
+            new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
             "local.settings.json")).Build();
 
         private static string GetFunctionsFileName()
