@@ -41,7 +41,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Fact]
-        public async void RedisScript_SetsCorrectValue()
+        public async void RedisScript_ReturnsCorrectValue()
         {
             string bindingValue = null;
             string functionName = nameof(IntegrationTestFunctions.ScriptBinding);
