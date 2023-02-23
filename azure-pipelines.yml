@@ -57,7 +57,7 @@ jobs:
           NODE_MODULES_PATH: '$(nodeModulesPath)'
         inputs:
           command: test
-          arguments: --configuration Debug -- xunit.parallelizeAssembly=false
+          arguments: --configuration Debug
 
   - job: build
     displayName: Build Release, Generate & Sign Nuget Package

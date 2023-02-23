@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Linq;
 using System.Collections.Concurrent;
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     public class RedisTriggerTests
