@@ -13,14 +13,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// 
         /// </summary>
         void Connect();
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="handler"></param>
-        void Subscribe(string channel, Func<ChannelMessage, Task> handler);
-        
+
+        void Subscribe(RedisChannel channel, Func<ChannelMessage, Task> handler);
+        Task<RedisValue> ListLeftPopAsync(RedisKey key);
+        Task<RedisValue[]> ListLeftPopAsync(RedisKey key, long count);
+        Task<ListPopResult> ListLeftPopAsync(RedisKey[] keys, long count);
+        Task<RedisValue> ListRightPopAsync(RedisKey key);
+        Task<RedisValue[]> ListRightPopAsync(RedisKey key, long count);
+        Task<ListPopResult> ListRightPopAsync(RedisKey[] keys, long count);
+        Task<long> ListLengthAsync(RedisKey key);
+
         /// <summary>
         /// 
         /// </summary>

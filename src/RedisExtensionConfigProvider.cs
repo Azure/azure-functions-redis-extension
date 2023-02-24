@@ -55,7 +55,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         internal IRedisService GetService(string connectionString, ILogger logger)
         {
-            return connections.GetOrAdd(connectionString, (cs) => new DefaultRedisService(connectionString, logger));
+            return connections.GetOrAdd(connectionString, (cs) => new CountingRedisService(connectionString, logger));
         }
 
     }
