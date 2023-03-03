@@ -9,7 +9,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName("PubSubTrigger")]
         public static void PubSubTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, Channel = "pubsubTest")] RedisMessageModel model,
+            [RedisPubSubTrigger(localhost, "pubsubTest")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -17,7 +17,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName("KeyspaceTrigger")]
         public static void KeyspaceTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, Channel = "__keyspace@0__:keyspaceTest")] RedisMessageModel model,
+            [RedisPubSubTrigger(localhost, "__keyspace@0__:keyspaceTest")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -25,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName("KeyeventTrigger")]
         public static void KeyeventTrigger(
-            [RedisPubSubTrigger(ConnectionString = localhost, Channel = "__keyevent@0__:del")] RedisMessageModel model,
+            [RedisPubSubTrigger(localhost, "__keyevent@0__:del")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(ListsTrigger))]
         public static void ListsTrigger(
-            [RedisListsTrigger(ConnectionString = localhost, Keys = "listTest")] RedisMessageModel model,
+            [RedisListsTrigger(localhost, "listTest")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -41,7 +41,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(ListsMultipleTrigger))]
         public static void ListsMultipleTrigger(
-            [RedisListsTrigger(ConnectionString = localhost, Keys = "listTest1 listTest2")] RedisMessageModel model,
+            [RedisListsTrigger(localhost, "listTest1 listTest2")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(StreamsTrigger))]
         public static void StreamsTrigger(
-            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest")] RedisMessageModel model,
+            [RedisStreamsTrigger(localhost, "streamTest")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -57,11 +57,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(StreamsMultipleTriggers))]
         public static void StreamsMultipleTriggers(
-            [RedisStreamsTrigger(ConnectionString = localhost, Keys = "streamTest1 streamTest2")] RedisMessageModel model,
+            [RedisStreamsTrigger(localhost, "streamTest1 streamTest2")] RedisMessageModel model,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
-
     }
 }
