@@ -1,6 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using FakeItEasy;
+using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
@@ -22,82 +28,56 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             { "falseKey", "false" }
         }).Build();
 
-        [Theory]
-        [InlineData("%CacheConnection%", "testCacheString")]
-        [InlineData("testCacheString", "testCacheString")]
-        public void ResolveString_ValidString_ReturnsResolvedString(string cacheString, string expectedResult)
+        private static IConfiguration localsettings = new ConfigurationBuilder().AddJsonFile(Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, "local.settings.json")).Build();
+
+        [Fact]
+        public void ResolveConnectionString_ValidConnectionStringSetting_ReturnsResolvedString()
         {
-            Assert.Equal(expectedResult, RedisUtilities.ResolveString(testConfig, cacheString, ""));
+            Assert.Equal("127.0.0.1:6379", RedisUtilities.ResolveConnectionString(localsettings, "redisLocalhost"));;
         }
 
         [Fact]
-        public void ResolveString_InvalidKey_ThrowsArgumentException()
+        public void ResolveConnectionString_ValidSetting_ReturnsResolvedString()
         {
-            Assert.Throws<ArgumentException>(() => RedisUtilities.ResolveString(testConfig, "%invalidStringKey%", ""));
-        }
-
-        [Fact]
-        public void ResolveString_EmptyString_ThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => RedisUtilities.ResolveString(testConfig, "", ""));
+            Assert.Equal("testCacheString", RedisUtilities.ResolveConnectionString(testConfig, "CacheConnection")); ;
         }
 
         [Theory]
-        [InlineData("%int100key%", 100)]
-        [InlineData("%int2key%", 2)]
-        public void ResolveInt_ValidInt_ReturnsResolvedInt(string cacheString, int expectedResult)
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData(null)]
+        public void ResolveConnectionString_EmptyConnectionStringSetting_ThrowsArgumentNullException(string connectionStringSetting)
         {
-            Assert.Equal(expectedResult, RedisUtilities.ResolveInt(testConfig, cacheString, ""));
+            Assert.Throws<ArgumentNullException>(() => RedisUtilities.ResolveConnectionString(testConfig, connectionStringSetting));
         }
 
         [Fact]
-        public void ResolveInt_InvalidKey_ThrowsArgumentException()
+        public void ResolveConnectionString_InvalidSetting_ThrowsArgumentOutOfRangeException()
         {
-            Assert.Throws<ArgumentException>(() => RedisUtilities.ResolveInt(testConfig, "%invalidStringKey%", ""));
+            Assert.Throws<ArgumentOutOfRangeException>(() => RedisUtilities.ResolveConnectionString(testConfig, "invalidSetting"));
         }
 
         [Fact]
-        public void ResolveInt_NegativeInt_ThrowsArgumentException()
+        public void ResolveString_ValidSetting_ReturnsResolvedString()
         {
-            Assert.Throws<ArgumentException>(() => RedisUtilities.ResolveInt(testConfig, "%int-5key%", ""));
-        }
-
-        [Fact]
-        public void ResolveInt_InvalidInt_ThrowsInvalidCastException()
-        {
-            Assert.Throws<InvalidCastException>(() => RedisUtilities.ResolveInt(testConfig, "%randomKey%", ""));
-        }
-
-        [Fact]
-        public void ResolveInt_EmptyInt_ThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => RedisUtilities.ResolveInt(testConfig, "", ""));
+            Assert.Equal("PubSub", RedisUtilities.ResolveString(new DefaultNameResolver(testConfig), "%pubsubkey%", "testSetting")); ;
         }
 
         [Theory]
-        [InlineData("%trueKey%", true)]
-        [InlineData("%falseKey%", false)]
-        public void ResolveBool_ValidBool_ReturnsResolvedBool(string cacheString, bool expectedResult)
+        [InlineData("%invalidStringKey%")]
+        [InlineData("hello")]
+        public void ResolveString_InvalidSetting_ReturnsInput(string setting)
         {
-            Assert.Equal(expectedResult, RedisUtilities.ResolveBool(testConfig, cacheString, ""));
+            Assert.Equal(setting, RedisUtilities.ResolveString(new DefaultNameResolver(testConfig), setting, "testSetting")); ;
         }
 
-        [Fact]
-        public void ResolveBool_InvalidKey_ThrowsArgumentException()
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData(null)]
+        public void ResolveString_EmptySetting_ThrowsArgumentNullException(string setting)
         {
-            Assert.Throws<ArgumentException>(() => RedisUtilities.ResolveBool(testConfig, "%invalidStringKey%", ""));
-        }
-
-        [Fact]
-        public void ResolveBool_InvalidBool_ThrowsInvalidCastException()
-        {
-            Assert.Throws<InvalidCastException>(() => RedisUtilities.ResolveBool(testConfig, "%randomKey%", ""));
-        }
-
-        [Fact]
-        public void ResolveBool_EmptyBool_ThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => RedisUtilities.ResolveBool(testConfig, "", ""));
+            Assert.Throws<ArgumentNullException>(() => RedisUtilities.ResolveString(new DefaultNameResolver(testConfig), setting, "testSetting"));
         }
     }
 }

@@ -12,10 +12,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisListsTriggerBindingProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration configuration;
+        private readonly INameResolver nameResolver;
 
-        public RedisListsTriggerBindingProvider(IConfiguration configuration)
+        public RedisListsTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver)
         {
             this.configuration = configuration;
+            this.nameResolver = nameResolver;
         }
 
         public Task<ITriggerBinding> TryCreateAsync(TriggerBindingProviderContext context)
@@ -33,8 +35,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
-            string connectionString = RedisUtilities.ResolveString(configuration, attribute.ConnectionStringSetting, "ConnectionString");
-            string keys = RedisUtilities.ResolveString(configuration, attribute.Keys, "Keys");
+            string connectionString = RedisUtilities.ResolveConnectionString(configuration, attribute.ConnectionStringSetting);
+            string keys = RedisUtilities.ResolveString(nameResolver, attribute.Keys, nameof(attribute.Keys));
             int messagesPerWorker = attribute.MessagesPerWorker;
             int batchSize = attribute.BatchSize;
             TimeSpan pollingInterval = TimeSpan.FromMilliseconds(attribute.PollingIntervalInMs);
