@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -13,25 +14,29 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         private readonly IConfiguration configuration;
         private readonly INameResolver nameResolver;
+        private readonly ILogger logger;
 
-        public RedisListsTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver)
+        public RedisListsTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
             this.nameResolver = nameResolver;
+            this.logger = logger;
         }
 
         public Task<ITriggerBinding> TryCreateAsync(TriggerBindingProviderContext context)
         {
-            if (context == null)
+            if (context is null)
             {
-                throw new ArgumentNullException("context");
+                logger?.LogError($"[{nameof(RedisListsTriggerBindingProvider)}] Provided {nameof(TriggerBindingProviderContext)} is null.");
+                throw new ArgumentNullException(nameof(context));
             }
-            
+
             ParameterInfo parameter = context.Parameter;
             RedisListsTriggerAttribute attribute = parameter.GetCustomAttribute<RedisListsTriggerAttribute>(inherit: false); 
 
-            if (attribute == null)
+            if (attribute is null)
             {
+                logger?.LogError($"[{nameof(RedisListsTriggerBindingProvider)}] No {nameof(RedisListsTriggerAttribute)} found in parameter of provided {nameof(TriggerBindingProviderContext)}.");
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
@@ -42,7 +47,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             TimeSpan pollingInterval = TimeSpan.FromMilliseconds(attribute.PollingIntervalInMs);
             bool listPopFromBeginning = attribute.ListPopFromBeginning;
 
-            return Task.FromResult<ITriggerBinding>(new RedisListsTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, listPopFromBeginning));
+            return Task.FromResult<ITriggerBinding>(new RedisListsTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, listPopFromBeginning, logger));
         }
     }
 }

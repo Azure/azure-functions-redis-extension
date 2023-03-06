@@ -3,8 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Listeners;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -13,16 +13,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     internal sealed class RedisPubSubListener : IListener
     {
-        internal ITriggeredFunctionExecutor executor;
         internal string connectionString;
         internal string channel;
+        internal ITriggeredFunctionExecutor executor;
+        internal ILogger logger;
+
         internal IConnectionMultiplexer multiplexer;
 
-        public RedisPubSubListener(string connectionString, string channel, ITriggeredFunctionExecutor executor)
+        public RedisPubSubListener(string connectionString, string channel, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.connectionString = connectionString;
             this.channel = channel;
             this.executor = executor;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -32,17 +35,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (multiplexer is null)
             {
-                multiplexer = await InitializeConnectionMultiplexerAsync(connectionString);
+                logger?.LogInformation($"[{nameof(RedisPubSubListener)}] Connecting to Redis.");
+                multiplexer = await ConnectionMultiplexer.ConnectAsync(connectionString);
             }
 
             if (!multiplexer.IsConnected)
             {
+                logger?.LogCritical($"[{nameof(RedisPubSubListener)}] Failed to connect to cache.");
                 throw new ArgumentException("Failed to connect to cache.");
             }
 
             ChannelMessageQueue channelMessageQeueue = await multiplexer.GetSubscriber().SubscribeAsync(channel);
             channelMessageQeueue.OnMessage(async (msg) =>
             {
+                logger?.LogDebug($"[{nameof(RedisPubSubListener)}] Message received on channel '{channel}'.");
                 var callBack = new RedisMessageModel
                 {
                     Trigger = msg.Channel,
@@ -51,6 +57,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
                 await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = callBack }, cancellationToken);
             });
+            logger?.LogInformation($"[{nameof(RedisPubSubListener)}] Subscribed to channel '{channel}'.");
+
             return;
         }
 
@@ -73,35 +81,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         /// <summary>
-        /// Creates redis cache multiplexer connection.
-        /// </summary>
-        private static async Task<IConnectionMultiplexer> InitializeConnectionMultiplexerAsync(string connectionString)
-        {
-            try
-            {
-                return await ConnectionMultiplexer.ConnectAsync(connectionString);
-            }
-            catch (Exception)
-            {
-                throw new Exception("Failed to create connection to cache.");
-            }
-
-        }
-
-        /// <summary>
         /// Closes redis cache multiplexer connection.
         /// </summary>
         internal async Task CloseMultiplexerAsync(IConnectionMultiplexer existingMultiplexer)
         {
-            try
-            {
-                await existingMultiplexer.CloseAsync();
-                await existingMultiplexer.DisposeAsync();
-            }
-            catch (Exception)
-            {
-                throw new Exception("Failed to close connection to cache.");
-            }
+            logger?.LogInformation($"[{nameof(RedisPubSubListener)}] Closing and disposing multiplexer.");
+            await existingMultiplexer.CloseAsync();
+            await existingMultiplexer.DisposeAsync();
         }
     }
 }

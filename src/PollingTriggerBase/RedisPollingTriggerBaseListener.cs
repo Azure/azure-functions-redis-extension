@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 
@@ -24,12 +25,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal int messagesPerWorker;
         internal int batchSize;
         internal ITriggeredFunctionExecutor executor;
+        internal ILogger logger;
+
         internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
 
         public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
 
-        public RedisPollingTriggerBaseListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor)
+        public RedisPollingTriggerBaseListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.connectionString = connectionString;
             this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
@@ -37,6 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.messagesPerWorker = messagesPerWorker;
             this.batchSize = batchSize;
             this.executor = executor;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -46,11 +50,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (multiplexer is null)
             {
+                logger?.LogInformation($"[{nameof(RedisPollingTriggerBaseListener)}] Connecting to Redis.");
                 multiplexer = await ConnectionMultiplexer.ConnectAsync(connectionString);
             }
 
             if (!multiplexer.IsConnected)
             {
+                logger?.LogCritical($"[{nameof(RedisPollingTriggerBaseListener)}] Failed to connect to cache.");
                 throw new ArgumentException("Failed to connect to cache.");
             }
 
@@ -82,16 +88,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         internal async Task CloseMultiplexerAsync(IConnectionMultiplexer existingMultiplexer)
         {
-            try
-            {
-                BeforeClosing();
-                await existingMultiplexer.CloseAsync();
-                await existingMultiplexer.DisposeAsync();
-            }
-            catch (Exception)
-            {
-                throw new Exception("Failed to close connection to cache.");
-            }
+            BeforeClosing();
+            logger?.LogInformation($"[{nameof(RedisPollingTriggerBaseListener)}] Closing and disposing multiplexer.");
+            await existingMultiplexer.CloseAsync();
+            await existingMultiplexer.DisposeAsync();
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 return new ScaleStatus { Vote = ScaleVote.None };
             }
 
-            double average = metrics.Skip(metrics.Length - MINIMUM_SAMPLES).Select(metric => metric.Remaining).Average();
+            double average = metrics.OrderByDescending(metric => metric.Timestamp).Take(MINIMUM_SAMPLES).Select(metric => metric.Remaining).Average();
 
             if (workerCount * messagesPerWorker < average)
             {
