@@ -13,13 +13,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Initializes a new <see cref="RedisStreamsTriggerAttribute"/>.
         /// </summary>
-        /// <param name="connectionStringSetting"></param>
-        /// <param name="keys"></param>
-        /// <param name="pollingIntervalInMs"></param>
-        /// <param name="messagesPerWorker"></param>
-        /// <param name="batchSize"></param>
-        /// <param name="consumerGroup"></param>
-        /// <param name="deleteAfterProcess"></param>
+        /// <param name="connectionStringSetting">Redis connection string setting.</param>
+        /// <param name="keys">Keys to read from, space-delimited.</param>
+        /// <param name="pollingIntervalInMs">How often to poll Redis in milliseconds. Default: 1000</param>
+        /// <param name="messagesPerWorker">The number of messages each functions instance is expected to handle. Default: 100</param>
+        /// <param name="batchSize">Number of elements to pull from a Redis stream at one time. Default: 10</param>
+        /// <param name="consumerGroup">Name of the consumer group to use when reading the streams. Default: AzureFunctionRedisExtension</param>
+        /// <param name="deleteAfterProcess">Decides if the function will delete the stream entries after processing. Default: false</param>
         public RedisStreamsTriggerAttribute(string connectionStringSetting, string keys, int pollingIntervalInMs = 1000, int messagesPerWorker = 100, int batchSize = 10, string consumerGroup = "AzureFunctionRedisExtension", bool deleteAfterProcess = false)
             : base(connectionStringSetting, keys, pollingIntervalInMs, messagesPerWorker, batchSize)
         {
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public string ConsumerGroup { get; }
 
         /// <summary>
-        /// If true, the function will delete the stream entries after processing.
+        /// Decides if the function will delete the stream entries after processing.
         /// </summary>
         public bool DeleteAfterProcess { get; }
 

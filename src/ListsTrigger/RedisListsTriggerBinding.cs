@@ -5,7 +5,6 @@ using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
-using StackExchange.Redis;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -46,9 +45,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
         {
-            if (context == null)
+            if (context is null)
             {
-                throw new ArgumentNullException("context");
+                logger?.LogError($"[{nameof(RedisListsTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
+                throw new ArgumentNullException(nameof(context));
             }
 
             return Task.FromResult<IListener>(new RedisListsListener(connectionString, keys, pollingInterval, messagesPerWorker, count, listPopFromBeginning, context.Executor, logger));

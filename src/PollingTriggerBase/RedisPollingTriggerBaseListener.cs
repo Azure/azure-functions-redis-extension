@@ -86,16 +86,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         internal async Task CloseMultiplexerAsync(IConnectionMultiplexer existingMultiplexer)
         {
-            try
-            {
-                BeforeClosing();
-                await existingMultiplexer.CloseAsync();
-                await existingMultiplexer.DisposeAsync();
-            }
-            catch (Exception)
-            {
-                throw new Exception("Failed to close connection to cache.");
-            }
+            BeforeClosing();
+            logger?.LogInformation($"[{nameof(RedisPubSubListener)}] Closing multiplexer.");
+            await existingMultiplexer.CloseAsync();
+            await existingMultiplexer.DisposeAsync();
         }
 
         /// <summary>
@@ -150,7 +144,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 return new ScaleStatus { Vote = ScaleVote.None };
             }
 
-            double average = metrics.Skip(metrics.Length - MINIMUM_SAMPLES).Select(metric => metric.Remaining).Average();
+            double average = metrics.OrderByDescending(metric => metric.Timestamp).Take(MINIMUM_SAMPLES).Select(metric => metric.Remaining).Average();
 
             if (workerCount * messagesPerWorker < average)
             {

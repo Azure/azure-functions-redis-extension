@@ -37,9 +37,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
         {
-            if (context == null)
+            if (context is null)
             {
-                throw new ArgumentNullException("context");
+                logger?.LogError($"[{nameof(RedisPubSubTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
+                throw new ArgumentNullException(nameof(context));
             }
 
             return Task.FromResult<IListener>(new RedisPubSubListener(connectionString, channel, context.Executor, logger));

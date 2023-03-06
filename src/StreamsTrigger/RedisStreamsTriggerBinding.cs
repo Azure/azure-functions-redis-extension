@@ -47,9 +47,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
         {
-            if (context == null)
+            if (context is null)
             {
-                throw new ArgumentNullException("context");
+                logger?.LogError($"[{nameof(RedisStreamsTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
+                throw new ArgumentNullException(nameof(context));
             }
 
             return Task.FromResult<IListener>(new RedisStreamsListener(connectionString, keys, pollingInterval, messagesPerWorker, count, consumerGroup, deleteAfterProcess, context.Executor, logger));

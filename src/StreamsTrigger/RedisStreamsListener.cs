@@ -7,7 +7,6 @@ using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
-
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
@@ -32,26 +31,34 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public override async void BeforePolling()
         {
             IDatabase db = multiplexer.GetDatabase();
-
-            // create consumer group for each stream key
             foreach (RedisKey key in keys)
             {
                 try
                 {
+                    logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Attempting to create consumer group '{consumerGroup}' for the stream at key '{key}'.");
                     if (!await db.StreamCreateConsumerGroupAsync(key, consumerGroup))
                     {
-                        throw new Exception($"Could not create consumer group for stream key {key}");
+                        logger?.LogCritical($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Could not create consumer group '{consumerGroup}' for the stream at key '{key}'.");
+                        throw new Exception($"Could not create consumer group '{consumerGroup}' for the stream at key '{key}'.");
                     }
+                    logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Successfully created consumer group '{consumerGroup}' for the stream at key '{key}'.");
+
                 }
                 catch (RedisServerException e)
                 {
-                    // consumer group already exists
-                    if (!e.Message.Contains("BUSYGROUP"))
+                    if (e.Message.Contains("BUSYGROUP"))
                     {
+                        logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Consumer group '{consumerGroup}' for the stream at key '{key}' already exists.");
+                    }
+                    else
+                    {
+                        logger?.LogCritical($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Could not create consumer group '{consumerGroup}' for the stream at key '{key}'.");
                         throw;
                     }
                 }
             }
+
+            logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Beginning polling loop.");
         }
 
         public override async Task PollAsync(CancellationToken cancellationToken)
@@ -59,38 +66,40 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             IDatabase db = multiplexer.GetDatabase();
             RedisStream[] streams = await db.StreamReadGroupAsync(positions, consumerGroup, consumerName, batchSize);
 
-            for (int i = 0; i < streams.Length; i++)
+            foreach (RedisStream stream in streams)
             {
-                if (streams[i].Entries.Length > 0)
+                logger?.LogDebug($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Received {stream.Entries.Length} elements from the stream at key '{stream.Key}'.");
+                foreach (StreamEntry entry in stream.Entries)
                 {
-                    foreach (StreamEntry entry in streams[i].Entries)
+                    var triggerValue = new RedisMessageModel
                     {
-                        var triggerValue = new RedisMessageModel
-                        {
-                            Trigger = streams[i].Key,
-                            Message = JsonSerializer.Serialize(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()))
-                        };
-
-                        await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                        Trigger = stream.Key,
+                        Message = JsonSerializer.Serialize(entry.Values)
                     };
 
-                    RedisValue[] entryIds = streams[i].Entries.Select(entry => entry.Id).ToArray();
-                    await db.StreamAcknowledgeAsync(streams[i].Key, consumerGroup, entryIds);
-
-                    if (deleteAfterProcess)
-                    {
-                        await db.StreamDeleteAsync(streams[i].Key, entryIds);
-                    }
+                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }
-            };
+
+                RedisValue[] entryIds = stream.Entries.Select(entry => entry.Id).ToArray();
+                long acknowledged = await db.StreamAcknowledgeAsync(stream.Key, consumerGroup, entryIds);
+                logger?.LogDebug($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Acknowledged {acknowledged} elements from the stream at key '{stream.Key}'.");
+
+                if (deleteAfterProcess)
+                {
+                    long deleted = await db.StreamDeleteAsync(stream.Key, entryIds);
+                    logger?.LogDebug($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Deleted {deleted} elements from the stream at key '{stream.Key}'.");
+                }
+            }
         }
 
-        public override void BeforeClosing()
+        public async override void BeforeClosing()
         {
             IDatabase db = multiplexer.GetDatabase();
             foreach (RedisKey key in keys)
             {
-                db.StreamDeleteConsumerAsync(key, consumerGroup, consumerName);
+                logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Attempting to delete consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'.");
+                long pending = await db.StreamDeleteConsumerAsync(key, consumerGroup, consumerName);
+                logger?.LogInformation($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Successfully deleted consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'. There were {pending} pending messages for the consumer.");
             }
         }
 

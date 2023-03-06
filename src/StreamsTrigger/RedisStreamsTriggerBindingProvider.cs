@@ -25,16 +25,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<ITriggerBinding> TryCreateAsync(TriggerBindingProviderContext context)
         {
-            if (context == null)
+            if (context is null)
             {
-                throw new ArgumentNullException("context");
+                logger?.LogError($"[{nameof(RedisStreamsTriggerBindingProvider)}] Provided {nameof(TriggerBindingProviderContext)} is null.");
+                throw new ArgumentNullException(nameof(context));
             }
 
             ParameterInfo parameter = context.Parameter;
             RedisStreamsTriggerAttribute attribute = parameter.GetCustomAttribute<RedisStreamsTriggerAttribute>(inherit: false);
 
-            if (attribute == null)
+            if (attribute is null)
             {
+                logger?.LogError($"[{nameof(RedisStreamsTriggerBindingProvider)}] No {nameof(RedisStreamsTriggerAttribute)} found in parameter of provided {nameof(TriggerBindingProviderContext)}.");
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
