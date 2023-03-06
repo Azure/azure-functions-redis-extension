@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 
@@ -24,12 +25,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal int messagesPerWorker;
         internal int batchSize;
         internal ITriggeredFunctionExecutor executor;
+        internal ILogger logger;
+
         internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
 
         public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
 
-        public RedisPollingTriggerBaseListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor)
+        public RedisPollingTriggerBaseListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.connectionString = connectionString;
             this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
@@ -37,6 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.messagesPerWorker = messagesPerWorker;
             this.batchSize = batchSize;
             this.executor = executor;
+            this.logger = logger;
         }
 
         /// <summary>

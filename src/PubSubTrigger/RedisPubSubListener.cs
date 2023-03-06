@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Listeners;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 
@@ -13,16 +14,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     internal sealed class RedisPubSubListener : IListener
     {
-        internal ITriggeredFunctionExecutor executor;
         internal string connectionString;
         internal string channel;
+        internal ITriggeredFunctionExecutor executor;
+        internal ILogger logger;
+
         internal IConnectionMultiplexer multiplexer;
 
-        public RedisPubSubListener(string connectionString, string channel, ITriggeredFunctionExecutor executor)
+        public RedisPubSubListener(string connectionString, string channel, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.connectionString = connectionString;
             this.channel = channel;
             this.executor = executor;
+            this.logger = logger;
         }
 
         /// <summary>

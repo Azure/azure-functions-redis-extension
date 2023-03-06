@@ -6,6 +6,7 @@ using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 using StackExchange.Redis;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -20,9 +21,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly string keys;
         private readonly int count;
         private readonly bool listPopFromBeginning;
+        private readonly ILogger logger;
 
-
-        public RedisListsTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning)
+        public RedisListsTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning, ILogger logger)
         {
             this.connectionString = connectionString;
             this.keys = keys;
@@ -30,6 +31,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.messagesPerWorker = messagesPerWorker;
             this.count = count;
             this.listPopFromBeginning = listPopFromBeginning;
+            this.logger = logger;
         }
 
         public Type TriggerValueType => typeof(RedisMessageModel);
@@ -49,7 +51,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException("context");
             }
 
-            return Task.FromResult<IListener>(new RedisListsListener(connectionString, keys, pollingInterval, messagesPerWorker, count, listPopFromBeginning, context.Executor));
+            return Task.FromResult<IListener>(new RedisListsListener(connectionString, keys, pollingInterval, messagesPerWorker, count, listPopFromBeginning, context.Executor, logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

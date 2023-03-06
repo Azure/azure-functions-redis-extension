@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -15,11 +16,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         private readonly string connectionString;
         private readonly string channel;
+        private readonly ILogger logger;
 
-        public RedisPubSubTriggerBinding(string connectionString, string channel)
+        public RedisPubSubTriggerBinding(string connectionString, string channel, ILogger logger)
         {
             this.connectionString = connectionString;
             this.channel = channel;
+            this.logger = logger;
         }
 
         public Type TriggerValueType => typeof(RedisMessageModel);
@@ -39,7 +42,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException("context");
             }
 
-            return Task.FromResult<IListener>(new RedisPubSubListener(connectionString, channel, context.Executor));
+            return Task.FromResult<IListener>(new RedisPubSubListener(connectionString, channel, context.Executor, logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

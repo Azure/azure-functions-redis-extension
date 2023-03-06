@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -13,11 +14,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         private readonly IConfiguration configuration;
         private readonly INameResolver nameResolver;
+        private readonly ILogger logger;
 
-        public RedisStreamsTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver)
+        public RedisStreamsTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
             this.nameResolver = nameResolver;
+            this.logger = logger;
         }
 
         public Task<ITriggerBinding> TryCreateAsync(TriggerBindingProviderContext context)
@@ -43,7 +46,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string consumerGroup = RedisUtilities.ResolveString(nameResolver, attribute.ConsumerGroup, nameof(attribute.ConsumerGroup));
             bool deleteAfterProcess = attribute.DeleteAfterProcess;
 
-            return Task.FromResult<ITriggerBinding>(new RedisStreamsTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, consumerGroup, deleteAfterProcess));
+            return Task.FromResult<ITriggerBinding>(new RedisStreamsTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, consumerGroup, deleteAfterProcess, logger));
         }
     }
 }
