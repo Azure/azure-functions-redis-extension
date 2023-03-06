@@ -50,11 +50,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (multiplexer is null)
             {
+                logger?.LogInformation($"[{nameof(RedisPollingTriggerBaseListener)}] Connecting to Redis.");
                 multiplexer = await ConnectionMultiplexer.ConnectAsync(connectionString);
             }
 
             if (!multiplexer.IsConnected)
             {
+                logger?.LogCritical($"[{nameof(RedisPollingTriggerBaseListener)}] Failed to connect to cache.");
                 throw new ArgumentException("Failed to connect to cache.");
             }
 
@@ -87,7 +89,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal async Task CloseMultiplexerAsync(IConnectionMultiplexer existingMultiplexer)
         {
             BeforeClosing();
-            logger?.LogInformation($"[{nameof(RedisPubSubListener)}] Closing multiplexer.");
+            logger?.LogInformation($"[{nameof(RedisPollingTriggerBaseListener)}] Closing and disposing multiplexer.");
             await existingMultiplexer.CloseAsync();
             await existingMultiplexer.DisposeAsync();
         }

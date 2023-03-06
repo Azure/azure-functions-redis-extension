@@ -85,7 +85,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         internal async Task CloseMultiplexerAsync(IConnectionMultiplexer existingMultiplexer)
         {
-            logger?.LogInformation($"[{nameof(RedisPubSubListener)}] Closing multiplexer.");
+            logger?.LogInformation($"[{nameof(RedisPubSubListener)}] Closing and disposing multiplexer.");
             await existingMultiplexer.CloseAsync();
             await existingMultiplexer.DisposeAsync();
         }
