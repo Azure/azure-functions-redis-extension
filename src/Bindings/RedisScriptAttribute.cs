@@ -4,34 +4,49 @@ using Microsoft.Azure.WebJobs.Description;
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// An input binding that excutes a Redis command.
+    /// An input binding that excutes a command on the redis instances and returns the reult.
     /// </summary>
-    [Binding]
     [AttributeUsage(AttributeTargets.Parameter)]
+    [Binding]
     public sealed class RedisScriptAttribute : Attribute
     {
         /// <summary>
-        /// Gets or sets the Redis connection string setting.
+        /// 
         /// </summary>
-        [AutoResolve]
-        public string ConnectionString { get; set; }
+        /// <param name="connectionStringSetting"></param>
+        /// <param name="luaScript"></param>
+        /// <param name="keys"></param>
+        /// <param name="args"></param>
+        public RedisScriptAttribute(string connectionStringSetting, string luaScript, string keys = "", string args = "") {
+            ConnectionStringSetting = connectionStringSetting;
+            LuaScript = luaScript;
+            Keys = keys;
+            Args = args;
+        }
 
         /// <summary>
-        /// The script to be executed on the cache.
+        /// Redis connection string setting.
+        /// This setting will be used to resolve the actual connection string from the appsettings.
         /// </summary>
         [AutoResolve]
-        public string Script { get; set; }
+        public string ConnectionStringSetting { get; }
+
+        /// <summary>
+        /// The lua script to be executed on the cache.
+        /// </summary>
+        [AutoResolve]
+        public string LuaScript { get; }
 
         /// <summary>
         /// Space-delimited keys for the script.
         /// </summary>
         [AutoResolve]
-        public string Keys { get; set; }
+        public string Keys { get; }
 
         /// <summary>
         /// Space-delimited values for the script.
         /// </summary>
         [AutoResolve]
-        public string Args { get; set; }
+        public string Args { get; }
     }
 }

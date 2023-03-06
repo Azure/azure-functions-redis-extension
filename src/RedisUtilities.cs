@@ -1,12 +1,22 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Azure.WebJobs.Host;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal static class RedisUtilities
     {
+        public static readonly char DELIMITER = ' ';
+
+        public static string[] ResolveDelimitedStrings(INameResolver nameResolver, string setting, string settingName)
+        {
+            string resolvedString = ResolveString(nameResolver, setting, settingName);
+            if (string.IsNullOrWhiteSpace(resolvedString)) {
+                return new string[] { };
+            }
+            return resolvedString.Split(DELIMITER);
+        }
+
         public static string ResolveString(INameResolver nameResolver, string setting, string settingName)
         {
             if (nameResolver is null)

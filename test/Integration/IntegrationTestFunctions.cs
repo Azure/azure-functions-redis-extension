@@ -119,8 +119,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(CommandBinding))]
         public static void CommandBinding(
-            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = pubsubChannel)] RedisMessageModel model,
-            [RedisCommand(ConnectionString = connectionString, Command = "set", Args = bindingKey + " " + bindingValue + "1")] RedisResult result,
+            [RedisPubSubTrigger(localhostSetting, pubsubChannel)] RedisMessageModel model,
+            [RedisCommand(localhostSetting, "set", bindingKey + " " + bindingValue + "1")] RedisResult result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(model));
@@ -128,8 +128,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ScriptBinding))]
         public static void ScriptBinding(
-            [RedisPubSubTrigger(ConnectionString = connectionString, Channel = pubsubChannel)] RedisMessageModel model,
-            [RedisScript(ConnectionString = connectionString, Script = "return redis.call('SET', KEYS[1], ARGV[1])", Keys = bindingKey, Args = bindingValue + "2")] RedisResult result,
+            [RedisPubSubTrigger(localhostSetting, pubsubChannel)] RedisMessageModel model,
+            [RedisScript(localhostSetting, "return redis.call('SET', KEYS[1], ARGV[1])", keys: bindingKey, args: bindingValue + "2")] RedisResult result,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(result));

@@ -324,7 +324,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { $"Executed '{functionName}' (Succeeded", 1 },
             };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7072))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -353,7 +353,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { $"Executed '{functionName}' (Succeeded", 1 },
             };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(IntegrationTestFunctions.connectionString))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7072))
             {
                 TaskCompletionSource<bool> functionCompleted = new TaskCompletionSource<bool>();

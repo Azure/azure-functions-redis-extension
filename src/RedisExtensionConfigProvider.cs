@@ -35,10 +35,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
 #pragma warning disable CS0618
             FluentBindingRule<RedisCommandAttribute> commandRule = context.AddBindingRule<RedisCommandAttribute>();
-            commandRule.BindToInput(new RedisCommandConverter(configuration));
+            commandRule.BindToInput(new RedisCommandConverter(configuration, nameResolver));
 
             FluentBindingRule<RedisScriptAttribute> scriptRule = context.AddBindingRule<RedisScriptAttribute>();
-            scriptRule.BindToInput(new RedisScriptConverter(configuration));
+            scriptRule.BindToInput(new RedisScriptConverter(configuration, nameResolver));
 
             FluentBindingRule<RedisPubSubTriggerAttribute> pubsubTriggerRule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
             pubsubTriggerRule.BindToTrigger<RedisMessageModel>(new RedisPubSubTriggerBindingProvider(configuration, nameResolver));
