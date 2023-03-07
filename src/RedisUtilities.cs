@@ -8,10 +8,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         public static readonly char DELIMITER = ' ';
 
-        public static string[] ResolveDelimitedStrings(INameResolver nameResolver, string setting, string settingName)
+        public static string[] ResolveDelimitedString(INameResolver nameResolver, string setting, string settingName)
         {
+            if (string.IsNullOrWhiteSpace(setting))
+            {
+                return new string[] { };
+            }
+
             string resolvedString = ResolveString(nameResolver, setting, settingName);
-            if (string.IsNullOrWhiteSpace(resolvedString)) {
+            if (string.IsNullOrWhiteSpace(resolvedString))
+            {
                 return new string[] { };
             }
             return resolvedString.Split(DELIMITER);
@@ -26,7 +32,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             if (string.IsNullOrWhiteSpace(setting))
             {
-                return setting;
+                throw new ArgumentNullException(settingName);
             }
 
             if (nameResolver.TryResolveWholeString(setting, out string resolvedString))

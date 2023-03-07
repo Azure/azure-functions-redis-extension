@@ -19,8 +19,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             string connectionString = RedisUtilities.ResolveConnectionString(configuration, input.ConnectionStringSetting);
             string scriptString = RedisUtilities.ResolveString(nameResolver, input.LuaScript, nameof(input.LuaScript));
-            string[] stringKeys = RedisUtilities.ResolveDelimitedStrings(nameResolver, input.Keys, nameof(input.Keys));
-            string[] stringArgs = RedisUtilities.ResolveDelimitedStrings(nameResolver, input.Args, nameof(input.Args));
+            string[] stringKeys = RedisUtilities.ResolveDelimitedString(nameResolver, input.Keys, nameof(input.Keys));
+            string[] stringArgs = RedisUtilities.ResolveDelimitedString(nameResolver, input.Args, nameof(input.Args));
 
             RedisKey[] keys = stringKeys.Select(key => new RedisKey(key)).ToArray();
             RedisValue[] args = stringArgs.Select(arg => new RedisValue(arg)).ToArray();

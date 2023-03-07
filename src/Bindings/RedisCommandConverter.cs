@@ -18,7 +18,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             string connectionString = RedisUtilities.ResolveConnectionString(configuration, input.ConnectionStringSetting);
             string commandString = RedisUtilities.ResolveString(nameResolver, input.Command, nameof(input.Command));
-            string[] stringArgs = RedisUtilities.ResolveDelimitedStrings(nameResolver, input.Args, nameof(input.Args));
+            string[] stringArgs = RedisUtilities.ResolveDelimitedString(nameResolver, input.Args, nameof(input.Args));
             object[] args = stringArgs.Select(arg => (object) arg).ToArray();
 
             return ConnectionMultiplexer.Connect(connectionString).GetDatabase().Execute(commandString, args);
