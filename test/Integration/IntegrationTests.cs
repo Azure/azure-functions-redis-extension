@@ -338,7 +338,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 multiplexer.Close();
                 functionsProcess.Kill();
             };
-            Assert.Equal(IntegrationTestFunctions.bindingValue + "1", bindingValue);
+            Assert.Equal(IntegrationTestFunctions.bindingValue, bindingValue);
             var incorrect = counts.Where(pair => pair.Value != 0);
             Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
@@ -368,7 +368,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 multiplexer.Close();
                 functionsProcess.Kill();
             };
-            Assert.Equal(IntegrationTestFunctions.bindingValue + "2", bindingValue);
+            Assert.Equal(IntegrationTestFunctions.bindingValue, bindingValue);
             var incorrect = counts.Where(pair => pair.Value != 0);
             Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }

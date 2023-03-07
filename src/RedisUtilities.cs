@@ -26,7 +26,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             if (string.IsNullOrWhiteSpace(setting))
             {
-                throw new ArgumentNullException(settingName);
+                return setting;
             }
 
             if (nameResolver.TryResolveWholeString(setting, out string resolvedString))

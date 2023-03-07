@@ -43,7 +43,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         [FunctionName(nameof(KeyspaceTriggerCommandBinding))]
         public static void KeyspaceTriggerCommandBinding(
             [RedisPubSubTrigger(localhostSetting, "__keyspace@0__:keytest")] RedisMessageModel model,
-            [RedisCommand(localhostSetting, "get", "keytest")] RedisResult result,
+            [RedisCommand(localhostSetting, "set", "keytest value")] RedisResult result,
             ILogger logger)
         {
             logger.LogInformation($"Triggered on {model.Message} event for key {model.Trigger}");

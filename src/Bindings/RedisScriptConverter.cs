@@ -23,7 +23,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string[] stringArgs = RedisUtilities.ResolveDelimitedStrings(nameResolver, input.Args, nameof(input.Args));
 
             RedisKey[] keys = stringKeys.Select(key => new RedisKey(key)).ToArray();
-            RedisValue[] args = stringKeys.Select(arg => new RedisValue(arg)).ToArray();
+            RedisValue[] args = stringArgs.Select(arg => new RedisValue(arg)).ToArray();
 
             return ConnectionMultiplexer.Connect(connectionString).GetDatabase().ScriptEvaluate(scriptString, keys, args);
         }
