@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    internal class RedisCommandConverter : IConverter<RedisCommandAttribute, RedisResult>
+    internal class RedisCommandConverter : IAsyncConverter<RedisCommandAttribute, RedisResult>
     {
         private readonly IConfiguration configuration;
         private readonly INameResolver nameResolver;
@@ -14,14 +16,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.nameResolver = nameResolver;
         }
 
-        public RedisResult Convert(RedisCommandAttribute input)
-        {
+        public async Task<RedisResult> ConvertAsync(RedisCommandAttribute input, CancellationToken cancellationToken) {
             string connectionString = RedisUtilities.ResolveConnectionString(configuration, input.ConnectionStringSetting);
             string commandString = RedisUtilities.ResolveString(nameResolver, input.Command, nameof(input.Command));
             string[] stringArgs = RedisUtilities.ResolveDelimitedString(nameResolver, input.Args, nameof(input.Args));
             object[] args = stringArgs.Select(arg => (object) arg).ToArray();
 
-            return ConnectionMultiplexer.Connect(connectionString).GetDatabase().Execute(commandString, args);
+            return await (await ConnectionMultiplexer.ConnectAsync(connectionString)).GetDatabase().ExecuteAsync(commandString, args);
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    internal class RedisScriptConverter : IConverter<RedisScriptAttribute, RedisResult>
+    internal class RedisScriptConverter : IAsyncConverter<RedisScriptAttribute, RedisResult>
     {
         private readonly IConfiguration configuration;
         private readonly INameResolver nameResolver;
@@ -15,8 +17,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.nameResolver = nameResolver;
         }
 
-        public RedisResult Convert(RedisScriptAttribute input)
-        {
+        public async Task<RedisResult> ConvertAsync(RedisScriptAttribute input, CancellationToken cancellationToken) {
             string connectionString = RedisUtilities.ResolveConnectionString(configuration, input.ConnectionStringSetting);
             string scriptString = RedisUtilities.ResolveString(nameResolver, input.LuaScript, nameof(input.LuaScript));
             string[] stringKeys = RedisUtilities.ResolveDelimitedString(nameResolver, input.Keys, nameof(input.Keys));
@@ -25,7 +26,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             RedisKey[] keys = stringKeys.Select(key => new RedisKey(key)).ToArray();
             RedisValue[] args = stringArgs.Select(arg => new RedisValue(arg)).ToArray();
 
-            return ConnectionMultiplexer.Connect(connectionString).GetDatabase().ScriptEvaluate(scriptString, keys, args);
+            return await (await ConnectionMultiplexer.ConnectAsync(connectionString)).GetDatabase().ScriptEvaluateAsync(scriptString, keys, args);
         }
     }
 }
