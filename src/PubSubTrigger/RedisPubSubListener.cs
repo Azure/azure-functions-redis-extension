@@ -52,7 +52,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 var callBack = new RedisTriggerModel
                 {
                     Trigger = msg.Channel,
-                    Value = msg.Message
+                    Value = msg.Message.ToString(),
                 };
 
                 await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = callBack }, cancellationToken);

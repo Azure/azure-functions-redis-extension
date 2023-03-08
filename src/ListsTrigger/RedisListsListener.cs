@@ -46,7 +46,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     RedisTriggerModel triggerValue = new RedisTriggerModel
                     {
                         Trigger = result.Key,
-                        Value = value
+                        Value = value.ToString()
                     };
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 };
