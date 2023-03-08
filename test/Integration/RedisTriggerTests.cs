@@ -22,10 +22,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), "separate", "testSeparate")]
         public async void PubSubTrigger_SuccessfullyTriggers(string functionName, string channel, string message)
         {
-            RedisMessageModel expectedReturn = new RedisMessageModel
+            RedisTriggerModel expectedReturn = new RedisTriggerModel
             {
                 Trigger = channel,
-                Message = message
+                Value = message
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -59,15 +59,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             string keyspace = "__keyspace@0__:";
             string key = channel.Substring(channel.IndexOf(keyspace) + keyspace.Length);
-            RedisMessageModel expectedSetReturn = new RedisMessageModel
+            RedisTriggerModel expectedSetReturn = new RedisTriggerModel
             {
                 Trigger = channel,
-                Message = "set"
+                Value = "set"
             };
-            RedisMessageModel expectedDelReturn = new RedisMessageModel
+            RedisTriggerModel expectedDelReturn = new RedisTriggerModel
             {
                 Trigger = channel,
-                Message = "del"
+                Value = "del"
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -98,10 +98,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             string key = "key";
             string value = "value";
-            RedisMessageModel expectedReturn = new RedisMessageModel
+            RedisTriggerModel expectedReturn = new RedisTriggerModel
             {
                 Trigger = IntegrationTestFunctions.keyeventChannel,
-                Message = key
+                Value = key
             };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -130,15 +130,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             string key = "key";
             string value = "value";
-            RedisMessageModel expectedSetReturn = new RedisMessageModel
+            RedisTriggerModel expectedSetReturn = new RedisTriggerModel
             {
                 Trigger = "__keyevent@0__:set",
-                Message = key
+                Value = key
             };
-            RedisMessageModel expectedDelReturn = new RedisMessageModel
+            RedisTriggerModel expectedDelReturn = new RedisTriggerModel
             {
                 Trigger = "__keyevent@0__:del",
-                Message = key
+                Value = key
             };
 
             Dictionary<string, int> counts = new Dictionary<string, int>

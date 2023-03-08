@@ -49,10 +49,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             channelMessageQeueue.OnMessage(async (msg) =>
             {
                 logger?.LogDebug($"[{nameof(RedisPubSubListener)}] Message received on channel '{channel}'.");
-                var callBack = new RedisMessageModel
+                var callBack = new RedisTriggerModel
                 {
                     Trigger = msg.Channel,
-                    Message = msg.Message
+                    Value = msg.Message
                 };
 
                 await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = callBack }, cancellationToken);

@@ -3,7 +3,7 @@
     /// <summary>
     /// This model gets returned when the function is triggered.
     /// </summary>
-    public class RedisMessageModel
+    public class RedisTriggerModel
     {
         /// <summary>
         /// The pubsub channel, stream key, or list key that the function was triggered on.
@@ -13,6 +13,6 @@
         /// <summary>
         /// The message from the pubsub channel, stream, or list that the function was triggered on.
         /// </summary>
-        public string Message { get; set; }
+        public string Value { get; set; }
     }
 }

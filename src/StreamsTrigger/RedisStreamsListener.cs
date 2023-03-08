@@ -71,10 +71,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 logger?.LogDebug($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Received {stream.Entries.Length} elements from the stream at key '{stream.Key}'.");
                 foreach (StreamEntry entry in stream.Entries)
                 {
-                    var triggerValue = new RedisMessageModel
+                    var triggerValue = new RedisTriggerModel
                     {
                         Trigger = stream.Key,
-                        Message = JsonSerializer.Serialize(entry.Values)
+                        Value = JsonSerializer.Serialize(entry.Values)
                     };
 
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
