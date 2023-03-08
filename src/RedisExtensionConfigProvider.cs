@@ -40,15 +40,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 #pragma warning disable CS0618
             FluentBindingRule<RedisPubSubTriggerAttribute> pubsubTriggerRule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
             pubsubTriggerRule.BindToTrigger<RedisTriggerModel>(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, logger));
-            pubsubTriggerRule.AddConverter<RedisTriggerModel, string>(model => model.Value);
+            pubsubTriggerRule.AddConverter<RedisTriggerModel, string>(model => (string) model.Value);
 
             FluentBindingRule<RedisListsTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListsTriggerAttribute>();
             listsTriggerRule.BindToTrigger<RedisTriggerModel>(new RedisListsTriggerBindingProvider(configuration, nameResolver, logger));
-            listsTriggerRule.AddConverter<RedisTriggerModel, string>(model => model.Value);
+            listsTriggerRule.AddConverter<RedisTriggerModel, string>(model => (string) model.Value);
 
             FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
             streamsTriggerRule.BindToTrigger<RedisTriggerModel>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
-            streamsTriggerRule.AddConverter<RedisTriggerModel, Dictionary<string, string>>(model => JsonSerializer.Deserialize<Dictionary<string, string>>(model.Value));
+            streamsTriggerRule.AddConverter<RedisTriggerModel, Dictionary<string, string>>(model => (Dictionary<string, string>) model.Value);
 #pragma warning restore CS0618
         }
     }

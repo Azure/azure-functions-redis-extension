@@ -13,6 +13,6 @@
         /// <summary>
         /// The message from the pubsub channel, stream, or list that the function was triggered on.
         /// </summary>
-        public string Value { get; set; }
+        public object Value { get; set; }
     }
 }
