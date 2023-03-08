@@ -105,8 +105,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.ListsTrigger_SingleKey_RedisTriggerModel), IntegrationTestFunctions.listSingleKey, "a b")]
-        //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys_RedisTriggerModel), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anythign before redis7, test is redis6
+        [InlineData(nameof(IntegrationTestFunctions.ListsTrigger_SingleKey), IntegrationTestFunctions.listSingleKey, "a b")]
+        //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anythign before redis7, test is redis6
         public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string values)
         {
             string[] keyArray = keys.Split(' ');
