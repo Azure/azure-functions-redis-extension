@@ -74,7 +74,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     var triggerValue = new RedisTriggerModel
                     {
                         Trigger = stream.Key,
-                        Value = JsonSerializer.Serialize(entry.Values)
+                        Value = JsonSerializer.Serialize(entry.Values.ToDictionary(e => e.Name.ToString(), x => x.Value.ToString()))
                     };
 
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
