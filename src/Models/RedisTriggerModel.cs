@@ -11,7 +11,9 @@
         public string Trigger { get; set; }
 
         /// <summary>
-        /// The message from the pubsub channel, stream, or list that the function was triggered on.
+        /// The value from the pubsub channel, stream, or list that the function was triggered on.
+        /// Pubsub and List values will be strings.
+        /// Streams values will be a Dictionary of strings.
         /// </summary>
         public object Value { get; set; }
     }
