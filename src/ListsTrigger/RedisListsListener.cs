@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Azure.WebJobs.Host.Executors;
+using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs.Host.Executors;
-using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -21,7 +21,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.listPopFromBeginning = listPopFromBeginning;
         }
 
-        public override void BeforePolling() {
+        public override void BeforePolling()
+        {
             if (serverVersion < new Version("7.0") && keys.Length > 1)
             {
                 logger?.LogWarning($"The cache's version ({serverVersion}) is lower than 7.0 and does not support lmpop. Defaulting to lpop/rpop on the first key given.");

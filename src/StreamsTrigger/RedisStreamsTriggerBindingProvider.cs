@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Azure.WebJobs.Host.Triggers;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
