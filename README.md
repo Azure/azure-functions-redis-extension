@@ -4,9 +4,9 @@
 ## Introduction
 This repository contains the triggers and bindings to use in your [Azure Functions](https://learn.microsoft.com/azure/azure-functions/functions-get-started) and [WebJobs](https://learn.microsoft.com/azure/app-service/webjobs-sdk-how-to).
 There are three triggers in the Azure Functions Redis Extension:
-- `RedisPubSubTrigger` triggers on [Redis pubsub messages](https://redis.io/docs/manual/pubsub/)
-- `RedisListsTrigger` triggers on [Redis lists](https://redis.io/docs/data-types/lists/)
-- `RedisStreamsTrigger` triggers on [Redis streams](https://redis.io/docs/data-types/streams/)
+- `RedisPubSubTrigger` triggers on messages from [Redis pubsub channels](https://redis.io/docs/manual/pubsub/)
+- `RedisListsTrigger` triggers on elements from [Redis lists](https://redis.io/docs/data-types/lists/)
+- `RedisStreamsTrigger` triggers on entries from [Redis streams](https://redis.io/docs/data-types/streams/)
 
 ## Getting Started
 1. [Set up an Azure Cache for Redis instance](https://learn.microsoft.com/azure/azure-cache-for-redis/quickstart-create-redis) or [install Redis locally](https://redis.io/download/).
@@ -45,33 +45,44 @@ The `RedisPubSubTrigger` subscribes to a specific channel pattern using [`PSUBSC
 
 > **Warning**
 > This trigger is not fully supported on a [Consumption plan](https://learn.microsoft.com/azure/azure-functions/consumption-plan) because Redis PubSub requires clients to always be actively listening to receive all messages.
-> For consumption plans, there is a chance your function may miss certain messages published to the channel. Functions with this trigger shuld also not be scaled out.
+> When using this trigger on consumption plans, there is a chance your function may miss certain messages published to the channel.
 
 > **Note**
 > In general, functions with this the `RedisPubSubTrigger` should not be scaled out to multiple instances.
 > Each instance will listen and process each pubsub message, resulting in duplicate processing.
 
 #### Inputs
-- `ConnectionString`: connection string to the redis cache (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+  - First attempts to resolve the connection string from the "ConnectionStrings" settings, and if not there, will look through the other appsettings for the string.
 - `Channel`: name of the pubsub channel that the trigger should listen to.
+  - Supports channel patterns.
+  - This can be resolved using `INameResolver`.
+
+#### Avaiable Output Types
+- `string`: pubsub message from the channel
+- `RedisTriggerModel`: See the end of the README for an explanation of this type.
+
+#### Binding Values
+- `"Channel"`: the pubsub channel that the message came from
+- `"Message"`: the message in the pubsub channel
 
 #### Sample
 The following sample listens to the channel "channel" at a localhost Redis instance at "127.0.0.1:6379"
 ```c#
 [FunctionName(nameof(PubSubTrigger))]
 public static void PubSubTrigger(
-    [RedisPubSubTrigger(ConnectionString = "127.0.0.1:6379", Channel = "channel")] RedisMessageModel model,
-    ILogger logger)
+  [RedisPubSubTrigger("localhostSetting", "pubsubTest")] string message,
+  ILogger logger)
 {
-    logger.LogInformation(JsonSerializer.Serialize(model));
+  logger.LogInformation(message);
 }
 ```
 
 ### `RedisListsTrigger`
 The `RedisListsTrigger` pops elements from a list and surfaces those elements to the function. The trigger polls Redis at a configurable fixed interval, and uses [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/)/[`LMPOP`](https://redis.io/commands/lmpop/) to pop elements from the lists.
 
-Inputs:
-- `ConnectionString`: connection string to the redis cache (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+#### Inputs
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Keys`: Keys to read from, space-delimited.
   - Multiple keys only supported on Redis 7.0+ using [`LMPOP`](https://redis.io/commands/lmpop/).
   - Listens to only the first key given in the argument using [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/) on Redis versions less than 7.0.
@@ -85,15 +96,23 @@ Inputs:
 - (optional) `ListPopFromBeginning`: determines whether to pop elements from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop elements from the end using [`RPOP`](https://redis.io/commands/rpop/).
   - Default: true
 
+#### Avaiable Output Types
+- `string`: element from the list
+- `RedisTriggerModel`: See the end of the README for an explanation of this type.
+
+#### Binding Values
+- `"Key"`: the list key that the element came from
+- `"Element"`: the element from the list
+
 #### Sample
 The following sample polls the key "listTest" at a localhost Redis instance at "127.0.0.1:6379"
 ```c#
 [FunctionName(nameof(ListsTrigger))]
 public static void ListsTrigger(
-    [RedisListsTrigger(ConnectionString = "127.0.0.1:6379", Keys = "listTest")] RedisMessageModel model,
-    ILogger logger)
+  [RedisListsTrigger("localhostSetting", "listTest")] string element,
+  ILogger logger)
 {
-    logger.LogInformation(JsonSerializer.Serialize(model));
+  logger.LogInformation(element);
 }
 ```
 
@@ -103,7 +122,7 @@ The trigger polls Redis at a configurable fixed interval, and uses [`XREADGROUP`
 Each function creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
 Inputs:
-- `ConnectionString`: connection string to the redis cache (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Keys`: Keys to read from, space-delimited.
   - Uses [`XREADGROUP`](https://redis.io/commands/xreadgroup/).
 - (optional) `PollingIntervalInMs`: How often to poll Redis in milliseconds.
@@ -117,36 +136,45 @@ Inputs:
 - (optional) `DeleteAfterProcess`: If the listener will delete the stream entries after the function runs.
   - Default: false
 
+#### Avaiable Output Types
+- `Dictionary<string,string>`: entry from the stream
+- `RedisTriggerModel`: See the end of the README for an explanation of this type.
+
+#### Binding Values
+- `"Key"`: the stream key that the entry came from
+- `"Entry"`: the entry from the stream
+
 #### Sample
 The following sample polls the key "streamTest" at a localhost Redis instance at "127.0.0.1:6379"
 ```c#
 [FunctionName(nameof(StreamsTrigger))]
 public static void StreamsTrigger(
-    [RedisStreamsTrigger(ConnectionString = "127.0.0.1:6379", Keys = "streamTest")] RedisMessageModel model,
-    ILogger logger)
+  [RedisStreamsTrigger("localhostSetting", "streamTest")] Dictionary<string, string> entry,
+  ILogger logger)
 {
-    logger.LogInformation(JsonSerializer.Serialize(model));
+  logger.LogInformation(JsonSerializer.Serialize(entry));
 }
 ```
 
-### Return Value
-All triggers return a [`RedisMessageModel`](./src/Models/RedisMessageModel.cs) object that has two fields:
+### `RedisTriggerModel`
+All triggers return a [`RedisTriggerModel`](./src/Models/RedisTriggerModel.cs) object that has two fields:
 ```c#
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-  public class RedisMessageModel
+  public class RedisTriggerModel
   {
     public string Trigger { get; set; }
-    public string Message { get; set; }
+    public object Value { get; set; }
   }
 }
 ```
 - `Trigger`: The pubsub channel, list key, or stream key that the function is listening to.
-- `Message`: The pubsub message, list element, or stream element.
+- `Value`: The pubsub message, list element, or stream entry.
+  - For the pubsub and list triggers, this will be a `string`.
+  - For the streams trigger, this will be a `Dictionary<string, string>`
 
 ## Known Issues
 - The `RedisPubSubTrigger` is not capable of listening to [keyspace notifications](https://redis.io/docs/manual/keyspace-notifications/) on clustered caches.
-
 
 ## Contributing
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
