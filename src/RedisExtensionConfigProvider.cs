@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.WebJobs.Description;
+﻿﻿using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
