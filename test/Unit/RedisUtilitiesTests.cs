@@ -28,13 +28,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public void ResolveConnectionString_ValidConnectionStringSetting_ReturnsResolvedString()
         {
-            Assert.Equal("127.0.0.1:6379", RedisUtilities.ResolveConnectionString(localsettings, "redisLocalhost")); ;
+            Assert.Equal("127.0.0.1:6379", RedisUtilities.ResolveConnectionString(localsettings, "redisLocalhost"));
         }
 
         [Fact]
         public void ResolveConnectionString_ValidSetting_ReturnsResolvedString()
         {
-            Assert.Equal("testCacheString", RedisUtilities.ResolveConnectionString(testConfig, "CacheConnection")); ;
+            Assert.Equal("testCacheString", RedisUtilities.ResolveConnectionString(testConfig, "CacheConnection"));
         }
 
         [Theory]
