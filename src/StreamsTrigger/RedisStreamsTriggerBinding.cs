@@ -37,11 +37,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Type TriggerValueType => typeof(RedisTriggerModel);
 
-        public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
+        public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>()
+        {
+            { "Key", typeof(string) },
+            { "Entry", typeof(Dictionary<string, string>) }
+        };
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>();
+            RedisTriggerModel model = (RedisTriggerModel) value;
+            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>()
+            {
+                { "Key", model.Trigger },
+                { "Entry", model.Value }
+            };
             return Task.FromResult<ITriggerData>(new TriggerData(null, bindingData));
         }
 

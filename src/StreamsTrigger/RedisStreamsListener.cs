@@ -73,7 +73,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 {
                     var triggerValue = new RedisTriggerModel
                     {
-                        Trigger = stream.Key,
+                        Trigger = stream.Key.ToString(),
                         Value = entry.Values.ToDictionary(e => e.Name.ToString(), x => x.Value.ToString())
                     };
 

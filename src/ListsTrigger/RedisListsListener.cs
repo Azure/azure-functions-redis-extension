@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 {
                     RedisTriggerModel triggerValue = new RedisTriggerModel
                     {
-                        Trigger = result.Key,
+                        Trigger = result.Key.ToString(),
                         Value = value.ToString()
                     };
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
@@ -59,8 +59,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 {
                     RedisTriggerModel triggerValue = new RedisTriggerModel
                     {
-                        Trigger = keys[0],
-                        Value = value
+                        Trigger = keys[0].ToString(),
+                        Value = value.ToString()
                     };
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 };
@@ -73,8 +73,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 {
                     RedisTriggerModel triggerValue = new RedisTriggerModel
                     {
-                        Trigger = keys[0],
-                        Value = result
+                        Trigger = keys[0].ToString(),
+                        Value = result.ToString()
                     };
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }

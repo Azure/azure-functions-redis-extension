@@ -48,10 +48,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             ChannelMessageQueue channelMessageQeueue = await multiplexer.GetSubscriber().SubscribeAsync(channel);
             channelMessageQeueue.OnMessage(async (msg) =>
             {
-                logger?.LogDebug($"[{nameof(RedisPubSubListener)}] Message received on channel '{channel}'.");
+                logger?.LogDebug($"[{nameof(RedisPubSubListener)}] Message received on channel '{msg.Channel}'.");
                 var callBack = new RedisTriggerModel
                 {
-                    Trigger = msg.Channel,
+                    Trigger = msg.Channel.ToString(),
                     Value = msg.Message.ToString(),
                 };
 
