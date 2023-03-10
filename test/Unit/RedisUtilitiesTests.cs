@@ -1,12 +1,7 @@
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using FakeItEasy;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Azure.WebJobs.Host.Executors;
-using Microsoft.Extensions.Configuration;
-using StackExchange.Redis;
 using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
@@ -33,13 +28,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public void ResolveConnectionString_ValidConnectionStringSetting_ReturnsResolvedString()
         {
-            Assert.Equal("127.0.0.1:6379", RedisUtilities.ResolveConnectionString(localsettings, "redisLocalhost"));;
+            Assert.Equal("127.0.0.1:6379", RedisUtilities.ResolveConnectionString(localsettings, "redisLocalhost"));
         }
 
         [Fact]
         public void ResolveConnectionString_ValidSetting_ReturnsResolvedString()
         {
-            Assert.Equal("testCacheString", RedisUtilities.ResolveConnectionString(testConfig, "CacheConnection")); ;
+            Assert.Equal("testCacheString", RedisUtilities.ResolveConnectionString(testConfig, "CacheConnection"));
         }
 
         [Theory]

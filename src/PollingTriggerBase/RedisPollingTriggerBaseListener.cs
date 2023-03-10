@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs.Host.Executors;
+﻿using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis

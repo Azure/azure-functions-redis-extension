@@ -1,13 +1,11 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Collections.Concurrent;
-using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
@@ -81,7 +79,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         internal static IConfiguration localsettings = new ConfigurationBuilder().AddJsonFile(Path.Combine(
-            new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, 
+            new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
             "local.settings.json")).Build();
 
         private static string GetFunctionsFileName()

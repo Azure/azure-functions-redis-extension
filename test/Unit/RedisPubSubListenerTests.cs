@@ -1,8 +1,8 @@
-using System.Threading;
 using FakeItEasy;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
+using System.Threading;
 using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
