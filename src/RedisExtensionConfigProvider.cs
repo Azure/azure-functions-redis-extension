@@ -1,8 +1,9 @@
-﻿﻿using Microsoft.Azure.WebJobs.Description;
+﻿using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -20,6 +21,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// Adds Redis triggers and bindings to the extension context.
         /// </summary>
         /// <param name="configuration"></param>
+        /// <param name="nameResolver"></param>
+        /// <param name="logger"></param>
         public RedisExtensionConfigProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
@@ -40,15 +43,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 #pragma warning disable CS0618
             FluentBindingRule<RedisPubSubTriggerAttribute> pubsubTriggerRule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
             pubsubTriggerRule.BindToTrigger(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, logger));
-            pubsubTriggerRule.AddConverter<RedisTriggerModel, string>(model => (string) model.Value);
+            pubsubTriggerRule.AddConverter<RedisTriggerModel, string>(model => (string)model.Value);
 
             FluentBindingRule<RedisListsTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListsTriggerAttribute>();
             listsTriggerRule.BindToTrigger(new RedisListsTriggerBindingProvider(configuration, nameResolver, logger));
-            listsTriggerRule.AddConverter<RedisTriggerModel, string>(model => (string) model.Value);
+            listsTriggerRule.AddConverter<RedisTriggerModel, string>(model => (string)model.Value);
 
             FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
             streamsTriggerRule.BindToTrigger(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
-            streamsTriggerRule.AddConverter<RedisTriggerModel, Dictionary<string, string>>(model => (Dictionary<string, string>) model.Value);
+            streamsTriggerRule.AddConverter<RedisTriggerModel, Dictionary<string, string>>(model => (Dictionary<string, string>)model.Value);
 #pragma warning restore CS0618
         }
     }

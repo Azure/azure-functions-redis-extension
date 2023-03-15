@@ -1,12 +1,12 @@
-﻿using System;
-using StackExchange.Redis;
-using System.Diagnostics;
-using Xunit;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Linq;
+﻿using StackExchange.Redis;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {

@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            RedisTriggerModel model = (RedisTriggerModel) value;
+            RedisTriggerModel model = (RedisTriggerModel)value;
             IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>()
             {
                 { "Key", model.Trigger },
