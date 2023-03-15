@@ -183,7 +183,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamsTrigger_DefaultGroup_SingleKey))]
         public static void StreamsTrigger_DefaultGroup_SingleKey(
-            [RedisStreamsTrigger(localhostSetting, streamSingleKey, pollingIntervalInMs: pollingInterval)] Dictionary<string, string> entry,
+            [RedisStreamsTrigger(localhostSetting, streamSingleKey, pollingIntervalInMs: pollingInterval)] IReadOnlyDictionary<string, string> entry,
             ILogger logger)
         {
             logger.LogInformation(string.Format(triggerValueFormat, JsonSerializer.Serialize(entry)));
@@ -199,7 +199,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamsTrigger_DefaultGroup_MultipleKeys))]
         public static void StreamsTrigger_DefaultGroup_MultipleKeys(
-            [RedisStreamsTrigger(localhostSetting, streamMultipleKeys, pollingIntervalInMs: pollingInterval)] Dictionary<string, string> entry,
+            [RedisStreamsTrigger(localhostSetting, streamMultipleKeys, pollingIntervalInMs: pollingInterval)] IReadOnlyDictionary<string, string> entry,
             ILogger logger)
         {
             logger.LogInformation(string.Format(triggerValueFormat, JsonSerializer.Serialize(entry)));
