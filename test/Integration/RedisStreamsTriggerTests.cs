@@ -14,7 +14,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [Theory]
         [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_RedisStreamEntry_SingleKey), RedisStreamsTriggerTestFunctions.streamSingleKey, "a c", "b d")]
+        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_KeyValuePair_SingleKey), RedisStreamsTriggerTestFunctions.streamSingleKey, "a c", "b d")]
         [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_RedisStreamEntry_MultipleKeys), RedisStreamsTriggerTestFunctions.streamMultipleKeys, "a c e", "b d f")]
+        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_KeyValuePair_MultipleKeys), RedisStreamsTriggerTestFunctions.streamMultipleKeys, "a c e", "b d f")]
         public async void StreamsTrigger_SuccessfullyTriggers(string functionName, string keys, string names, string values)
         {
             string[] keyArray = keys.Split(' ');
@@ -36,13 +38,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
-
                 foreach (string key in keyArray)
                 {
                     await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
                 }
-
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(5));
 
                 await multiplexer.CloseAsync();
                 functionsProcess.Kill();
@@ -53,7 +53,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [Theory]
         [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_RedisStreamEntry_SingleKey), RedisStreamsTriggerTestFunctions.streamSingleKey, "a c", "b d")]
+        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_KeyValuePair_SingleKey), RedisStreamsTriggerTestFunctions.streamSingleKey, "a c", "b d")]
         [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_RedisStreamEntry_MultipleKeys), RedisStreamsTriggerTestFunctions.streamMultipleKeys, "a c e", "b d f")]
+        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_KeyValuePair_MultipleKeys), RedisStreamsTriggerTestFunctions.streamMultipleKeys, "a c e", "b d f")]
         public async void StreamsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string names, string values)
         {
             string[] keyArray = keys.Split(' ');
@@ -82,8 +84,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
                 }
-
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(5));
 
                 await multiplexer.CloseAsync();
                 functionsProcess1.Kill();
