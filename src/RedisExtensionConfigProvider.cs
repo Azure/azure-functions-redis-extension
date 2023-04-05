@@ -2,7 +2,9 @@
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -20,6 +22,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// Adds Redis triggers and bindings to the extension context.
         /// </summary>
         /// <param name="configuration"></param>
+        /// <param name="nameResolver"></param>
+        /// <param name="logger"></param>
         public RedisExtensionConfigProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
@@ -39,13 +43,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
 #pragma warning disable CS0618
             FluentBindingRule<RedisPubSubTriggerAttribute> pubsubTriggerRule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
-            pubsubTriggerRule.BindToTrigger<RedisMessageModel>(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, logger));
+            pubsubTriggerRule.BindToTrigger<RedisPubSubMessage>(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, logger));
+            pubsubTriggerRule.AddConverter<RedisPubSubMessage, string>(m => m.Message);
 
             FluentBindingRule<RedisListsTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListsTriggerAttribute>();
-            listsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisListsTriggerBindingProvider(configuration, nameResolver, logger));
+            listsTriggerRule.BindToTrigger<RedisListEntry>(new RedisListsTriggerBindingProvider(configuration, nameResolver, logger));
+            pubsubTriggerRule.AddConverter<RedisListEntry, string>(l => l.Value);
 
             FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
-            streamsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
+            streamsTriggerRule.BindToTrigger<RedisStreamEntry>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
+            pubsubTriggerRule.AddConverter<RedisStreamEntry, KeyValuePair<string, string>[]>(s => s.Values);
+            pubsubTriggerRule.AddConverter<RedisStreamEntry, IReadOnlyDictionary<string, string>>(s => s.Values.ToDictionary());
 #pragma warning restore CS0618
         }
     }

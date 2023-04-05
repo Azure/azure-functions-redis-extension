@@ -33,7 +33,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.logger = logger;
         }
 
-        public Type TriggerValueType => typeof(RedisMessageModel);
+        public Type TriggerValueType => typeof(RedisListEntry);
 
         public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
 

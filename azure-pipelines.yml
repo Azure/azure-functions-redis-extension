@@ -14,7 +14,7 @@ trigger:
 
 variables:
   majorVersion: 0
-  minorVersion: 1
+  minorVersion: 2
   majorMinorVersion: $[ format('{0}.{1}', variables['majorVersion'], variables['minorVersion']) ]
   fullVersion: $[ format('{0}.{1}', variables['majorMinorVersion'], counter(variables['majorMinorVersion'], 0)) ]
   ${{ if parameters['previewBuild'] }}:
@@ -57,7 +57,7 @@ jobs:
           NODE_MODULES_PATH: '$(nodeModulesPath)'
         inputs:
           command: test
-          arguments: --configuration Debug
+          arguments: --configuration Debug -- xunit.parallelizeTestCollections=false
 
   - job: build
     displayName: Build Release, Generate & Sign Nuget Package

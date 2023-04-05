@@ -49,13 +49,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             channelMessageQeueue.OnMessage(async (msg) =>
             {
                 logger?.LogDebug($"[{nameof(RedisPubSubListener)}] Message received on channel '{channel}'.");
-                var callBack = new RedisMessageModel
-                {
-                    Trigger = msg.Channel,
-                    Message = msg.Message
-                };
-
-                await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = callBack }, cancellationToken);
+                var message = new RedisPubSubMessage(msg.SubscriptionChannel, msg.Channel, msg.Message);
+                await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = message }, cancellationToken);
             });
             logger?.LogInformation($"[{nameof(RedisPubSubListener)}] Subscribed to channel '{channel}'.");
 
