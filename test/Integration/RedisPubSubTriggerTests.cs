@@ -9,6 +9,7 @@ using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
+    [Collection("RedisTriggerTests")]
     public class RedisPubSubTriggerTests
     {
         [Theory]

@@ -9,7 +9,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         public const string localhostSetting = "redisLocalhost";
         public const string listSingleKey = "listSingleKey";
         public const string listMultipleKeys = "listKey1 listKey2 listKey3";
-        public const string alphabet = "a b c d e f g h i j k l m n o p q r s t u v w x y z";
         public const int pollingInterval = 100;
 
         [FunctionName(nameof(ListsTrigger_RedisListEntry_SingleKey))]
