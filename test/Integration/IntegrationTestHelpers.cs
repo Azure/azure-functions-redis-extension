@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -64,7 +65,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             return functionsProcess;
         }
 
-        internal static DataReceivedEventHandler CounterHandlerCreator(IDictionary<string, int> counts)
+        internal static DataReceivedEventHandler CounterHandlerCreator(ConcurrentDictionary<string, int> counts)
         {
             return (object sender, DataReceivedEventArgs e) =>
             {
@@ -72,7 +73,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     if (e.Data?.Contains(key) ?? false)
                     {
-                        counts[key] -= 1;
+                        counts.AddOrUpdate(key, 0, (s, c) => c - 1);
                     }
                 }
             };

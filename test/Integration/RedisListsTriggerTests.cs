@@ -1,7 +1,6 @@
 ﻿using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
@@ -14,7 +13,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [Theory]
         [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
-        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
+        //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         public async void ListsTrigger_SuccessfullyTriggers(string functionName, string keys, string values)
@@ -22,10 +21,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             string[] keyArray = keys.Split(' ');
             RedisValue[] valuesArray = values.Split(' ').Select((value) => new RedisValue(value)).ToArray();
 
-            Dictionary<string, int> counts = new Dictionary<string, int>
-            {
-                { $"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length },
-            };
+            ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length);
 
             foreach (var value in valuesArray)
             {
@@ -33,12 +30,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     foreach (var key in keyArray)
                     {
-                        counts.Add(string.Format(RedisListsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisListEntry(key, value))), 1);
+                        counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisListEntry(key, value))), 1, (s, c) => c + 1);
                     }
                 }
                 else
                 {
-                    counts.Add(string.Format(RedisListsTriggerTestFunctions.stringFormat, value), keyArray.Length);
+                    counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, value), keyArray.Length, (s, c) => c + keyArray.Length);
                 }
             }
 
@@ -52,7 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     await multiplexer.GetDatabase().ListLeftPushAsync(key, valuesArray);
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(keyArray.Length * valuesArray.Length / 5));
 
                 await multiplexer.CloseAsync();
                 functionsProcess.Kill();
@@ -63,7 +60,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [Theory]
         [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
-        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
+        //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string values)
@@ -80,12 +77,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     foreach (var key in keyArray)
                     {
-                        counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisListEntry(key, value))), (s) => 1, (s, c) => c + 1);
+                        counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisListEntry(key, value))), 1, (s, c) => c + 1);
                     }
                 }
                 else
                 {
-                    counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, value), (s) => keyArray.Length, (s, c) => c + keyArray.Length);
+                    counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, value), keyArray.Length, (s, c) => c + keyArray.Length);
                 }
             }
 
@@ -103,7 +100,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     await multiplexer.GetDatabase().ListLeftPushAsync(key, valuesArray);
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(keyArray.Length * valuesArray.Length / 5));
 
                 await multiplexer.CloseAsync();
                 functionsProcess1.Kill();

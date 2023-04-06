@@ -42,17 +42,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     for (int i = 0; i < entries; i++)
                     {
-                        counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisStreamEntry(key, $"{streamEntryIdStart + i}-0", pairs))), (s) => 1, (s, c) => c + 1);
+                        counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisStreamEntry(key, $"{streamEntryIdStart + i}-0", pairs))), 1, (s, c) => c + 1);
                     }
                 }
             }
             else if (functionName.Contains(nameof(KeyValuePair)))
             {
-                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs)), (s) => keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
+                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs)), keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
             }
             else if (functionName.Contains(nameof(IReadOnlyDictionary<string, string>)))
             {
-                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs.ToDictionary())), (s) => keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
+                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs.ToDictionary())), keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
             }
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisStreamsTriggerTestFunctions.localhostSetting)))
@@ -113,17 +113,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     for (int i = 0; i < entries; i++)
                     {
-                        counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisStreamEntry(key, $"{streamEntryIdStart + i}-0", pairs))), (s) => 1, (s, c) => c + 1);
+                        counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisStreamEntry(key, $"{streamEntryIdStart + i}-0", pairs))), 1, (s, c) => c + 1);
                     }
                 }
             }
             else if (functionName.Contains(nameof(KeyValuePair)))
             {
-                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs)), (s) => keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
+                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs)), keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
             }
             else if (functionName.Contains(nameof(IReadOnlyDictionary<string, string>)))
             {
-                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs.ToDictionary())), (s) => keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
+                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs.ToDictionary())), keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
             }
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisStreamsTriggerTestFunctions.localhostSetting)))

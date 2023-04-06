@@ -1,6 +1,6 @@
 ﻿using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
@@ -27,21 +27,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.PubSubTrigger_RedisPubSubMessage_AllChannels), RedisPubSubTriggerTestFunctions.all, "separate", "testSeparate")]
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.PubSubTrigger_string_AllChannels), RedisPubSubTriggerTestFunctions.all, "separate", "testSeparate")]
 
-        public async void PubSubTrigger_RedisPubSubMessage_SuccessfullyTriggers(string functionName, string subscriptionChannel, string channel, string message)
+        public async void PubSubTrigger_SuccessfullyTriggers(string functionName, string subscriptionChannel, string channel, string message)
         {
             RedisPubSubMessage expectedReturn = new RedisPubSubMessage(subscriptionChannel, channel, message);
-            Dictionary<string, int> counts = new Dictionary<string, int>
-            {
-                { $"Executed '{functionName}' (Succeeded", 1},
-            };
+            ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
             if (functionName.Contains(nameof(RedisPubSubMessage)))
             {
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(subscriptionChannel, channel, message))), 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(subscriptionChannel, channel, message))), 1, (s, c) => c + 1);
             }
             else
             {
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, message), 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, message), 1, (s, c) => c + 1);
             }
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisPubSubTriggerTestFunctions.localhostSetting)))
@@ -72,27 +70,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.KeySpaceTrigger_RedisPubSubMessage_AllKeys), RedisPubSubTriggerTestFunctions.keyspaceChannelAll, RedisPubSubTriggerTestFunctions.keyspaceChannel + "suffix")]
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.KeySpaceTrigger_string_AllKeys), RedisPubSubTriggerTestFunctions.keyspaceChannelAll, RedisPubSubTriggerTestFunctions.keyspaceChannel + "suffix")]
 
-        public async void KeySpaceTrigger_RedisPubSubMessage_SuccessfullyTriggers(string functionName, string subscriptionChannel, string channel)
+        public async void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string subscriptionChannel, string channel)
         {
             string keyspace = "__keyspace@0__:";
             string key = channel.Substring(channel.IndexOf(keyspace) + keyspace.Length);
 
-            Dictionary<string, int> counts = new Dictionary<string, int>
-            {
-                { $"Executed '{functionName}' (Succeeded", 2},
-            };
+            ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", 2);
 
             if (functionName.Contains(nameof(RedisPubSubMessage)))
             {
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(subscriptionChannel, channel, "set"))), 1);
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(subscriptionChannel, channel, "del"))), 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(subscriptionChannel, channel, "set"))), 1, (s, c) => c + 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(subscriptionChannel, channel, "del"))), 1, (s, c) => c + 1);
             }
             else
             {
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, "set"), 1);
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, "del"), 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, "set"), 1, (s, c) => c + 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, "del"), 1, (s, c) => c + 1);
             }
-
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisPubSubTriggerTestFunctions.localhostSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
@@ -114,23 +109,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Theory]
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.KeyEventTrigger_RedisPubSubMessage_SingleEvent))]
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.KeyEventTrigger_string_SingleEvent))]
-        public async void KeyEventTrigger_RedisPubSubMessage_SingleEvent_SuccessfullyTriggers(string functionName)
+        public async void KeyEventTrigger_SingleEvent_SuccessfullyTriggers(string functionName)
         {
             string key = "key";
             string value = "value";
-            RedisPubSubMessage expectedReturn = new RedisPubSubMessage(RedisPubSubTriggerTestFunctions.keyeventChannel, RedisPubSubTriggerTestFunctions.keyeventChannel, key);
-            Dictionary<string, int> counts = new Dictionary<string, int>
-            {
-                { $"Executed '{functionName}' (Succeeded", 1},
-            };
+            ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
             if (functionName.Contains(nameof(RedisPubSubMessage)))
             {
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(RedisPubSubTriggerTestFunctions.keyeventChannel, RedisPubSubTriggerTestFunctions.keyeventChannel, key))), 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(RedisPubSubTriggerTestFunctions.keyeventChannel, RedisPubSubTriggerTestFunctions.keyeventChannel, key))), 1, (s, c) => c + 1);
             }
             else
             {
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, key), 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, key), 1, (s, c) => c + 1);
             }
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisPubSubTriggerTestFunctions.localhostSetting)))
@@ -152,24 +144,22 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Theory]
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.KeyEventTrigger_RedisPubSubMessage_AllEvents))]
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.KeyEventTrigger_string_AllEvents))]
-        public async void KeyEventTrigger_RedisPubSubMessage_AllEvents_SuccessfullyTriggers(string functionName)
+        public async void KeyEventTrigger_AllEvents_SuccessfullyTriggers(string functionName)
         {
             string key = "key";
             string value = "value";
 
-            Dictionary<string, int> counts = new Dictionary<string, int>
-            {
-                { $"Executed '{functionName}' (Succeeded", 2},
-            };
+            ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", 2);
 
             if (functionName.Contains(nameof(RedisPubSubMessage)))
             {
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(RedisPubSubTriggerTestFunctions.keyeventChannelAll, "__keyevent@0__:set", key))), 1);
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(RedisPubSubTriggerTestFunctions.keyeventChannelAll, "__keyevent@0__:del", key))), 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(RedisPubSubTriggerTestFunctions.keyeventChannelAll, "__keyevent@0__:set", key))), 1, (s, c) => c + 1);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisPubSubMessage(RedisPubSubTriggerTestFunctions.keyeventChannelAll, "__keyevent@0__:del", key))), 1, (s, c) => c + 1);
             }
             else
             {
-                counts.Add(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, key), 2);
+                counts.AddOrUpdate(string.Format(RedisPubSubTriggerTestFunctions.stringFormat, key), 2, (s, c) => c + 2);
             }
 
 
