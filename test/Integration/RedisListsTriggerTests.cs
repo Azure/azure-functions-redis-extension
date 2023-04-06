@@ -13,8 +13,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public class RedisListsTriggerTests
     {
         [Theory]
-        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, "a b")]
-        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, "a b")]
+        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
+        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         public async void ListsTrigger_SuccessfullyTriggers(string functionName, string keys, string values)
@@ -26,6 +26,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 { $"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length },
             };
+
+            foreach (var value in valuesArray)
+            {
+                if (functionName.Contains(nameof(RedisListEntry)))
+                {
+                    foreach (var key in keyArray)
+                    {
+                        counts.Add(string.Format(RedisListsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisListEntry(key, value))), 1);
+                    }
+                }
+                else
+                {
+                    counts.Add(string.Format(RedisListsTriggerTestFunctions.stringFormat, value), keyArray.Length);
+                }
+            }
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListsTriggerTestFunctions.localhostSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
@@ -47,11 +62,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, "a b")]
-        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, "a b")]
+        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
+        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, RedisListsTriggerTestFunctions.alphabet)]
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
-
         public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string values)
         {
             string[] keyArray = keys.Split(' ');
@@ -59,6 +73,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length);
+
+            foreach (var value in valuesArray)
+            {
+                if (functionName.Contains(nameof(RedisListEntry)))
+                {
+                    foreach (var key in keyArray)
+                    {
+                        counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisListEntry(key, value))), (s) => 1, (s, c) => c + 1);
+                    }
+                }
+                else
+                {
+                    counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, value), (s) => keyArray.Length, (s, c) => c + keyArray.Length);
+                }
+            }
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListsTriggerTestFunctions.localhostSetting)))
             using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
