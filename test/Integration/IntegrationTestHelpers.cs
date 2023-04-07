@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -47,6 +46,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 }
             }
             functionsProcess.OutputDataReceived += functionLoadedHandler;
+
+            string file = Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, $"{functionName}_{port}.txt");
+            File.Delete(file);
+            void fileWriterHandler(object sender, DataReceivedEventArgs e)
+            {
+                File.AppendAllText(file, e.Data + Environment.NewLine);
+            }
+            functionsProcess.OutputDataReceived += fileWriterHandler;
 
             functionsProcess.Start();
             functionsProcess.BeginOutputReadLine();

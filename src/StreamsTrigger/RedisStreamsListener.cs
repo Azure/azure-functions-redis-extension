@@ -71,8 +71,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 logger?.LogDebug($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Received {stream.Entries.Length} elements from the stream at key '{stream.Key}'.");
                 foreach (StreamEntry entry in stream.Entries)
                 {
-                    RedisStreamEntry refEntry = new RedisStreamEntry(stream.Key, entry.Id, entry.Values.Select(a => new KeyValuePair<string, string>(a.Name.ToString(), a.Value.ToString())).ToArray());
-                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = refEntry }, cancellationToken);
+                    RedisStreamEntry triggerValue = new RedisStreamEntry(stream.Key, entry.Id, entry.Values.Select(a => new KeyValuePair<string, string>(a.Name.ToString(), a.Value.ToString())).ToArray());
+                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }
 
                 RedisValue[] entryIds = stream.Entries.Select(entry => entry.Id).ToArray();
