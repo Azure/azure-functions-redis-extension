@@ -14,12 +14,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public class RedisStreamsTriggerTests
     {
         [Theory]
-        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_RedisStreamEntry_SingleKey), RedisStreamsTriggerTestFunctions.streamSingleKey, "a c", "b d", 6)]
-        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_KeyValuePair_SingleKey), RedisStreamsTriggerTestFunctions.streamSingleKey, "a c", "b d", 6)]
-        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_IReadOnlyDictionary_SingleKey), RedisStreamsTriggerTestFunctions.streamSingleKey, "a c", "b d", 6)]
-        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_RedisStreamEntry_MultipleKeys), RedisStreamsTriggerTestFunctions.streamMultipleKeys, "a c e", "b d f", 6)]
-        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_KeyValuePair_MultipleKeys), RedisStreamsTriggerTestFunctions.streamMultipleKeys, "a c e", "b d f", 6)]
-        [InlineData(nameof(RedisStreamsTriggerTestFunctions.StreamsTrigger_IReadOnlyDictionary_MultipleKeys), RedisStreamsTriggerTestFunctions.streamMultipleKeys, "a c e", "b d f", 6)]
+        [InlineData(nameof(RedisTestFunctions.StreamsTrigger_RedisStreamEntry_SingleKey), RedisTestFunctions.streamSingleKey, "a c", "b d", 6)]
+        [InlineData(nameof(RedisTestFunctions.StreamsTrigger_KeyValuePair_SingleKey), RedisTestFunctions.streamSingleKey, "a c", "b d", 6)]
+        [InlineData(nameof(RedisTestFunctions.StreamsTrigger_IReadOnlyDictionary_SingleKey), RedisTestFunctions.streamSingleKey, "a c", "b d", 6)]
+        [InlineData(nameof(RedisTestFunctions.StreamsTrigger_RedisStreamEntry_MultipleKeys), RedisTestFunctions.streamMultipleKeys, "a c e", "b d f", 6)]
+        [InlineData(nameof(RedisTestFunctions.StreamsTrigger_KeyValuePair_MultipleKeys), RedisTestFunctions.streamMultipleKeys, "a c e", "b d f", 6)]
+        [InlineData(nameof(RedisTestFunctions.StreamsTrigger_IReadOnlyDictionary_MultipleKeys), RedisTestFunctions.streamMultipleKeys, "a c e", "b d f", 6)]
         public async void StreamsTrigger_SuccessfullyTriggers(string functionName, string keys, string names, string values, int entries)
         {
             string[] keyArray = keys.Split(' ');
@@ -43,20 +43,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     for (int i = 0; i < entries; i++)
                     {
-                        counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisStreamEntry(key, $"{streamEntryIdStart + i}-0", pairs))), 1, (s, c) => c + 1);
+                        counts.AddOrUpdate(string.Format(RedisTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisStreamEntry(key, $"{streamEntryIdStart + i}-0", pairs))), 1, (s, c) => c + 1);
                     }
                 }
             }
             else if (functionName.Contains(nameof(KeyValuePair)))
             {
-                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs)), keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
+                counts.AddOrUpdate(string.Format(RedisTestFunctions.stringFormat, JsonSerializer.Serialize(pairs)), keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
             }
             else if (functionName.Contains(nameof(IReadOnlyDictionary<string, string>)))
             {
-                counts.AddOrUpdate(string.Format(RedisStreamsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(pairs.ToDictionary())), keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
+                counts.AddOrUpdate(string.Format(RedisTestFunctions.stringFormat, JsonSerializer.Serialize(pairs.ToDictionary())), keyArray.Length * entries, (s, c) => c + keyArray.Length * entries);
             }
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisStreamsTriggerTestFunctions.localhostSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisTestFunctions.localhostSetting)))
             {
                 foreach (string key in keyArray)
                 {

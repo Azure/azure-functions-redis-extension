@@ -13,8 +13,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public class RedisListsTriggerTests
     {
         [Theory]
-        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, "a b c d e f")]
-        [InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_SingleKey), RedisListsTriggerTestFunctions.listSingleKey, "a b c d e f")]
+        [InlineData(nameof(RedisTestFunctions.ListsTrigger_RedisListEntry_SingleKey), RedisTestFunctions.listSingleKey, "a b c d e f")]
+        [InlineData(nameof(RedisTestFunctions.ListsTrigger_string_SingleKey), RedisTestFunctions.listSingleKey, "a b c d e f")]
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_RedisListEntry_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         //[InlineData(nameof(RedisListsTriggerTestFunctions.ListsTrigger_string_MultipleKeys), RedisListsTriggerTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         public async void ListsTrigger_SuccessfullyTriggers(string functionName, string keys, string values)
@@ -31,16 +31,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     foreach (var key in keyArray)
                     {
-                        counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisListEntry(key, value))), 1, (s, c) => c + 1);
+                        counts.AddOrUpdate(string.Format(RedisTestFunctions.stringFormat, JsonSerializer.Serialize(new RedisListEntry(key, value))), 1, (s, c) => c + 1);
                     }
                 }
                 else
                 {
-                    counts.AddOrUpdate(string.Format(RedisListsTriggerTestFunctions.stringFormat, value), keyArray.Length, (s, c) => c + keyArray.Length);
+                    counts.AddOrUpdate(string.Format(RedisTestFunctions.stringFormat, value), keyArray.Length, (s, c) => c + keyArray.Length);
                 }
             }
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListsTriggerTestFunctions.localhostSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisTestFunctions.localhostSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
