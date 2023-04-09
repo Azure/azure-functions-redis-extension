@@ -52,18 +52,27 @@ The `RedisPubSubTrigger` subscribes to a specific channel pattern using [`PSUBSC
 > Each instance will listen and process each pubsub message, resulting in duplicate processing.
 
 #### Inputs
-- `ConnectionString`: connection string to the redis cache (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+  - First attempts to resolve the connection string from the "ConnectionStrings" settings, and if not there, will look through the other appsettings for the string.
 - `Channel`: name of the pubsub channel that the trigger should listen to.
+  - Supports channel patterns.
+  - This field can be resolved using `INameResolver`.
+
+#### Avaiable Output Types
+- `RedisPubSubMessage`: This class wraps [`ChannelMessage` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs).
+  - `string SubscriptionChannel`: The channel that the subscription was created from.
+  - `string Channel`: The channel that the message was broadcast to.
+  - `string Message`: The value that was broadcast.
 
 #### Sample
 The following sample listens to the channel "channel" at a localhost Redis instance at "127.0.0.1:6379"
 ```c#
 [FunctionName(nameof(PubSubTrigger))]
 public static void PubSubTrigger(
-    [RedisPubSubTrigger(ConnectionString = "127.0.0.1:6379", Channel = "channel")] RedisMessageModel model,
+    [RedisPubSubTrigger("redisConnectionStringSetting", "pubsubTest")] RedisPubSubMessage message,
     ILogger logger)
 {
-    logger.LogInformation(JsonSerializer.Serialize(model));
+    logger.LogInformation(JsonSerializer.Serialize(message));
 }
 ```
 
