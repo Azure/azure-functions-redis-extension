@@ -9,34 +9,34 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(PubSubTrigger))]
         public static void PubSubTrigger(
-            [RedisPubSubTrigger(localhostSetting, "pubsubTest")] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, "pubsubTest")] RedisPubSubMessage message,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(model));
+            logger.LogInformation(JsonSerializer.Serialize(message));
         }
 
         [FunctionName(nameof(PubSubTriggerResolvedChannel))]
         public static void PubSubTriggerResolvedChannel(
-            [RedisPubSubTrigger(localhostSetting, "%pubsubChannel%")] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, "%pubsubChannel%")] RedisPubSubMessage message,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(model));
+            logger.LogInformation(JsonSerializer.Serialize(message));
         }
 
         [FunctionName(nameof(KeyspaceTrigger))]
         public static void KeyspaceTrigger(
-            [RedisPubSubTrigger(localhostSetting, "__keyspace@0__:keyspaceTest")] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, "__keyspace@0__:keyspaceTest")] RedisPubSubMessage message,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(model));
+            logger.LogInformation(JsonSerializer.Serialize(message));
         }
 
         [FunctionName(nameof(KeyeventTrigger))]
         public static void KeyeventTrigger(
-            [RedisPubSubTrigger(localhostSetting, "__keyevent@0__:del")] RedisMessageModel model,
+            [RedisPubSubTrigger(localhostSetting, "__keyevent@0__:del")] RedisPubSubMessage message,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(model));
+            logger.LogInformation(JsonSerializer.Serialize(message));
         }
 
         [FunctionName(nameof(ListsTrigger))]
