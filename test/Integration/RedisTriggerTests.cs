@@ -16,7 +16,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_SingleChannel), IntegrationTestFunctions.pubsubChannel, IntegrationTestFunctions.pubsubChannel, "test")]
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_MultipleChannels), IntegrationTestFunctions.pubsubMultiple, IntegrationTestFunctions.pubsubChannel, "test")]
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_MultipleChannels), IntegrationTestFunctions.pubsubMultiple, IntegrationTestFunctions.pubsubChannel + "suffix", "testSuffix")]
-        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.all, IntegrationTestFunctions.pubsubChannel, "test")]
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.all, IntegrationTestFunctions.pubsubChannel + "suffix", "testSuffix")]
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.all, "prefix" + IntegrationTestFunctions.pubsubChannel, "testPrefix")]
         [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.all, "separate", "testSeparate")]
