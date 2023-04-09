@@ -234,8 +234,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_DefaultGroup_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d")]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_DefaultGroup_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f")]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d")]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f")]
         public async void StreamsTrigger_SuccessfullyTriggers(string functionName, string keys, string names, string values)
         {
             string[] keyArray = keys.Split(' ');
@@ -273,8 +273,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_DefaultGroup_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d")]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_DefaultGroup_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f")]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d")]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f")]
         public async void StreamsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string names, string values)
         {
             string[] keyArray = keys.Split(' ');

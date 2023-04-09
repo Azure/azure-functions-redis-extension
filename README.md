@@ -102,30 +102,33 @@ The `RedisStreamsTrigger` pops elements from a stream and surfaces those element
 The trigger polls Redis at a configurable fixed interval, and uses [`XREADGROUP`](https://redis.io/commands/xreadgroup/) to read elements from the stream.
 Each function creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
-Inputs:
-- `ConnectionString`: connection string to the redis cache (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+#### Inputs
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Keys`: Keys to read from, space-delimited.
   - Uses [`XREADGROUP`](https://redis.io/commands/xreadgroup/).
+  - This field can be resolved using `INameResolver`.
 - (optional) `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: 1000
 - (optional) `MessagesPerWorker`: How many messages each functions worker "should" process. Used to determine how many workers the function should scale to.
-  - Default: 100
-- (optional) `BatchSize`: Number of elements to pull from Redis at one time.
-  - Default: 10
-- (optional) `ConsumerGroup`: The name of the consumer group that the function will use.
-  - Default: "AzureFunctionRedisExtension"
+@@ -117,37 +142,32 @@ Inputs:
 - (optional) `DeleteAfterProcess`: If the listener will delete the stream entries after the function runs.
   - Default: false
 
+#### Avaiable Output Types
+- `RedisStreamEntry`: This class wraps [`StreamEntry` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs).
+  - `string Key`: The stream key that the function was triggered on.
+  - `string Id`: The ID assigned to the entry.
+  - `KeyValuePair<string, string>[] Values`: The values contained within the entry.
+
 #### Sample
-The following sample polls the key "streamTest" at a localhost Redis instance at "127.0.0.1:6379"
+The following sample polls the key "streamTest" at a Redis instance defined in local.settings.json at the key "redisConnectionStringSetting"
 ```c#
 [FunctionName(nameof(StreamsTrigger))]
 public static void StreamsTrigger(
-    [RedisStreamsTrigger(ConnectionString = "127.0.0.1:6379", Keys = "streamTest")] RedisMessageModel model,
+    [RedisStreamsTrigger("redisConnectionStringSetting", "streamTest")] RedisStreamEntry entry,
     ILogger logger)
 {
-    logger.LogInformation(JsonSerializer.Serialize(model));
+    logger.LogInformation(JsonSerializer.Serialize(entry));
 }
 ```
 

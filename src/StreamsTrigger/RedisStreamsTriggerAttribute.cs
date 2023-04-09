@@ -36,6 +36,5 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// Decides if the function will delete the stream entries after processing.
         /// </summary>
         public bool DeleteAfterProcess { get; }
-
     }
 }

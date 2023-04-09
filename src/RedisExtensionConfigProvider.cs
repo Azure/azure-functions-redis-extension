@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             listsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisListsTriggerBindingProvider(configuration, nameResolver, logger));
 
             FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
-            streamsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
+            streamsTriggerRule.BindToTrigger<RedisStreamEntry>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
 #pragma warning restore CS0618
         }
     }

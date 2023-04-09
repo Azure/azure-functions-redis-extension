@@ -99,20 +99,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             logger.LogInformation(JsonSerializer.Serialize(result));
         }
 
-        [FunctionName(nameof(StreamsTrigger_DefaultGroup_SingleKey))]
-        public static void StreamsTrigger_DefaultGroup_SingleKey(
-            [RedisStreamsTrigger(localhostSetting, streamSingleKey, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
+        [FunctionName(nameof(StreamsTrigger_SingleKey))]
+        public static void StreamsTrigger_SingleKey(
+            [RedisStreamsTrigger(localhostSetting, streamSingleKey, pollingIntervalInMs: pollingInterval)] RedisStreamEntry entry,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
+            logger.LogInformation(JsonSerializer.Serialize(entry));
         }
 
-        [FunctionName(nameof(StreamsTrigger_DefaultGroup_MultipleKeys))]
-        public static void StreamsTrigger_DefaultGroup_MultipleKeys(
-            [RedisStreamsTrigger(localhostSetting, streamMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
+        [FunctionName(nameof(StreamsTrigger_MultipleKeys))]
+        public static void StreamsTrigger_MultipleKeys(
+            [RedisStreamsTrigger(localhostSetting, streamMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisStreamEntry entry,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
+            logger.LogInformation(JsonSerializer.Serialize(entry));
         }
     }
 }
