@@ -110,9 +110,13 @@ Each function creates a new random GUID to use as its consumer name within the g
 - (optional) `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: 1000
 - (optional) `MessagesPerWorker`: How many messages each functions worker "should" process. Used to determine how many workers the function should scale to.
-@@ -117,37 +142,32 @@ Inputs:
+  - Default: 100
+- (optional) `BatchSize`: Number of elements to pull from Redis at one time.
+  - Default: 10
 - (optional) `DeleteAfterProcess`: If the listener will delete the stream entries after the function runs.
   - Default: false
+- (optional) `ConsumerGroup`: The name of the consumer group that the function will use.
+  - Default: "AzureFunctionRedisExtension"
 
 #### Avaiable Output Types
 - `RedisStreamEntry`: This class wraps [`StreamEntry` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs).
