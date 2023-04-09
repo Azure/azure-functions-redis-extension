@@ -20,6 +20,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// Adds Redis triggers and bindings to the extension context.
         /// </summary>
         /// <param name="configuration"></param>
+        /// <param name="nameResolver"></param>
+        /// <param name="logger"></param>
         public RedisExtensionConfigProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
@@ -42,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             pubsubTriggerRule.BindToTrigger<RedisMessageModel>(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, logger));
 
             FluentBindingRule<RedisListsTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListsTriggerAttribute>();
-            listsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisListsTriggerBindingProvider(configuration, nameResolver, logger));
+            listsTriggerRule.BindToTrigger<RedisListEntry>(new RedisListsTriggerBindingProvider(configuration, nameResolver, logger));
 
             FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
             streamsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));

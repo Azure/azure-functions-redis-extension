@@ -43,11 +43,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 logger?.LogDebug($"[{nameof(RedisListsListener)}] Received {result.Values.Count()} elements from the list at key '{result.Key}'.");
                 foreach (RedisValue value in result.Values)
                 {
-                    RedisMessageModel triggerValue = new RedisMessageModel
-                    {
-                        Trigger = result.Key,
-                        Message = value
-                    };
+                    RedisListEntry triggerValue = new RedisListEntry(result.Key, value);
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 };
             }
@@ -57,11 +53,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 logger?.LogDebug($"[{nameof(RedisListsListener)}] Received {result.Length} elements from the list at key '{keys[0]}'.");
                 foreach (RedisValue value in result)
                 {
-                    RedisMessageModel triggerValue = new RedisMessageModel
-                    {
-                        Trigger = keys[0],
-                        Message = value
-                    };
+                    RedisListEntry triggerValue = new RedisListEntry(keys[0], value);
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 };
             }
@@ -71,11 +63,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 logger?.LogDebug($"[{nameof(RedisListsListener)}] Received 1 element from the list at key '{keys[0]}'.");
                 if (!result.IsNullOrEmpty)
                 {
-                    RedisMessageModel triggerValue = new RedisMessageModel
-                    {
-                        Trigger = keys[0],
-                        Message = result
-                    };
+                    RedisListEntry triggerValue = new RedisListEntry(keys[0], result);
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }
             }

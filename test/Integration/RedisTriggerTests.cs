@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
+    [Collection("RedisTriggerTests")]
     public class RedisTriggerTests
     {
         [Theory]
@@ -167,7 +168,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [Theory]
         [InlineData(nameof(IntegrationTestFunctions.ListsTrigger_SingleKey), IntegrationTestFunctions.listSingleKey, "a b")]
-        //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anythign before redis7, test is redis6
+        //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         public async void ListsTrigger_SuccessfullyTriggers(string functionName, string keys, string values)
         {
             string[] keyArray = keys.Split(' ');
@@ -199,7 +200,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [Theory]
         [InlineData(nameof(IntegrationTestFunctions.ListsTrigger_SingleKey), IntegrationTestFunctions.listSingleKey, "a b")]
-        //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anythign before redis7, test is redis6
+        //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
         public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string values)
         {
             string[] keyArray = keys.Split(' ');

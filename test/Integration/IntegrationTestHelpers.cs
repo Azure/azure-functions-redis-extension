@@ -18,7 +18,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = GetFunctionsFileName(),
-                    Arguments = $"start --verbose --functions {functionName} --port {port}",
+                    Arguments = $"start --verbose --functions {functionName} --port {port} --no-build --prefix {GetPrefix()}",
                     WindowStyle = ProcessWindowStyle.Hidden,
                     WorkingDirectory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
                     RedirectStandardOutput = true,
@@ -50,11 +50,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.Start();
             functionsProcess.BeginOutputReadLine();
             functionsProcess.BeginErrorReadLine();
-            if (!hostStarted.Task.Wait(TimeSpan.FromMinutes(5)))
+            if (!hostStarted.Task.Wait(TimeSpan.FromMinutes(1)))
             {
                 throw new Exception("Azure Functions Host did not start");
             }
-            if (!functionLoaded.Task.Wait(TimeSpan.FromMinutes(5)))
+            if (!functionLoaded.Task.Wait(TimeSpan.FromMinutes(1)))
             {
                 throw new Exception($"Did not load Function {functionName}");
             }
@@ -92,6 +92,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 throw new FileNotFoundException($"Azure Functions Core Tools not found at {filepath}");
             }
             return filepath;
+        }
+
+        private static string GetPrefix()
+        {
+            return Path.Combine("bin", "Debug", "net6.0");
         }
     }
 }
