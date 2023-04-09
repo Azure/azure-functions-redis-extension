@@ -70,11 +70,12 @@ public static void PubSubTrigger(
 ### `RedisListsTrigger`
 The `RedisListsTrigger` pops elements from a list and surfaces those elements to the function. The trigger polls Redis at a configurable fixed interval, and uses [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/)/[`LMPOP`](https://redis.io/commands/lmpop/) to pop elements from the lists.
 
-Inputs:
-- `ConnectionString`: connection string to the redis cache (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+#### Inputs
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Keys`: Keys to read from, space-delimited.
   - Multiple keys only supported on Redis 7.0+ using [`LMPOP`](https://redis.io/commands/lmpop/).
   - Listens to only the first key given in the argument using [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/) on Redis versions less than 7.0.
+  - This field can be resolved using `INameResolver`.
 - (optional) `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: 1000
 - (optional) `MessagesPerWorker`: How many messages each functions worker "should" process. Used to determine how many workers the function should scale to.
@@ -85,15 +86,20 @@ Inputs:
 - (optional) `ListPopFromBeginning`: determines whether to pop elements from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop elements from the end using [`RPOP`](https://redis.io/commands/rpop/).
   - Default: true
 
+#### Avaiable Output Types
+- `RedisListEntry`: This class somewhat wraps [`ListPopResult` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/ListPopResult.cs).
+  - `string Key`: The list key that the function was triggered on.
+  - `string Element`: The list entry.
+
 #### Sample
-The following sample polls the key "listTest" at a localhost Redis instance at "127.0.0.1:6379"
+The following sample polls the key "listTest" at a Redis instance defined in local.settings.json at the key "redisConnectionStringSetting"
 ```c#
 [FunctionName(nameof(ListsTrigger))]
 public static void ListsTrigger(
-    [RedisListsTrigger(ConnectionString = "127.0.0.1:6379", Keys = "listTest")] RedisMessageModel model,
+    [RedisListsTrigger("redisConnectionStringSetting", "listTest")] RedisListEntry entry,
     ILogger logger)
 {
-    logger.LogInformation(JsonSerializer.Serialize(model));
+    logger.LogInformation(JsonSerializer.Serialize(entry));
 }
 ```
 
