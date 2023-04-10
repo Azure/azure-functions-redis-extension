@@ -9,34 +9,34 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(PubSubTrigger))]
         public static void PubSubTrigger(
-            [RedisPubSubTrigger(localhostSetting, "pubsubTest")] RedisPubSubMessage message,
+            [RedisPubSubTrigger(localhostSetting, "pubsubTest")] string message,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(message));
+            logger.LogInformation(message);
         }
 
         [FunctionName(nameof(PubSubTriggerResolvedChannel))]
         public static void PubSubTriggerResolvedChannel(
-            [RedisPubSubTrigger(localhostSetting, "%pubsubChannel%")] RedisPubSubMessage message,
+            [RedisPubSubTrigger(localhostSetting, "%pubsubChannel%")] string message,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(message));
+            logger.LogInformation(message);
         }
 
         [FunctionName(nameof(KeyspaceTrigger))]
         public static void KeyspaceTrigger(
-            [RedisPubSubTrigger(localhostSetting, "__keyspace@0__:keyspaceTest")] RedisPubSubMessage message,
+            [RedisPubSubTrigger(localhostSetting, "__keyspace@0__:keyspaceTest")] string message,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(message));
+            logger.LogInformation(message);
         }
 
         [FunctionName(nameof(KeyeventTrigger))]
         public static void KeyeventTrigger(
-            [RedisPubSubTrigger(localhostSetting, "__keyevent@0__:del")] RedisPubSubMessage message,
+            [RedisPubSubTrigger(localhostSetting, "__keyevent@0__:del")] string message,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(message));
+            logger.LogInformation(message);
         }
 
         [FunctionName(nameof(ListsTrigger))]
