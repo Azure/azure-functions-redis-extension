@@ -39,20 +39,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation(JsonSerializer.Serialize(model));
         }
 
-        [FunctionName(nameof(ListsTrigger))]
-        public static void ListsTrigger(
-            [RedisListTrigger(localhostSetting, "listTest")] RedisListEntry entry,
+        [FunctionName(nameof(ListTrigger))]
+        public static void ListTrigger(
+            [RedisListTrigger(localhostSetting, "listTest")] string entry,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(entry));
+            logger.LogInformation("The value from the list: " + entry);
         }
 
-        [FunctionName(nameof(ListsMultipleTrigger))]
-        public static void ListsMultipleTrigger(
-            [RedisListTrigger(localhostSetting, "listTest1 listTest2")] RedisListEntry entry,
+        [FunctionName(nameof(ListMultipleTrigger))]
+        public static void ListMultipleTrigger(
+            [RedisListTrigger(localhostSetting, "listTest1 listTest2")] string entry,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(entry));
+            logger.LogInformation("The value from the list: " + entry);
         }
 
         [FunctionName(nameof(StreamsTrigger))]
