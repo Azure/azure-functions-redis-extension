@@ -41,7 +41,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(ListsTrigger))]
         public static void ListsTrigger(
-            [RedisListsTrigger(localhostSetting, "listTest")] RedisListEntry entry,
+            [RedisListTrigger(localhostSetting, "listTest")] RedisListEntry entry,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(entry));
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(ListsMultipleTrigger))]
         public static void ListsMultipleTrigger(
-            [RedisListsTrigger(localhostSetting, "listTest1 listTest2")] RedisListEntry entry,
+            [RedisListTrigger(localhostSetting, "listTest1 listTest2")] RedisListEntry entry,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(entry));

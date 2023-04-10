@@ -85,7 +85,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListsTrigger_SingleKey))]
         public static void ListsTrigger_SingleKey(
-            [RedisListsTrigger(localhostSetting, listSingleKey, pollingIntervalInMs: pollingInterval)] RedisListEntry entry,
+            [RedisListTrigger(localhostSetting, listSingleKey, pollingIntervalInMs: pollingInterval)] RedisListEntry entry,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(entry));
@@ -93,7 +93,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListsTrigger_MultipleKeys))]
         public static void ListsTrigger_MultipleKeys(
-            [RedisListsTrigger(localhostSetting, listMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisListEntry entry,
+            [RedisListTrigger(localhostSetting, listMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisListEntry entry,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(entry));

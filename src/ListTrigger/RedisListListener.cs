@@ -11,11 +11,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for managing connections and listening to a given Azure Redis Cache.
     /// </summary>
-    internal sealed class RedisListsListener : RedisPollingTriggerBaseListener
+    internal sealed class RedisListListener : RedisPollingTriggerBaseListener
     {
         internal bool listPopFromBeginning;
 
-        public RedisListsListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisListListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
             : base(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
@@ -40,7 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (serverVersion >= new Version("7.0"))
             {
                 ListPopResult result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, batchSize) : await db.ListRightPopAsync(keys, batchSize);
-                logger?.LogDebug($"[{nameof(RedisListsListener)}] Received {result.Values.Count()} elements from the list at key '{result.Key}'.");
+                logger?.LogDebug($"[{nameof(RedisListListener)}] Received {result.Values.Count()} elements from the list at key '{result.Key}'.");
                 foreach (RedisValue value in result.Values)
                 {
                     RedisListEntry triggerValue = new RedisListEntry(result.Key, value);
@@ -50,7 +50,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             else if (serverVersion >= new Version("6.2"))
             {
                 RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], batchSize) : await db.ListRightPopAsync(keys[0], batchSize);
-                logger?.LogDebug($"[{nameof(RedisListsListener)}] Received {result.Length} elements from the list at key '{keys[0]}'.");
+                logger?.LogDebug($"[{nameof(RedisListListener)}] Received {result.Length} elements from the list at key '{keys[0]}'.");
                 foreach (RedisValue value in result)
                 {
                     RedisListEntry triggerValue = new RedisListEntry(keys[0], value);
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             else
             {
                 RedisValue result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0]) : await db.ListRightPopAsync(keys[0]);
-                logger?.LogDebug($"[{nameof(RedisListsListener)}] Received 1 element from the list at key '{keys[0]}'.");
+                logger?.LogDebug($"[{nameof(RedisListListener)}] Received 1 element from the list at key '{keys[0]}'.");
                 if (!result.IsNullOrEmpty)
                 {
                     RedisListEntry triggerValue = new RedisListEntry(keys[0], result);

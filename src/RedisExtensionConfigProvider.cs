@@ -43,8 +43,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             FluentBindingRule<RedisPubSubTriggerAttribute> pubsubTriggerRule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
             pubsubTriggerRule.BindToTrigger<RedisMessageModel>(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, logger));
 
-            FluentBindingRule<RedisListsTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListsTriggerAttribute>();
-            listsTriggerRule.BindToTrigger<RedisListEntry>(new RedisListsTriggerBindingProvider(configuration, nameResolver, logger));
+            FluentBindingRule<RedisListTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListTriggerAttribute>();
+            listsTriggerRule.BindToTrigger<RedisListEntry>(new RedisListTriggerBindingProvider(configuration, nameResolver, logger));
 
             FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
             streamsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
