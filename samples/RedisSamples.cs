@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
@@ -57,7 +58,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(StreamsTrigger))]
         public static void StreamsTrigger(
-            [RedisStreamsTrigger(localhostSetting, "streamTest")] RedisStreamEntry entry,
+            [RedisStreamsTrigger(localhostSetting, "streamTest")] KeyValuePair<string, string>[] entry,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(entry));
@@ -65,7 +66,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(StreamsMultipleTriggers))]
         public static void StreamsMultipleTriggers(
-            [RedisStreamsTrigger(localhostSetting, "streamTest1 streamTest2")] RedisStreamEntry entry,
+            [RedisStreamsTrigger(localhostSetting, "streamTest1 streamTest2")] KeyValuePair<string, string>[] entry,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(entry));
