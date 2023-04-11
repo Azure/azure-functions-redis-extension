@@ -26,8 +26,8 @@ variables:
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
 
 jobs:
-  - job: test
-    displayName: Build Debug, Test
+  - job: testDotnet
+    displayName: Test Debug
     steps:
       - task: UseDotNet@2
         displayName: Install .NET SDK
@@ -59,7 +59,7 @@ jobs:
           command: test
           arguments: --configuration Debug
 
-  - job: build
+  - job: buildDotnet
     displayName: Build Release, Generate & Sign Nuget Package
     condition: eq(variables.isReleaseBuild, 'True')
     steps:
@@ -145,3 +145,42 @@ jobs:
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
+
+  - job: buildJava
+    displayName: Java Library
+    condition: eq(variables.isReleaseBuild, 'True')
+    steps:
+      - task: Maven@3
+        displayName: Set library version
+        inputs:
+          mavenPomFile: java-library/pom.xml
+          goals: versions:set
+          options: --batch-mode --define=newVersion=$(fullVersion) --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots
+
+      - task: Maven@3
+        displayName: Build library
+        inputs:
+          mavenPomFile: java-library/pom.xml
+          options: --batch-mode --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots
+
+      - powershell: |
+          $prefix = 'azure-functions-java-library-redis-$(fullVersion)'
+          $source = 'java-library'
+          $destination = '$(Build.ArtifactStagingDirectory)/$(fullVersion)'
+          New-Item $destination -ItemType Directory
+          Copy-Item "$source/pom.xml" "$destination/$prefix.pom"
+          Copy-Item "$source/target/$prefix.jar" "$destination/$prefix.jar"
+          Copy-Item "$source/target/$prefix-javadoc.jar" "$destination/$prefix-javadoc.jar"
+          Copy-Item "$source/target/$prefix-sources.jar" "$destination/$prefix-sources.jar"
+        displayName: Copy output files
+
+      - task: ManifestGeneratorTask@0
+        displayName: Generate SBOM manifest
+        inputs:
+          buildDropPath: $(Build.ArtifactStagingDirectory)/$(fullVersion)
+          packageName: Azure Functions Redis Java Bindings
+          packageVersion: $(fullVersion)
+
+      - publish: $(Build.ArtifactStagingDirectory)
+        displayName: Publish library package
+        artifact: drop-java-library
