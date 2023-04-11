@@ -148,7 +148,7 @@ jobs:
 
   - job: buildJava
     displayName: Java Library
-    condition: eq(variables.isReleaseBuild, 'True')
+    # condition: eq(variables.isReleaseBuild, 'True')
     steps:
       - task: Maven@3
         displayName: Set library version
