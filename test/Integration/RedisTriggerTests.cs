@@ -13,24 +13,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public class RedisTriggerTests
     {
         [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_SingleChannel), IntegrationTestFunctions.pubsubChannel, "test")]
-        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_MultipleChannels), IntegrationTestFunctions.pubsubChannel, "test")]
-        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_MultipleChannels), IntegrationTestFunctions.pubsubChannel + "suffix", "testSuffix")]
-        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.pubsubChannel, "test")]
-        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.pubsubChannel + "suffix", "testSuffix")]
-        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), "prefix" + IntegrationTestFunctions.pubsubChannel, "testPrefix")]
-        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), "separate", "testSeparate")]
-        public async void PubSubTrigger_SuccessfullyTriggers(string functionName, string channel, string message)
+        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_SingleChannel), IntegrationTestFunctions.pubsubChannel, IntegrationTestFunctions.pubsubChannel, "test")]
+        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_MultipleChannels), IntegrationTestFunctions.pubsubMultiple, IntegrationTestFunctions.pubsubChannel, "test")]
+        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_MultipleChannels), IntegrationTestFunctions.pubsubMultiple, IntegrationTestFunctions.pubsubChannel + "suffix", "testSuffix")]
+        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.all, IntegrationTestFunctions.pubsubChannel + "suffix", "testSuffix")]
+        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.all, "prefix" + IntegrationTestFunctions.pubsubChannel, "testPrefix")]
+        [InlineData(nameof(IntegrationTestFunctions.PubSubTrigger_AllChannels), IntegrationTestFunctions.all, "separate", "testSeparate")]
+        public async void PubSubTrigger_SuccessfullyTriggers(string functionName, string subscriptionChannel, string channel, string message)
         {
-            RedisMessageModel expectedReturn = new RedisMessageModel
-            {
-                Trigger = channel,
-                Message = message
-            };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
                 { $"Executed '{functionName}' (Succeeded", 1},
-                { JsonSerializer.Serialize(expectedReturn), 1},
+                { JsonSerializer.Serialize(new RedisPubSubMessage(subscriptionChannel, channel, message)), 1},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
@@ -50,30 +44,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_SingleKey), IntegrationTestFunctions.keyspaceChannel)]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_MultipleKeys), IntegrationTestFunctions.keyspaceChannel)]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_MultipleKeys), IntegrationTestFunctions.keyspaceChannel + "suffix")]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceChannel)]
-        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceChannel + "suffix")]
-        public async void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string channel)
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_SingleKey), IntegrationTestFunctions.keyspaceChannel, IntegrationTestFunctions.keyspaceChannel)]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_MultipleKeys), IntegrationTestFunctions.keyspaceMultiple, IntegrationTestFunctions.keyspaceChannel)]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_MultipleKeys), IntegrationTestFunctions.keyspaceMultiple, IntegrationTestFunctions.keyspaceChannel + "suffix")]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceChannelAll, IntegrationTestFunctions.keyspaceChannel)]
+        [InlineData(nameof(IntegrationTestFunctions.KeySpaceTrigger_AllKeys), IntegrationTestFunctions.keyspaceChannelAll, IntegrationTestFunctions.keyspaceChannel + "suffix")]
+        public async void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string subscriptionChannel, string channel)
         {
             string keyspace = "__keyspace@0__:";
             string key = channel.Substring(channel.IndexOf(keyspace) + keyspace.Length);
-            RedisMessageModel expectedSetReturn = new RedisMessageModel
-            {
-                Trigger = channel,
-                Message = "set"
-            };
-            RedisMessageModel expectedDelReturn = new RedisMessageModel
-            {
-                Trigger = channel,
-                Message = "del"
-            };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
                 { $"Executed '{functionName}' (Succeeded", 2},
-                { JsonSerializer.Serialize(expectedSetReturn), 1},
-                { JsonSerializer.Serialize(expectedDelReturn), 1},
+                { JsonSerializer.Serialize(new RedisPubSubMessage(subscriptionChannel, channel, "set")), 1},
+                { JsonSerializer.Serialize(new RedisPubSubMessage(subscriptionChannel, channel, "del")), 1},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
@@ -98,15 +82,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             string key = "key";
             string value = "value";
-            RedisMessageModel expectedReturn = new RedisMessageModel
-            {
-                Trigger = IntegrationTestFunctions.keyeventChannel,
-                Message = key
-            };
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
                 { $"Executed '{nameof(IntegrationTestFunctions.KeyEventTrigger_SingleEvent)}' (Succeeded", 1},
-                { JsonSerializer.Serialize(expectedReturn), 1},
+                { JsonSerializer.Serialize(new RedisPubSubMessage(IntegrationTestFunctions.keyeventChannel, IntegrationTestFunctions.keyeventChannel, key)), 1},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
@@ -130,22 +109,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             string key = "key";
             string value = "value";
-            RedisMessageModel expectedSetReturn = new RedisMessageModel
-            {
-                Trigger = "__keyevent@0__:set",
-                Message = key
-            };
-            RedisMessageModel expectedDelReturn = new RedisMessageModel
-            {
-                Trigger = "__keyevent@0__:del",
-                Message = key
-            };
 
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
                 { $"Executed '{nameof(IntegrationTestFunctions.KeyEventTrigger_AllEvents)}' (Succeeded", 2},
-                { JsonSerializer.Serialize(expectedSetReturn), 1},
-                { JsonSerializer.Serialize(expectedDelReturn), 1},
+                { JsonSerializer.Serialize(new RedisPubSubMessage(IntegrationTestFunctions.keyeventChannelAll, "__keyevent@0__:set", key)), 1},
+                { JsonSerializer.Serialize(new RedisPubSubMessage(IntegrationTestFunctions.keyeventChannelAll, "__keyevent@0__:del", key)), 1},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
