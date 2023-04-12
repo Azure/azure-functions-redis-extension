@@ -5,6 +5,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Microsoft.Azure.WebJobs.Extensions.Redis</AssemblyName>
     <RootNamespace>Microsoft.Azure.WebJobs.Extensions.Redis</RootNamespace>
+    <Version>0.0.0</Version>
 
     <PackageId>Microsoft.Azure.WebJobs.Extensions.Redis</PackageId>
     <Authors>Microsoft</Authors>

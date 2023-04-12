@@ -59,6 +59,7 @@ The `RedisPubSubTrigger` subscribes to a specific channel pattern using [`PSUBSC
   - This field can be resolved using `INameResolver`.
 
 #### Avaiable Output Types
+- `string`: This is the value that was broadcast.
 - `RedisPubSubMessage`: This class wraps [`ChannelMessage` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs).
   - `string SubscriptionChannel`: The channel that the subscription was created from.
   - `string Channel`: The channel that the message was broadcast to.
@@ -96,6 +97,7 @@ The `RedisListsTrigger` pops elements from a list and surfaces those elements to
   - Default: true
 
 #### Avaiable Output Types
+- `string`: The list entry.
 - `RedisListEntry`: This class somewhat wraps [`ListPopResult` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/ListPopResult.cs).
   - `string Key`: The list key that the function was triggered on.
   - `string Element`: The list entry.
@@ -134,6 +136,10 @@ Each function creates a new random GUID to use as its consumer name within the g
   - Default: "AzureFunctionRedisExtension"
 
 #### Avaiable Output Types
+- `string`: The values contained within the entry as a list of JSON objects.
+  - `[{"name":"value"},{"name2":"value2"}]`
+- `KeyValuePair<string, string>[]`: The values contained within the entry as an array of KeyValuePairs.
+- `IReadOnlyDictionary<string, string>`: The values contained within the entry as an IReadOnlyDictionary.
 - `RedisStreamEntry`: This class wraps [`StreamEntry` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs).
   - `string Key`: The stream key that the function was triggered on.
   - `string Id`: The ID assigned to the entry.
@@ -151,24 +157,8 @@ public static void StreamsTrigger(
 }
 ```
 
-### Return Value
-All triggers return a [`RedisMessageModel`](./src/Models/RedisMessageModel.cs) object that has two fields:
-```c#
-namespace Microsoft.Azure.WebJobs.Extensions.Redis
-{
-  public class RedisMessageModel
-  {
-    public string Trigger { get; set; }
-    public string Message { get; set; }
-  }
-}
-```
-- `Trigger`: The pubsub channel, list key, or stream key that the function is listening to.
-- `Message`: The pubsub message, list element, or stream element.
-
 ## Known Issues
 - The `RedisPubSubTrigger` is not capable of listening to [keyspace notifications](https://redis.io/docs/manual/keyspace-notifications/) on clustered caches.
-
 
 ## Contributing
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
