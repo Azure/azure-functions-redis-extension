@@ -8,10 +8,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     [Binding]
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class RedisListsTriggerAttribute : RedisPollingTriggerBaseAttribute
+    public class RedisListTriggerAttribute : RedisPollingTriggerBaseAttribute
     {
         /// <summary>
-        /// Initializes a new <see cref="RedisListsTriggerAttribute"/>.
+        /// Initializes a new <see cref="RedisListTriggerAttribute"/>.
         /// </summary>
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="keys">Keys to read from, space-delimited.</param>
@@ -19,7 +19,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <param name="messagesPerWorker">The number of messages each functions instance is expected to handle. Default: 100</param>
         /// <param name="batchSize">Number of elements to pull from a Redis list at one time. Default: 10</param>
         /// <param name="listPopFromBeginning">Decides if the function will pop elements from the front or end of the list. Default: true</param>
-        public RedisListsTriggerAttribute(string connectionStringSetting, string keys, int pollingIntervalInMs = 1000, int messagesPerWorker = 100, int batchSize = 10, bool listPopFromBeginning = true)
+        public RedisListTriggerAttribute(string connectionStringSetting, string keys, int pollingIntervalInMs = 1000, int messagesPerWorker = 100, int batchSize = 10, bool listPopFromBeginning = true)
             : base(connectionStringSetting, keys, pollingIntervalInMs, messagesPerWorker, batchSize)
         {
             ListPopFromBeginning = listPopFromBeginning;

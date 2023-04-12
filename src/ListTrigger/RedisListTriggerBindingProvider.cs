@@ -10,13 +10,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Provides trigger binding, variables configured in local.settings.json are being retrieved here.
     /// </summary>
-    internal class RedisListsTriggerBindingProvider : ITriggerBindingProvider
+    internal class RedisListTriggerBindingProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration configuration;
         private readonly INameResolver nameResolver;
         private readonly ILogger logger;
 
-        public RedisListsTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
+        public RedisListTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
             this.nameResolver = nameResolver;
@@ -27,16 +27,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (context is null)
             {
-                logger?.LogError($"[{nameof(RedisListsTriggerBindingProvider)}] Provided {nameof(TriggerBindingProviderContext)} is null.");
+                logger?.LogError($"[{nameof(RedisListTriggerBindingProvider)}] Provided {nameof(TriggerBindingProviderContext)} is null.");
                 throw new ArgumentNullException(nameof(context));
             }
 
             ParameterInfo parameter = context.Parameter;
-            RedisListsTriggerAttribute attribute = parameter.GetCustomAttribute<RedisListsTriggerAttribute>(inherit: false);
+            RedisListTriggerAttribute attribute = parameter.GetCustomAttribute<RedisListTriggerAttribute>(inherit: false);
 
             if (attribute is null)
             {
-                logger?.LogError($"[{nameof(RedisListsTriggerBindingProvider)}] No {nameof(RedisListsTriggerAttribute)} found in parameter of provided {nameof(TriggerBindingProviderContext)}.");
+                logger?.LogError($"[{nameof(RedisListTriggerBindingProvider)}] No {nameof(RedisListTriggerAttribute)} found in parameter of provided {nameof(TriggerBindingProviderContext)}.");
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
@@ -47,7 +47,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             TimeSpan pollingInterval = TimeSpan.FromMilliseconds(attribute.PollingIntervalInMs);
             bool listPopFromBeginning = attribute.ListPopFromBeginning;
 
-            return Task.FromResult<ITriggerBinding>(new RedisListsTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, listPopFromBeginning, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisListTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, listPopFromBeginning, logger));
         }
     }
 }

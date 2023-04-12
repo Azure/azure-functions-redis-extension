@@ -12,7 +12,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Trigger Binding, manages and binds context to listener.
     /// </summary>
-    internal class RedisListsTriggerBinding : ITriggerBinding
+    internal class RedisListTriggerBinding : ITriggerBinding
     {
         private readonly string connectionString;
         private readonly TimeSpan pollingInterval;
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly bool listPopFromBeginning;
         private readonly ILogger logger;
 
-        public RedisListsTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning, ILogger logger)
+        public RedisListTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning, ILogger logger)
         {
             this.connectionString = connectionString;
             this.keys = keys;
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.logger = logger;
         }
 
-        public Type TriggerValueType => typeof(RedisMessageModel);
+        public Type TriggerValueType => typeof(RedisListEntry);
 
         public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
 
@@ -47,11 +47,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (context is null)
             {
-                logger?.LogError($"[{nameof(RedisListsTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
+                logger?.LogError($"[{nameof(RedisListTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return Task.FromResult<IListener>(new RedisListsListener(connectionString, keys, pollingInterval, messagesPerWorker, count, listPopFromBeginning, context.Executor, logger));
+            return Task.FromResult<IListener>(new RedisListListener(connectionString, keys, pollingInterval, messagesPerWorker, count, listPopFromBeginning, context.Executor, logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

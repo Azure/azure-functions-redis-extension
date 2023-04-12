@@ -6,6 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public static class IntegrationTestFunctions
     {
         public const string localhostSetting = "redisLocalhost";
+        public const string format = "triggerValue:{0}";
         public const string pubsubChannel = "testChannel";
         public const string pubsubMultiple = "testChannel*";
         public const string keyspaceChannel = "__keyspace@0__:testKey";
@@ -85,20 +86,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             logger.LogInformation(JsonSerializer.Serialize(message));
         }
 
-        [FunctionName(nameof(ListsTrigger_SingleKey))]
-        public static void ListsTrigger_SingleKey(
-            [RedisListsTrigger(localhostSetting, listSingleKey, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
+        [FunctionName(nameof(ListTrigger_SingleKey))]
+        public static void ListTrigger_SingleKey(
+            [RedisListTrigger(localhostSetting, listSingleKey, pollingIntervalInMs: pollingInterval)] string entry,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
+            logger.LogInformation(string.Format(format, entry));
         }
 
         [FunctionName(nameof(ListsTrigger_MultipleKeys))]
         public static void ListsTrigger_MultipleKeys(
-            [RedisListsTrigger(localhostSetting, listMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisMessageModel result,
+            [RedisListTrigger(localhostSetting, listMultipleKeys, pollingIntervalInMs: pollingInterval)] string entry,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(result));
+            logger.LogInformation(string.Format(format, entry));
         }
 
         [FunctionName(nameof(StreamsTrigger_SingleKey))]
