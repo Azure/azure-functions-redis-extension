@@ -14,7 +14,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for polling a cache.
     /// </summary>
-    internal abstract class RedisPollingTriggerBaseListener : IListener, IScaleMonitor, IScaleMonitor<RedisPollingTriggerBaseMetrics>
+    internal abstract class RedisPollingTriggerBaseListener : IListener, IScaleMonitor, IScaleMonitor<RedisPollingTriggerBaseMetrics>, ITargetScaler
     {
         private const int MINIMUM_SAMPLES = 5;
         internal string connectionString;
@@ -27,8 +27,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
-
-        public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
 
         public RedisPollingTriggerBaseListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor, ILogger logger)
         {
@@ -158,5 +156,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             return new ScaleStatus { Vote = ScaleVote.None };
         }
+
+        public async Task<TargetScalerResult> GetScaleResultAsync(TargetScalerContext context)
+        {
+            RedisPollingTriggerBaseMetrics metric = await GetMetricsAsync();
+            return new TargetScalerResult() { TargetWorkerCount = (int)Math.Ceiling(metric.Remaining / (decimal) messagesPerWorker) };
+        }
+
+        public ScaleMonitorDescriptor Descriptor => throw new NotImplementedException();
+
+        public TargetScalerDescriptor TargetScalerDescriptor => throw new NotImplementedException();
     }
 }
