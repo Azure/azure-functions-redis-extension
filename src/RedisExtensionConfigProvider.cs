@@ -2,7 +2,10 @@
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -45,7 +48,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             listsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisListsTriggerBindingProvider(configuration, nameResolver, logger));
 
             FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
-            streamsTriggerRule.BindToTrigger<RedisMessageModel>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
+            streamsTriggerRule.BindToTrigger<RedisStreamEntry>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
+            streamsTriggerRule.AddConverter<RedisStreamEntry, KeyValuePair<string, string>[]>(entry => entry.Values);
+            streamsTriggerRule.AddConverter<RedisStreamEntry, string>(entry => JsonSerializer.Serialize(entry.Values));
+            streamsTriggerRule.AddConverter<RedisStreamEntry, IReadOnlyDictionary<string, string>>(entry => entry.Values.ToDictionary());
 #pragma warning restore CS0618
         }
     }

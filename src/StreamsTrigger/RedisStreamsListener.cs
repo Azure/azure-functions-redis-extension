@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -71,12 +71,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 logger?.LogDebug($"[{nameof(RedisStreamsListener)}][Consumer:{consumerName}] Received {stream.Entries.Length} elements from the stream at key '{stream.Key}'.");
                 foreach (StreamEntry entry in stream.Entries)
                 {
-                    var triggerValue = new RedisMessageModel
-                    {
-                        Trigger = stream.Key,
-                        Message = JsonSerializer.Serialize(entry.Values)
-                    };
-
+                    RedisStreamEntry triggerValue = new RedisStreamEntry(stream.Key, entry.Id, entry.Values.Select(a => new KeyValuePair<string, string>(a.Name.ToString(), a.Value.ToString())).ToArray());
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }
 
