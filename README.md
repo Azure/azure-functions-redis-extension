@@ -136,6 +136,8 @@ Each function creates a new random GUID to use as its consumer name within the g
   - Default: "AzureFunctionRedisExtension"
 
 #### Avaiable Output Types
+- `string`: The values contained within the entry as a list of JSON objects.
+  - `[{"name":"value"},{"name2":"value2"}]`
 - `KeyValuePair<string, string>[]`: The values contained within the entry as an array of KeyValuePairs.
 - `IReadOnlyDictionary<string, string>`: The values contained within the entry as an IReadOnlyDictionary.
 - `RedisStreamEntry`: This class wraps [`StreamEntry` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs).
