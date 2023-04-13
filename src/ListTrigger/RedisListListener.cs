@@ -23,12 +23,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override void BeforePolling()
         {
-            if (serverVersion < new Version("7.0") && keys.Length > 1)
+            if (serverVersion < RedisUtilities.Version70 && keys.Length > 1)
             {
                 logger?.LogWarning($"The cache's version ({serverVersion}) is lower than 7.0 and does not support lmpop. Defaulting to lpop/rpop on the first key given.");
             }
 
-            if (serverVersion < new Version("6.2") && batchSize > 1)
+            if (serverVersion < RedisUtilities.Version62 && batchSize > 1)
             {
                 logger?.LogWarning($"The cache's version ({serverVersion}) is lower than 6.2 and does not support the COUNT argument in lpop/rpop. Defaulting to lpop/rpop without the COUNT argument, which pulls a single element from the list at a time.");
             }
@@ -37,7 +37,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public override async Task PollAsync(CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            if (serverVersion >= new Version("7.0"))
+            if (serverVersion >= RedisUtilities.Version70)
             {
                 ListPopResult result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, batchSize) : await db.ListRightPopAsync(keys, batchSize);
                 logger?.LogDebug($"[{nameof(RedisListListener)}] Received {result.Values.Count()} elements from the list at key '{result.Key}'.");
@@ -47,7 +47,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 };
             }
-            else if (serverVersion >= new Version("6.2"))
+            else if (serverVersion >= RedisUtilities.Version62)
             {
                 RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], batchSize) : await db.ListRightPopAsync(keys[0], batchSize);
                 logger?.LogDebug($"[{nameof(RedisListListener)}] Received {result.Length} elements from the list at key '{keys[0]}'.");
