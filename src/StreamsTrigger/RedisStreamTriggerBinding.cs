@@ -12,7 +12,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Trigger Binding, manages and binds context to listener.
     /// </summary>
-    internal class RedisStreamsTriggerBinding : ITriggerBinding
+    internal class RedisStreamTriggerBinding : ITriggerBinding
     {
         private readonly string connectionString;
         private readonly TimeSpan pollingInterval;
@@ -23,7 +23,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly bool deleteAfterProcess;
         private readonly ILogger logger;
 
-        public RedisStreamsTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, string consumerGroup, bool deleteAfterProcess, ILogger logger)
+        public RedisStreamTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, string consumerGroup, bool deleteAfterProcess, ILogger logger)
         {
             this.connectionString = connectionString;
             this.keys = keys;
@@ -49,11 +49,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (context is null)
             {
-                logger?.LogError($"[{nameof(RedisStreamsTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
+                logger?.LogError($"[{nameof(RedisStreamTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return Task.FromResult<IListener>(new RedisStreamsListener(connectionString, keys, pollingInterval, messagesPerWorker, count, consumerGroup, deleteAfterProcess, context.Executor, logger));
+            return Task.FromResult<IListener>(new RedisStreamListener(connectionString, keys, pollingInterval, messagesPerWorker, count, consumerGroup, deleteAfterProcess, context.Executor, logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()
