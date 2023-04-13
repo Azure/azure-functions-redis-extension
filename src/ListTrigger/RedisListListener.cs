@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             : base(name, connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
-            this.logPrefix = $"[RedisListTrigger][Name:{name}][Keys:{keys}]";
+            this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Keys:{keys}]";
             this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisListTrigger");
             this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisListTrigger");
         }
