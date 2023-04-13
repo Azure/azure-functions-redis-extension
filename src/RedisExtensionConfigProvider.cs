@@ -51,8 +51,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             listsTriggerRule.BindToTrigger<RedisListEntry>(new RedisListTriggerBindingProvider(configuration, nameResolver, logger));
             listsTriggerRule.AddConverter<RedisListEntry, string>(listEntry => listEntry.Value);
 
-            FluentBindingRule<RedisStreamsTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamsTriggerAttribute>();
-            streamsTriggerRule.BindToTrigger<RedisStreamEntry>(new RedisStreamsTriggerBindingProvider(configuration, nameResolver, logger));
+            FluentBindingRule<RedisStreamTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamTriggerAttribute>();
+            streamsTriggerRule.BindToTrigger<RedisStreamEntry>(new RedisStreamTriggerBindingProvider(configuration, nameResolver, logger));
             streamsTriggerRule.AddConverter<RedisStreamEntry, KeyValuePair<string, string>[]>(entry => entry.Values);
             streamsTriggerRule.AddConverter<RedisStreamEntry, string>(entry => JsonSerializer.Serialize(entry.Values));
             streamsTriggerRule.AddConverter<RedisStreamEntry, IReadOnlyDictionary<string, string>>(entry => entry.Values.ToDictionary());

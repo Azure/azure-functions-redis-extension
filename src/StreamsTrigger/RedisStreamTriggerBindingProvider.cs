@@ -10,13 +10,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Provides trigger binding, variables configured in local.settings.json are being retrieved here.
     /// </summary>
-    internal class RedisStreamsTriggerBindingProvider : ITriggerBindingProvider
+    internal class RedisStreamTriggerBindingProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration configuration;
         private readonly INameResolver nameResolver;
         private readonly ILogger logger;
 
-        public RedisStreamsTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
+        public RedisStreamTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
             this.nameResolver = nameResolver;
@@ -27,16 +27,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (context is null)
             {
-                logger?.LogError($"[{nameof(RedisStreamsTriggerBindingProvider)}] Provided {nameof(TriggerBindingProviderContext)} is null.");
+                logger?.LogError($"[{nameof(RedisStreamTriggerBindingProvider)}] Provided {nameof(TriggerBindingProviderContext)} is null.");
                 throw new ArgumentNullException(nameof(context));
             }
 
             ParameterInfo parameter = context.Parameter;
-            RedisStreamsTriggerAttribute attribute = parameter.GetCustomAttribute<RedisStreamsTriggerAttribute>(inherit: false);
+            RedisStreamTriggerAttribute attribute = parameter.GetCustomAttribute<RedisStreamTriggerAttribute>(inherit: false);
 
             if (attribute is null)
             {
-                logger?.LogError($"[{nameof(RedisStreamsTriggerBindingProvider)}] No {nameof(RedisStreamsTriggerAttribute)} found in parameter of provided {nameof(TriggerBindingProviderContext)}.");
+                logger?.LogError($"[{nameof(RedisStreamTriggerBindingProvider)}] No {nameof(RedisStreamTriggerAttribute)} found in parameter of provided {nameof(TriggerBindingProviderContext)}.");
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string consumerGroup = RedisUtilities.ResolveString(nameResolver, attribute.ConsumerGroup, nameof(attribute.ConsumerGroup));
             bool deleteAfterProcess = attribute.DeleteAfterProcess;
 
-            return Task.FromResult<ITriggerBinding>(new RedisStreamsTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, consumerGroup, deleteAfterProcess, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisStreamTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, consumerGroup, deleteAfterProcess, logger));
         }
     }
 }
