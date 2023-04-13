@@ -27,7 +27,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.channel = channel;
             this.executor = executor;
             this.logger = logger;
-            this.logPrefix = $"[RedisPubSubTrigger][Id:{id}][Channel:{channel}]";
+            this.logPrefix = $"[RedisPubSubTrigger][Id:{id}]";
         }
 
         /// <summary>
