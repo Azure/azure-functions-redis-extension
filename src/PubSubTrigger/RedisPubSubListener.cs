@@ -21,13 +21,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         internal IConnectionMultiplexer multiplexer;
 
-        public RedisPubSubListener(string id, string connectionString, string channel, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPubSubListener(string name, string connectionString, string channel, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.connectionString = connectionString;
             this.channel = channel;
             this.executor = executor;
             this.logger = logger;
-            this.logPrefix = $"[RedisPubSubTrigger][Id:{id}][Channel:{channel}]";
+            this.logPrefix = $"[RedisPubSubTrigger][Id:{name}][Channel:{channel}]";
         }
 
         /// <summary>

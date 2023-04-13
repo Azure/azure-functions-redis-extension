@@ -43,7 +43,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return Task.FromResult<IListener>(new RedisPubSubListener(context.Descriptor.Id, connectionString, channel, context.Executor, logger));
+            return Task.FromResult<IListener>(new RedisPubSubListener(context.Descriptor.LogName, connectionString, channel, context.Executor, logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

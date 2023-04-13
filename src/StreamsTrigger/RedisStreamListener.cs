@@ -17,17 +17,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool deleteAfterProcess;
         internal string consumerGroup;
+        internal string consumerName;
         internal StreamPosition[] positions;
 
-        public RedisStreamListener(string id, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(id, connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
+        public RedisStreamListener(string name, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
         {
             this.consumerGroup = consumerGroup;
             this.deleteAfterProcess = deleteAfterProcess;
             this.positions = this.keys.Select((key) => new StreamPosition(key, StreamPosition.NewMessages)).ToArray();
-            this.logPrefix = $"[RedisStreamTrigger][ConsumerGroup:{consumerGroup}][Consumer:{id}][Keys:{keys}]";
-            this.Descriptor = new ScaleMonitorDescriptor(id, $"{id}-RedisStreamTrigger");
-            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{id}-RedisStreamTrigger");
+            this.consumerName = Guid.NewGuid().ToString();
+
+            this.logPrefix = $"[RedisStreamTrigger][Name:{name}][ConsumerGroup:{consumerGroup}][Consumer:{consumerName}][Keys:{keys}]";
+            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisStreamTrigger-{consumerGroup}-{consumerName}");
+            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisStreamTrigger-{consumerGroup}-{consumerName}");
         }
 
         public override async void BeforePolling()
@@ -66,7 +69,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public override async Task PollAsync(CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            RedisStream[] streams = await db.StreamReadGroupAsync(positions, consumerGroup, id, batchSize);
+            RedisStream[] streams = await db.StreamReadGroupAsync(positions, consumerGroup, consumerName, batchSize);
 
             foreach (RedisStream stream in streams)
             {
@@ -94,9 +97,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             IDatabase db = multiplexer.GetDatabase();
             foreach (RedisKey key in keys)
             {
-                logger?.LogInformation($"{logPrefix} Attempting to delete consumer name '{id}' from the consumer group '{consumerGroup}' for the stream at key '{key}'.");
-                long pending = await db.StreamDeleteConsumerAsync(key, consumerGroup, id);
-                logger?.LogInformation($"{logPrefix} Successfully deleted consumer name '{id}' from the consumer group '{consumerGroup}' for the stream at key '{key}'. There were {pending} pending messages for the consumer.");
+                logger?.LogInformation($"{logPrefix} Attempting to delete consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'.");
+                long pending = await db.StreamDeleteConsumerAsync(key, consumerGroup, consumerName);
+                logger?.LogInformation($"{logPrefix} Successfully deleted consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'. There were {pending} pending messages for the consumer.");
             }
         }
 

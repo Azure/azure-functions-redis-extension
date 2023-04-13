@@ -16,13 +16,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool listPopFromBeginning;
 
-        public RedisListListener(string id, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(id, connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
+        public RedisListListener(string name, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
-            this.logPrefix = $"[RedisListTrigger][Id:{id}][Keys:{keys}]";
-            this.Descriptor = new ScaleMonitorDescriptor(id, $"{id}-RedisListTrigger");
-            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{id}-RedisListTrigger");
+            this.logPrefix = $"[RedisListTrigger][Name:{name}][Keys:{keys}]";
+            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisListTrigger");
+            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisListTrigger");
         }
 
         public override void BeforePolling()
