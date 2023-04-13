@@ -166,7 +166,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public async Task<TargetScalerResult> GetScaleResultAsync(TargetScalerContext context)
         {
             RedisPollingTriggerBaseMetrics metric = await GetMetricsAsync();
-            return new TargetScalerResult() { TargetWorkerCount = (int)Math.Ceiling(metric.Remaining / (decimal) messagesPerWorker) };
+            return new TargetScalerResult() { TargetWorkerCount = (int)Math.Ceiling(metric.Remaining / (decimal)messagesPerWorker) };
         }
     }
 }

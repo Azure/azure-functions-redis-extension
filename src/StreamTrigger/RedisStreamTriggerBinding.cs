@@ -1,14 +1,10 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
-using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -51,9 +47,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
         {
-
-            File.AppendAllText(@"C:\Users\mapalan\source\repos\functions2\samples\log.txt", JsonSerializer.Serialize(context.Descriptor));
-
             if (context is null)
             {
                 logger?.LogError($"[{nameof(RedisStreamTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
