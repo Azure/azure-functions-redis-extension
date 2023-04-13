@@ -51,7 +51,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return Task.FromResult<IListener>(new RedisListListener(connectionString, keys, pollingInterval, messagesPerWorker, count, listPopFromBeginning, context.Executor, logger));
+            return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.Id, connectionString, keys, pollingInterval, messagesPerWorker, count, listPopFromBeginning, context.Executor, logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()
