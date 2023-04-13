@@ -17,7 +17,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal bool listPopFromBeginning;
 
         public RedisListListener(string id, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
+            : base(id, connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
             this.logPrefix = $"[RedisListTrigger][Id:{id}][Keys:{keys}]";

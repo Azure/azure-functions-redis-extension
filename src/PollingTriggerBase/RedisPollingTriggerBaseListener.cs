@@ -17,6 +17,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal abstract class RedisPollingTriggerBaseListener : IListener, IScaleMonitor, IScaleMonitor<RedisPollingTriggerBaseMetrics>, ITargetScaler
     {
         private const int MINIMUM_SAMPLES = 5;
+        internal string id;
         internal string connectionString;
         internal RedisKey[] keys;
         internal TimeSpan pollingInterval;
@@ -32,8 +33,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
 
-        public RedisPollingTriggerBaseListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPollingTriggerBaseListener(string id, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor, ILogger logger)
         {
+            this.id = id;
             this.connectionString = connectionString;
             this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
             this.pollingInterval = pollingInterval;

@@ -19,8 +19,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string consumerGroup;
         internal StreamPosition[] positions;
 
-        public RedisStreamsListener(string id, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
+        public RedisStreamListener(string id, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(id, connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
         {
             this.consumerGroup = consumerGroup;
             this.deleteAfterProcess = deleteAfterProcess;
