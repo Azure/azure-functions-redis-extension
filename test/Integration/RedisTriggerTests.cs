@@ -239,7 +239,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
-                { $"Executed '{functionName}' (Succeeded", keyArray.Length },
+                { $"Executed '{functionName}' (Succeeded", keyArray.Length},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
@@ -262,9 +262,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d")]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f")]
-        public async void StreamsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string names, string values)
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d", 100)]
+        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f", 100)]
+        public async void StreamsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string names, string values, int count)
         {
             string[] keyArray = keys.Split(' ');
             string[] namesArray = names.Split(' ');
@@ -277,7 +277,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
-            counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length);
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * count);
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
             using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
@@ -290,10 +290,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
                 foreach (string key in keyArray)
                 {
-                    await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
+                    for(int i = 0; i < count; i++)
+                    {
+                        await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
+                    }
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(count / 10));
 
                 await multiplexer.CloseAsync();
                 functionsProcess1.Kill();
