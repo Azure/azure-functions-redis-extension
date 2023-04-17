@@ -145,9 +145,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length);
-            foreach (string value in valuesArray)
+            foreach (string key in keyArray)
             {
-                counts.AddOrUpdate(string.Format(IntegrationTestFunctions.format, value), 1, (s, c) => c + 1);
+                foreach (string value in valuesArray)
+                {
+                    counts.AddOrUpdate(JsonSerializer.Serialize(new RedisListEntry(key, value)), 1, (s, c) => c + 1);
+                }
             }
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
@@ -186,9 +189,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length);
-            foreach (string value in valuesArray)
+            foreach (string key in keyArray)
             {
-                counts.AddOrUpdate(string.Format(IntegrationTestFunctions.format, value), 1, (s, c) => c + 1);
+                foreach (string value in valuesArray)
+                {
+                    counts.AddOrUpdate(JsonSerializer.Serialize(new RedisListEntry(key, value)), 1, (s, c) => c + 1);
+                }
             }
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))

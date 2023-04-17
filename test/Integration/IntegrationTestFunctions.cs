@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using System.Text.Json;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
@@ -88,18 +89,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListTrigger_SingleKey))]
         public static void ListTrigger_SingleKey(
-            [RedisListTrigger(localhostSetting, listSingleKey, pollingIntervalInMs: pollingInterval)] string entry,
+            [RedisListTrigger(localhostSetting, listSingleKey, pollingIntervalInMs: pollingInterval)] RedisListEntry entry,
             ILogger logger)
         {
-            logger.LogInformation(string.Format(format, entry));
+            logger.LogInformation(JsonSerializer.Serialize(entry));
         }
 
         [FunctionName(nameof(ListsTrigger_MultipleKeys))]
         public static void ListsTrigger_MultipleKeys(
-            [RedisListTrigger(localhostSetting, listMultipleKeys, pollingIntervalInMs: pollingInterval)] string entry,
+            [RedisListTrigger(localhostSetting, listMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisListEntry entry,
             ILogger logger)
         {
-            logger.LogInformation(string.Format(format, entry));
+            logger.LogInformation(JsonSerializer.Serialize(entry));
         }
 
         [FunctionName(nameof(StreamsTrigger_SingleKey))]
