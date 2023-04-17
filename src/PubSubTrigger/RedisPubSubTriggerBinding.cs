@@ -16,12 +16,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         private readonly string connectionString;
         private readonly string channel;
+        private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisPubSubTriggerBinding(string connectionString, string channel, ILogger logger)
+        public RedisPubSubTriggerBinding(string connectionString, string channel, Type parameterType, ILogger logger)
         {
             this.connectionString = connectionString;
             this.channel = channel;
+            this.parameterType = parameterType;
             this.logger = logger;
         }
 
@@ -31,8 +33,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
+            RedisPubSubMessage message = (RedisPubSubMessage)value;
             IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>();
-            return Task.FromResult<ITriggerData>(new TriggerData(null, bindingData));
+            return Task.FromResult<ITriggerData>(new TriggerData(new RedisPubSubValueProvider(message, parameterType), bindingData));
         }
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
