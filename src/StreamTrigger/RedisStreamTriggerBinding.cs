@@ -21,9 +21,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly int count;
         private readonly string consumerGroup;
         private readonly bool deleteAfterProcess;
+        private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisStreamTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, string consumerGroup, bool deleteAfterProcess, ILogger logger)
+        public RedisStreamTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, string consumerGroup, bool deleteAfterProcess, Type parameterType, ILogger logger)
         {
             this.connectionString = connectionString;
             this.keys = keys;
@@ -32,6 +33,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.count = count;
             this.consumerGroup = consumerGroup;
             this.deleteAfterProcess = deleteAfterProcess;
+            this.parameterType = parameterType;
             this.logger = logger;
         }
 
@@ -41,8 +43,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
+            RedisStreamEntry entry = (RedisStreamEntry)value;
             IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>();
-            return Task.FromResult<ITriggerData>(new TriggerData(null, bindingData));
+            return Task.FromResult<ITriggerData>(new TriggerData(new RedisStreamEntryValueProvider(entry, parameterType), bindingData));
         }
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)

@@ -9,7 +9,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// 
     /// </summary>
-    public class RedisPubSubValueProvider : IValueProvider
+    public class RedisPubSubMessageValueProvider : IValueProvider
     {
         private readonly RedisPubSubMessage message;
 
@@ -18,7 +18,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         /// <param name="message"></param>
         /// <param name="destinationType"></param>
-        public RedisPubSubValueProvider(RedisPubSubMessage message, Type destinationType)
+        public RedisPubSubMessageValueProvider(RedisPubSubMessage message, Type destinationType)
         {
             this.message = message;
             this.Type = destinationType;

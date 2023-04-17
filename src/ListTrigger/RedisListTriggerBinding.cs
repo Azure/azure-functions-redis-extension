@@ -20,9 +20,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly string keys;
         private readonly int count;
         private readonly bool listPopFromBeginning;
+        private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisListTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning, ILogger logger)
+        public RedisListTriggerBinding(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning, Type parameterType, ILogger logger)
         {
             this.connectionString = connectionString;
             this.keys = keys;
@@ -30,6 +31,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.messagesPerWorker = messagesPerWorker;
             this.count = count;
             this.listPopFromBeginning = listPopFromBeginning;
+            this.parameterType = parameterType;
             this.logger = logger;
         }
 
@@ -39,8 +41,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
+            RedisListEntry entry = (RedisListEntry)value;
             IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>();
-            return Task.FromResult<ITriggerData>(new TriggerData(null, bindingData));
+            return Task.FromResult<ITriggerData>(new TriggerData(new RedisListEntryValueProvider(entry, parameterType), bindingData));
         }
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)

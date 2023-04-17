@@ -35,7 +35,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             RedisPubSubMessage message = (RedisPubSubMessage)value;
             IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>();
-            return Task.FromResult<ITriggerData>(new TriggerData(new RedisPubSubValueProvider(message, parameterType), bindingData));
+            return Task.FromResult<ITriggerData>(new TriggerData(new RedisPubSubMessageValueProvider(message, parameterType), bindingData));
         }
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
