@@ -155,7 +155,7 @@ jobs:
         inputs:
           mavenPomFile: java-library/pom.xml
           goals: versions:set
-          options: --batch-mode --define=newVersion=$(fullVersion) --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots
+          options: --batch-mode --define=newVersion=$(releaseVersion) --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots
 
       - task: Maven@3
         displayName: Build library
@@ -164,9 +164,9 @@ jobs:
           options: --batch-mode --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots
 
       - powershell: |
-          $prefix = 'azure-functions-java-library-redis-$(fullVersion)'
+          $prefix = 'azure-functions-java-library-redis-$(releaseVersion)'
           $source = 'java-library'
-          $destination = '$(Build.ArtifactStagingDirectory)/$(fullVersion)'
+          $destination = '$(Build.ArtifactStagingDirectory)/$(releaseVersion)'
           New-Item $destination -ItemType Directory
           Copy-Item "$source/pom.xml" "$destination/$prefix.pom"
           Copy-Item "$source/target/$prefix.jar" "$destination/$prefix.jar"
@@ -177,9 +177,9 @@ jobs:
       - task: ManifestGeneratorTask@0
         displayName: Generate SBOM manifest
         inputs:
-          buildDropPath: $(Build.ArtifactStagingDirectory)/$(fullVersion)
+          buildDropPath: $(Build.ArtifactStagingDirectory)/$(releaseVersion)
           packageName: Azure Functions Redis Java Bindings
-          packageVersion: $(fullVersion)
+          packageVersion: $(releaseVersion)
 
       - publish: $(Build.ArtifactStagingDirectory)
         displayName: Publish library package
