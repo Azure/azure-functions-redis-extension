@@ -29,8 +29,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.consumerName = Guid.NewGuid().ToString();
 
             this.logPrefix = $"[Name:{name}][Trigger:RedisStreamTrigger][ConsumerGroup:{consumerGroup}][Consumer:{consumerName}][Keys:{keys}]";
-            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisStreamTrigger-{consumerGroup}");
-            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisStreamTrigger-{consumerGroup}");
+            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisStreamTrigger-{consumerGroup}-{keys}");
+            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisStreamTrigger-{consumerGroup}-{keys}");
         }
 
         public override async void BeforePolling()

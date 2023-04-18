@@ -21,8 +21,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             this.listPopFromBeginning = listPopFromBeginning;
             this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Keys:{keys}]";
-            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisListTrigger");
-            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisListTrigger");
+            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisListTrigger-{keys}");
+            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisListTrigger-{keys}");
         }
 
         public override void BeforePolling()
