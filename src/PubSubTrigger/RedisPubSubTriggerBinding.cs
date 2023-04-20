@@ -28,13 +28,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         public Type TriggerValueType => typeof(RedisPubSubMessage);
-
-        public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
-
+        public IReadOnlyDictionary<string, Type> BindingDataContract => CreateBindingDataContract();
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
             RedisPubSubMessage message = (RedisPubSubMessage)value;
-            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>();
+            IReadOnlyDictionary<string, object> bindingData = CreateBindingData(message);
             return Task.FromResult<ITriggerData>(new TriggerData(new RedisPubSubMessageValueProvider(message, parameterType), bindingData));
         }
 
@@ -52,6 +50,26 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public ParameterDescriptor ToParameterDescriptor()
         {
             return new ParameterDescriptor();
+        }
+
+        internal static IReadOnlyDictionary<string, Type> CreateBindingDataContract()
+        {
+            return new Dictionary<string, Type>()
+            {
+                { nameof(RedisPubSubMessage.SubscriptionChannel), typeof(string) },
+                { nameof(RedisPubSubMessage.Channel), typeof(string) },
+                { nameof(RedisPubSubMessage.Message), typeof(string) },
+            };
+        }
+
+        internal static IReadOnlyDictionary<string, object> CreateBindingData(RedisPubSubMessage message)
+        {
+            return new Dictionary<string, object>()
+            {
+                { nameof(message.SubscriptionChannel), message.SubscriptionChannel },
+                { nameof(message.Channel), message.Channel },
+                { nameof(message.Message) , message.Message },
+            };
         }
     }
 }

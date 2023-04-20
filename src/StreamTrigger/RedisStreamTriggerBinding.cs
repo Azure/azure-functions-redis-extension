@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -38,13 +39,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         public Type TriggerValueType => typeof(RedisStreamEntry);
-
-        public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
+        public IReadOnlyDictionary<string, Type> BindingDataContract => CreateBindingDataContract();
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
             RedisStreamEntry entry = (RedisStreamEntry)value;
-            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>();
+            IReadOnlyDictionary<string, object> bindingData = CreateBindingData(entry);
             return Task.FromResult<ITriggerData>(new TriggerData(new RedisStreamEntryValueProvider(entry, parameterType), bindingData));
         }
 
@@ -62,6 +62,26 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public ParameterDescriptor ToParameterDescriptor()
         {
             return new ParameterDescriptor();
+        }
+
+        internal static IReadOnlyDictionary<string, Type> CreateBindingDataContract()
+        {
+            return new Dictionary<string, Type>()
+            {
+                { nameof(RedisStreamEntry.Key), typeof(string) },
+                { nameof(RedisStreamEntry.Id), typeof(string) },
+                { nameof(RedisStreamEntry.Values), typeof(KeyValuePair<string, string>[]) }
+            };
+        }
+
+        internal static IReadOnlyDictionary<string, object> CreateBindingData(RedisStreamEntry entry)
+        {
+            return new Dictionary<string, object>()
+            {
+                { nameof(entry.Key), entry.Key },
+                { nameof(entry.Id), entry.Id },
+                { nameof(entry.Values), entry.Values },
+            };
         }
     }
 }

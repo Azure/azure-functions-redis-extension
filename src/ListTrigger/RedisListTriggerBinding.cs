@@ -36,13 +36,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         public Type TriggerValueType => typeof(RedisListEntry);
-
-        public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
+        public IReadOnlyDictionary<string, Type> BindingDataContract => CreateBindingDataContract();
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
             RedisListEntry entry = (RedisListEntry)value;
-            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>();
+            IReadOnlyDictionary<string, object> bindingData = CreateBindingData(entry);
             return Task.FromResult<ITriggerData>(new TriggerData(new RedisListEntryValueProvider(entry, parameterType), bindingData));
         }
 
@@ -60,6 +59,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public ParameterDescriptor ToParameterDescriptor()
         {
             return new ParameterDescriptor();
+        }
+
+        internal static IReadOnlyDictionary<string, Type> CreateBindingDataContract()
+        {
+            return new Dictionary<string, Type>()
+            {
+                { nameof(RedisListEntry.Key), typeof(string) },
+                { nameof(RedisListEntry.Value), typeof(string) },
+            };
+        }
+
+        internal static IReadOnlyDictionary<string, object> CreateBindingData(RedisListEntry entry)
+        {
+            return new Dictionary<string, object>()
+            {
+                { nameof(entry.Key), entry.Key },
+                { nameof(entry.Value), entry.Value },
+            };
         }
     }
 }
