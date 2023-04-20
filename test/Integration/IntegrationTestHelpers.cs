@@ -23,7 +23,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     WorkingDirectory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    UseShellExecute = false
+                    UseShellExecute = true
                 }
             };
 
