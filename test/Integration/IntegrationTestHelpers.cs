@@ -86,7 +86,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             string filepath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
-                : @"/usr/local/lib/node_modules/azure-functions-core-tools/bin/func";
+                : @"/usr/bin/func";
             if (!File.Exists(filepath))
             {
                 throw new FileNotFoundException($"Azure Functions Core Tools not found at {filepath}");
