@@ -36,9 +36,6 @@ jobs:
           version: 6.x
           performMultiLevelLookup: true
 
-      - script: npm install -g azure-functions-core-tools
-        displayName: 'Install Azure Functions Core Tools'
-
       - task: Bash@3
         displayName: Install Azure Functions Core Tools
         inputs:
