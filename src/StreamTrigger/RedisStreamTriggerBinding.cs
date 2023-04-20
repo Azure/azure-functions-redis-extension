@@ -58,7 +58,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public ParameterDescriptor ToParameterDescriptor()
         {
-            return new ParameterDescriptor();
+            return new RedisStreamTriggerParameterDescriptor(keys);
         }
     }
 }
