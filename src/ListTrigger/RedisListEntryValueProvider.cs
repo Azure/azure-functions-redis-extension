@@ -1,20 +1,20 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
+using Newtonsoft.Json;
 using System;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// 
+    /// Value provider for list entry.
     /// </summary>
     public class RedisListEntryValueProvider : IValueProvider
     {
         private readonly RedisListEntry entry;
 
         /// <summary>
-        /// 
+        /// Value provider for list entry.
         /// </summary>
         /// <param name="entry"></param>
         /// <param name="destinationType"></param>
@@ -25,12 +25,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         /// <summary>
-        /// 
+        /// Requested parameter type.
         /// </summary>
         public Type Type { get; }
 
         /// <summary>
-        /// 
+        /// Converts the RedisListEntry into the requested object.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
@@ -57,7 +57,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 try
                 {
-                    return Task.FromResult(JsonSerializer.Deserialize(ToInvokeString(), Type));
+                    return Task.FromResult(JsonConvert.DeserializeObject(ToInvokeString(), Type));
                 }
                 catch (JsonException e)
                 {
@@ -69,12 +69,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         /// <summary>
-        /// 
+        /// Serializes RedisStreamEntry into a string.
         /// </summary>
         /// <returns></returns>
         public string ToInvokeString()
         {
-            return JsonSerializer.Serialize(entry);
+            return JsonConvert.SerializeObject(entry);
         }
     }
 }

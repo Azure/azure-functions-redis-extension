@@ -3,20 +3,20 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// 
+    /// Value provider for stream entry.
     /// </summary>
     public class RedisStreamEntryValueProvider : IValueProvider
     {
         private readonly RedisStreamEntry entry;
 
         /// <summary>
-        /// 
+        /// Value provider for stream entry.
         /// </summary>
         /// <param name="entry"></param>
         /// <param name="destinationType"></param>
@@ -27,12 +27,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         /// <summary>
-        /// 
+        /// Requested parameter type.
         /// </summary>
         public Type Type { get; }
 
         /// <summary>
-        /// 
+        /// Converts the RedisStreamEntry into the requested object.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
@@ -52,22 +52,22 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             else if (Type.Equals(typeof(ReadOnlyMemory<byte>)))
             {
-                return Task.FromResult<object>(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(ToInvokeString())));
+                return Task.FromResult<object>(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(entry.Values))));
             }
             else if (Type.Equals(typeof(byte[])))
             {
-                return Task.FromResult<object>(Encoding.UTF8.GetBytes(ToInvokeString()));
+                return Task.FromResult<object>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(entry.Values)));
             }
             else if (Type.Equals(typeof(string)))
             {
-                return Task.FromResult<object>(JsonSerializer.Serialize(entry.Values));
+                return Task.FromResult<object>(JsonConvert.SerializeObject(entry.Values));
             }
 
             else
             {
                 try
                 {
-                    return Task.FromResult(JsonSerializer.Deserialize(ToInvokeString(), Type));
+                    return Task.FromResult(JsonConvert.DeserializeObject(ToInvokeString(), Type));
                 }
                 catch (JsonException e)
                 {
@@ -79,12 +79,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         /// <summary>
-        /// 
+        /// Serializes RedisStreamEntry into a string.
         /// </summary>
         /// <returns></returns>
         public string ToInvokeString()
         {
-            return JsonSerializer.Serialize(entry);
+            return JsonConvert.SerializeObject(entry);
         }
     }
 }
