@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Executors;
+using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -15,22 +16,25 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool listPopFromBeginning;
 
-        public RedisListListener(string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
+        public RedisListListener(string name, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
+            this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Keys:{keys}]";
+            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisListTrigger-{keys}");
+            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisListTrigger-{keys}");
         }
 
         public override void BeforePolling()
         {
             if (serverVersion < RedisUtilities.Version70 && keys.Length > 1)
             {
-                logger?.LogWarning($"The cache's version ({serverVersion}) is lower than 7.0 and does not support lmpop. Defaulting to lpop/rpop on the first key given.");
+                logger?.LogWarning($"{logPrefix} The cache's version ({serverVersion}) is lower than 7.0 and does not support lmpop. Defaulting to lpop/rpop on the first key given.");
             }
 
             if (serverVersion < RedisUtilities.Version62 && batchSize > 1)
             {
-                logger?.LogWarning($"The cache's version ({serverVersion}) is lower than 6.2 and does not support the COUNT argument in lpop/rpop. Defaulting to lpop/rpop without the COUNT argument, which pulls a single element from the list at a time.");
+                logger?.LogWarning($"{logPrefix} The cache's version ({serverVersion}) is lower than 6.2 and does not support the COUNT argument in lpop/rpop. Defaulting to lpop/rpop without the COUNT argument, which pulls a single element from the list at a time.");
             }
         }
 
@@ -40,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (serverVersion >= RedisUtilities.Version70)
             {
                 ListPopResult result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, batchSize) : await db.ListRightPopAsync(keys, batchSize);
-                logger?.LogDebug($"[{nameof(RedisListListener)}] Received {result.Values.Count()} elements from the list at key '{result.Key}'.");
+                logger?.LogDebug($"{logPrefix} Received {result.Values.Count()} elements from the list at key '{result.Key}'.");
                 foreach (RedisValue value in result.Values)
                 {
                     RedisListEntry triggerValue = new RedisListEntry(result.Key, value);
@@ -50,7 +54,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             else if (serverVersion >= RedisUtilities.Version62)
             {
                 RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], batchSize) : await db.ListRightPopAsync(keys[0], batchSize);
-                logger?.LogDebug($"[{nameof(RedisListListener)}] Received {result.Length} elements from the list at key '{keys[0]}'.");
+                logger?.LogDebug($"{logPrefix} Received {result.Length} elements from the list at key '{keys[0]}'.");
                 foreach (RedisValue value in result)
                 {
                     RedisListEntry triggerValue = new RedisListEntry(keys[0], value);
@@ -60,7 +64,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             else
             {
                 RedisValue result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0]) : await db.ListRightPopAsync(keys[0]);
-                logger?.LogDebug($"[{nameof(RedisListListener)}] Received 1 element from the list at key '{keys[0]}'.");
+                logger?.LogDebug($"{logPrefix} Received 1 element from the list at key '{keys[0]}'.");
                 if (!result.IsNullOrEmpty)
                 {
                     RedisListEntry triggerValue = new RedisListEntry(keys[0], result);
