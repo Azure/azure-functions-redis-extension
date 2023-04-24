@@ -36,14 +36,11 @@ jobs:
           version: 6.x
           performMultiLevelLookup: true
 
-      - script: npm install -g azure-functions-core-tools
-        displayName: 'Install Azure Functions Core Tools'
-
       - task: Bash@3
-        displayName: Set npm installation path
+        displayName: Install Azure Functions Core Tools
         inputs:
           targetType: 'inline'
-          script: 'echo "##vso[task.setvariable variable=nodeModulesPath]$(npm root -g)"'
+          script: 'wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb; sudo dpkg -i packages-microsoft-prod.deb; sudo apt-get update; sudo apt-get install -qq -y azure-functions-core-tools-4'
 
       - task: Bash@3
         displayName: Download and start redis server, enable all keyspace/keyevent notifications
@@ -53,8 +50,6 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Test
-        env:
-          NODE_MODULES_PATH: '$(nodeModulesPath)'
         inputs:
           command: test
           arguments: --configuration Debug
@@ -65,8 +60,6 @@ jobs:
     steps:
       - task: DotNetCoreCLI@2
         displayName: Build
-        env:
-          NODE_MODULES_PATH: '$(nodeModulesPath)'
         inputs:
           command: build
           arguments: --configuration Release -property:Version=$(releaseVersion)
