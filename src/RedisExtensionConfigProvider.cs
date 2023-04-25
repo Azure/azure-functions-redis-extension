@@ -17,19 +17,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         private readonly IConfiguration configuration;
         private readonly INameResolver nameResolver;
-        private readonly ILogger logger;
+        private readonly ILoggerFactory loggerFactory;
 
         /// <summary>
         /// Adds Redis triggers and bindings to the extension context.
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="nameResolver"></param>
-        /// <param name="logger"></param>
-        public RedisExtensionConfigProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
+        /// <param name="loggerFactory"></param>
+        public RedisExtensionConfigProvider(IConfiguration configuration, INameResolver nameResolver, ILoggerFactory loggerFactory)
         {
             this.configuration = configuration;
             this.nameResolver = nameResolver;
-            this.logger = logger;
+            this.loggerFactory = loggerFactory;
         }
 
         /// <summary>
@@ -44,15 +44,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
 #pragma warning disable CS0618
             FluentBindingRule<RedisPubSubTriggerAttribute> pubsubTriggerRule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
-            pubsubTriggerRule.BindToTrigger<RedisPubSubMessage>(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, logger));
+            pubsubTriggerRule.BindToTrigger<RedisPubSubMessage>(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger("RedisPubSubTrigger")));
             pubsubTriggerRule.AddConverter<RedisPubSubMessage, string>(message => message.Message);
 
             FluentBindingRule<RedisListTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListTriggerAttribute>();
-            listsTriggerRule.BindToTrigger<RedisListEntry>(new RedisListTriggerBindingProvider(configuration, nameResolver, logger));
+            listsTriggerRule.BindToTrigger<RedisListEntry>(new RedisListTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger("RedisListTrigger")));
             listsTriggerRule.AddConverter<RedisListEntry, string>(listEntry => listEntry.Value);
 
             FluentBindingRule<RedisStreamTriggerAttribute> streamsTriggerRule = context.AddBindingRule<RedisStreamTriggerAttribute>();
-            streamsTriggerRule.BindToTrigger<RedisStreamEntry>(new RedisStreamTriggerBindingProvider(configuration, nameResolver, logger));
+            streamsTriggerRule.BindToTrigger<RedisStreamEntry>(new RedisStreamTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger("RedisStreamTrigger")));
             streamsTriggerRule.AddConverter<RedisStreamEntry, KeyValuePair<string, string>[]>(entry => entry.Values);
             streamsTriggerRule.AddConverter<RedisStreamEntry, string>(entry => JsonSerializer.Serialize(entry.Values));
             streamsTriggerRule.AddConverter<RedisStreamEntry, IReadOnlyDictionary<string, string>>(entry => entry.Values.ToDictionary());
