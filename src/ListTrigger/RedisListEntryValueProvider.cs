@@ -36,7 +36,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <exception cref="InvalidOperationException"></exception>
         public Task<object> GetValueAsync()
         {
-            if (Type.Equals(typeof(RedisPubSubMessage)))
+            if (Type.Equals(typeof(RedisListEntry)))
             {
                 return Task.FromResult<object>(entry);
             }
