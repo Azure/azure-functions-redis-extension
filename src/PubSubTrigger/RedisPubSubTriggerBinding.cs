@@ -48,7 +48,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public ParameterDescriptor ToParameterDescriptor()
         {
-            return new RedisPubSubTriggerParameterDescriptor(channel);
+            return new RedisPubSubTriggerParameterDescriptor
+            {
+                Channel = channel
+            };
         }
     }
 }
