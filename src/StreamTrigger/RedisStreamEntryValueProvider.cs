@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// Value provider for stream entry.
+    /// Value provider for <see cref="RedisStreamEntry"/>.
     /// </summary>
     public class RedisStreamEntryValueProvider : IValueProvider
     {
         private readonly RedisStreamEntry entry;
 
         /// <summary>
-        /// Value provider for stream entry.
+        /// Value provider for <see cref="RedisStreamEntry"/>.
         /// </summary>
         /// <param name="entry"></param>
         /// <param name="destinationType"></param>
@@ -32,13 +32,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public Type Type { get; }
 
         /// <summary>
-        /// Converts the RedisStreamEntry into the requested object.
+        /// Converts the <see cref="RedisStreamEntry"/> into the requested type.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
         public Task<object> GetValueAsync()
         {
-            if (Type.Equals(typeof(RedisPubSubMessage)))
+            if (Type.Equals(typeof(RedisStreamEntry)))
             {
                 return Task.FromResult<object>(entry);
             }
@@ -79,7 +79,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         /// <summary>
-        /// Serializes RedisStreamEntry into a string.
+        /// Serializes <see cref="RedisStreamEntry"/> into a string.
         /// </summary>
         /// <returns></returns>
         public string ToInvokeString()

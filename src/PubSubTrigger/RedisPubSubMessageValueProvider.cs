@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
-    /// Value provider for RedisPubSubMessage.
+    /// Value provider for <see cref="RedisPubSubMessage"/>.
     /// </summary>
     public class RedisPubSubMessageValueProvider : IValueProvider
     {
         private readonly RedisPubSubMessage message;
 
         /// <summary>
-        /// Value provider for RedisPubSubMessage.
+        /// Value provider for <see cref="RedisPubSubMessage"/>.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="destinationType"></param>
@@ -30,7 +30,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public Type Type { get; }
 
         /// <summary>
-        /// Converts the RedisPubSubMessage into the requested object.
+        /// Converts the <see cref="RedisPubSubMessage"/> into the requested object.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         /// <summary>
-        /// Serializes RedisStreamEntry into a string.
+        /// Serializes <see cref="RedisPubSubMessage"/> into a string.
         /// </summary>
         /// <returns></returns>
         public string ToInvokeString()
