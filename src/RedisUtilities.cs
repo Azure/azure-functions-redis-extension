@@ -81,5 +81,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new InvalidOperationException(msg, e);
             }
         }
+
+        public static JArray StreamEntryToValuesJArray(StreamEntry entries)
+        {
+            return JArray.FromObject(entries.Values.Select(value => new JObject() { [value.Name.ToString()] = value.Value.ToString() }));
+        }
     }
 }
