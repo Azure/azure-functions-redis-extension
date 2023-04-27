@@ -90,7 +90,7 @@ The `RedisListsTrigger` pops elements from a list and surfaces those elements to
   - Default: 1000
 - (optional) `MessagesPerWorker`: How many messages each functions worker "should" process. Used to determine how many workers the function should scale to.
   - Default: 100
-- (optional) `BatchSize`: Number of elements to pull from Redis at one time.
+- (optional) `Count`: Number of elements to pull from Redis at one time.
   - Default: 10
   - Only supported on Redis 6.2+ using the `COUNT` argument in [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/).
 - (optional) `ListPopFromBeginning`: determines whether to pop elements from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop elements from the end using [`RPOP`](https://redis.io/commands/rpop/).
@@ -128,7 +128,7 @@ Each function creates a new random GUID to use as its consumer name within the g
   - Default: 1000
 - (optional) `MessagesPerWorker`: How many messages each functions worker "should" process. Used to determine how many workers the function should scale to.
   - Default: 100
-- (optional) `BatchSize`: Number of elements to pull from Redis at one time.
+- (optional) `Count`: Number of elements to pull from Redis at one time.
   - Default: 10
 - (optional) `DeleteAfterProcess`: If the listener will delete the stream entries after the function runs.
   - Default: false
