@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
 using System.Text;
@@ -79,28 +80,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <returns></returns>
         public string ToInvokeString()
         {
-            return JsonConvert.SerializeObject(message, ChannelMessageConverter.Instance);
-        }
-
-        internal sealed class ChannelMessageConverter : JsonConverter<ChannelMessage>
-        {
-            internal static readonly ChannelMessageConverter Instance = new ChannelMessageConverter();
-            public override ChannelMessage ReadJson(JsonReader reader, Type objectType, ChannelMessage existingValue, bool hasExistingValue, JsonSerializer serializer)
+            JObject obj = new JObject()
             {
-                throw new NotImplementedException();
-            }
-
-            public override void WriteJson(JsonWriter writer, ChannelMessage value, JsonSerializer serializer)
-            {
-                writer.WriteStartObject();
-                writer.WritePropertyName(nameof(ChannelMessage.SubscriptionChannel));
-                writer.WriteValue(value.SubscriptionChannel.ToString());
-                writer.WritePropertyName(nameof(ChannelMessage.Channel));
-                writer.WriteValue(value.Channel.ToString());
-                writer.WritePropertyName(nameof(ChannelMessage.Message));
-                writer.WriteValue(value.Message.ToString());
-                writer.WriteEndObject();
-            }
+                [nameof(ChannelMessage.SubscriptionChannel)] = message.SubscriptionChannel.ToString(),
+                [nameof(ChannelMessage.Channel)] = message.Channel.ToString(),
+                [nameof(ChannelMessage.Message)] = message.Message.ToString()
+            };
+            return obj.ToString(Formatting.None);
         }
     }
 }
