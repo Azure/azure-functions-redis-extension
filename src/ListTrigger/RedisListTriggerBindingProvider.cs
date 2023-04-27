@@ -43,11 +43,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string connectionString = RedisUtilities.ResolveConnectionString(configuration, attribute.ConnectionStringSetting);
             string keys = RedisUtilities.ResolveString(nameResolver, attribute.Keys, nameof(attribute.Keys));
             int messagesPerWorker = attribute.MessagesPerWorker;
-            int batchSize = attribute.BatchSize;
+            int count = attribute.Count;
             TimeSpan pollingInterval = TimeSpan.FromMilliseconds(attribute.PollingIntervalInMs);
             bool listPopFromBeginning = attribute.ListPopFromBeginning;
 
-            return Task.FromResult<ITriggerBinding>(new RedisListTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, batchSize, listPopFromBeginning, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisListTriggerBinding(connectionString, keys, pollingInterval, messagesPerWorker, count, listPopFromBeginning, logger));
         }
     }
 }
