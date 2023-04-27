@@ -14,14 +14,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// Initializes a new <see cref="RedisStreamTriggerAttribute"/>.
         /// </summary>
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
-        /// <param name="keys">Keys to read from, space-delimited.</param>
+        /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in milliseconds. Default: 1000</param>
         /// <param name="messagesPerWorker">The number of messages each functions instance is expected to handle. Default: 100</param>
         /// <param name="count">Number of elements to pull from a Redis stream at one time. Default: 10</param>
         /// <param name="consumerGroup">Name of the consumer group to use when reading the streams. Default: AzureFunctionRedisExtension</param>
         /// <param name="deleteAfterProcess">Decides if the function will delete the stream entries after processing. Default: false</param>
-        public RedisStreamTriggerAttribute(string connectionStringSetting, string keys, int pollingIntervalInMs = 1000, int messagesPerWorker = 100, int count = 10, string consumerGroup = "AzureFunctionRedisExtension", bool deleteAfterProcess = false)
-            : base(connectionStringSetting, keys, pollingIntervalInMs, messagesPerWorker, count)
+        public RedisStreamTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int messagesPerWorker = 100, int count = 10, string consumerGroup = "AzureFunctionRedisExtension", bool deleteAfterProcess = false)
+            : base(connectionStringSetting, key, pollingIntervalInMs, messagesPerWorker, count)
         {
             ConsumerGroup = consumerGroup;
             DeleteAfterProcess = deleteAfterProcess;

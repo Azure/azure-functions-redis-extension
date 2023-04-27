@@ -16,22 +16,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool listPopFromBeginning;
 
-        public RedisListListener(string name, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, connectionString, keys, pollingInterval, messagesPerWorker, count, executor, logger)
+        public RedisListListener(string name, string connectionString, string key, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, key, pollingInterval, messagesPerWorker, count, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
-            this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Keys:{keys}]";
-            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisListTrigger-{keys}");
-            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisListTrigger-{keys}");
+            this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Key:{key}]";
+            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisListTrigger-{key}");
+            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisListTrigger-{key}");
         }
 
         public override void BeforePolling()
         {
-            if (serverVersion < RedisUtilities.Version70 && keys.Length > 1)
-            {
-                logger?.LogWarning($"{logPrefix} The cache's version ({serverVersion}) is lower than 7.0 and does not support lmpop. Defaulting to lpop/rpop on the first key given.");
-            }
-
             if (serverVersion < RedisUtilities.Version62 && count > 1)
             {
                 logger?.LogWarning($"{logPrefix} The cache's version ({serverVersion}) is lower than 6.2 and does not support the COUNT argument in lpop/rpop. Defaulting to lpop/rpop without the COUNT argument, which pulls a single element from the list at a time.");
@@ -41,33 +36,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public override async Task PollAsync(CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            if (serverVersion >= RedisUtilities.Version70)
+            if (serverVersion >= RedisUtilities.Version62)
             {
-                ListPopResult result = listPopFromBeginning ? await db.ListLeftPopAsync(keys, count) : await db.ListRightPopAsync(keys, count);
-                logger?.LogDebug($"{logPrefix} Received {result.Values.Count()} elements from the list at key '{result.Key}'.");
-                foreach (RedisValue value in result.Values)
-                {
-                    RedisListEntry triggerValue = new RedisListEntry(result.Key, value);
-                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
-                };
-            }
-            else if (serverVersion >= RedisUtilities.Version62)
-            {
-                RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0], count) : await db.ListRightPopAsync(keys[0], count);
-                logger?.LogDebug($"{logPrefix} Received {result.Length} elements from the list at key '{keys[0]}'.");
+                RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(key, count) : await db.ListRightPopAsync(key, count);
+                logger?.LogDebug($"{logPrefix} Received {result.Length} elements from the list at key '{key}'.");
                 foreach (RedisValue value in result)
                 {
-                    RedisListEntry triggerValue = new RedisListEntry(keys[0], value);
+                    RedisListEntry triggerValue = new RedisListEntry(key, value);
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 };
             }
             else
             {
-                RedisValue result = listPopFromBeginning ? await db.ListLeftPopAsync(keys[0]) : await db.ListRightPopAsync(keys[0]);
-                logger?.LogDebug($"{logPrefix} Received 1 element from the list at key '{keys[0]}'.");
+                RedisValue result = listPopFromBeginning ? await db.ListLeftPopAsync(key) : await db.ListRightPopAsync(key);
+                logger?.LogDebug($"{logPrefix} Received 1 element from the list at key '{key}'.");
                 if (!result.IsNullOrEmpty)
                 {
-                    RedisListEntry triggerValue = new RedisListEntry(keys[0], result);
+                    RedisListEntry triggerValue = new RedisListEntry(key, result);
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }
             }
@@ -77,7 +62,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             var metrics = new RedisPollingTriggerBaseMetrics
             {
-                Remaining = keys.Sum((key) => multiplexer.GetDatabase().ListLength(key)),
+                Remaining = multiplexer.GetDatabase().ListLength(key),
                 Timestamp = DateTime.UtcNow,
             };
 

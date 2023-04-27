@@ -135,16 +135,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
-        [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.ListTrigger_SingleKey), IntegrationTestFunctions.listSingleKey, "a b")]
-        //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
-        public async void ListsTrigger_SuccessfullyTriggers(string functionName, string keys, string values)
+        [Fact]
+        public async void ListsTrigger_SuccessfullyTriggers()
         {
-            string[] keyArray = keys.Split(' ');
-            RedisValue[] valuesArray = values.Split(' ').Select((value) => new RedisValue(value)).ToArray();
+            string functionName = nameof(IntegrationTestFunctions.ListTrigger);
+            RedisValue[] valuesArray = new RedisValue[] { "a", "b" };
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
-            counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length);
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", valuesArray.Length);
             foreach (string value in valuesArray)
             {
                 counts.AddOrUpdate(string.Format(IntegrationTestFunctions.format, value), 1, (s, c) => c + 1);
@@ -152,20 +150,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
             {
-                foreach (string key in keyArray)
-                {
-                    await multiplexer.GetDatabase().KeyDeleteAsync(key);
-                }
-
+                await multiplexer.GetDatabase().KeyDeleteAsync(IntegrationTestFunctions.listKey);
+                
                 using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                    foreach (string key in keyArray)
-                    {
-                        await multiplexer.GetDatabase().ListLeftPushAsync(key, valuesArray);
-                    }
-
+                    await multiplexer.GetDatabase().ListLeftPushAsync(IntegrationTestFunctions.listKey, valuesArray);
+                    
                     await Task.Delay(TimeSpan.FromSeconds(1));
 
                     await multiplexer.CloseAsync();
@@ -176,16 +168,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
         }
 
-        [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.ListTrigger_SingleKey), IntegrationTestFunctions.listSingleKey, "a b")]
-        //[InlineData(nameof(IntegrationTestFunctions.ListsTrigger_MultipleKeys), IntegrationTestFunctions.listMultipleKeys, "a b c d e f")] //fails on anything before redis7, test is redis6
-        public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string values)
+        [Fact]
+        public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents()
         {
-            string[] keyArray = keys.Split(' ');
-            RedisValue[] valuesArray = values.Split(' ').Select((value) => new RedisValue(value)).ToArray();
+            string functionName = nameof(IntegrationTestFunctions.ListTrigger);
+            RedisValue[] valuesArray = new RedisValue[] { "a", "b" };
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
-            counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * valuesArray.Length);
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", valuesArray.Length);
             foreach (string value in valuesArray)
             {
                 counts.AddOrUpdate(string.Format(IntegrationTestFunctions.format, value), 1, (s, c) => c + 1);
@@ -193,10 +183,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
             {
-                foreach (string key in keyArray)
-                {
-                    await multiplexer.GetDatabase().KeyDeleteAsync(key);
-                }
+                await multiplexer.GetDatabase().KeyDeleteAsync(IntegrationTestFunctions.listKey);
+                
                 using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
                 using (Process functionsProcess2 = IntegrationTestHelpers.StartFunction(functionName, 7072))
                 using (Process functionsProcess3 = IntegrationTestHelpers.StartFunction(functionName, 7073))
@@ -205,10 +193,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     functionsProcess2.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                     functionsProcess3.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                    foreach (string key in keyArray)
-                    {
-                        await multiplexer.GetDatabase().ListLeftPushAsync(key, valuesArray);
-                    }
+                    await multiplexer.GetDatabase().ListLeftPushAsync(IntegrationTestFunctions.listKey, valuesArray);
 
                     await Task.Delay(TimeSpan.FromSeconds(1));
 
@@ -222,14 +207,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
-        [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d")]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f")]
-        public async void StreamsTrigger_SuccessfullyTriggers(string functionName, string keys, string names, string values)
+        [Fact]
+        public async void StreamsTrigger_SuccessfullyTriggers()
         {
-            string[] keyArray = keys.Split(' ');
-            string[] namesArray = names.Split(' ');
-            string[] valuesArray = values.Split(' ');
+            string functionName = nameof(IntegrationTestFunctions.StreamsTrigger);
+            string[] namesArray = new string[] { "a", "c" };
+            string[] valuesArray = new string[] { "b", "d" };
 
             NameValueEntry[] nameValueEntries = new NameValueEntry[namesArray.Length];
             for (int i = 0; i < namesArray.Length; i++)
@@ -239,7 +222,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
-                { $"Executed '{functionName}' (Succeeded", keyArray.Length},
+                { $"Executed '{functionName}' (Succeeded", 1},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
@@ -247,11 +230,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                foreach (string key in keyArray)
-                {
-                    await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
-                }
-
+                await multiplexer.GetDatabase().StreamAddAsync(IntegrationTestFunctions.streamKey, nameValueEntries);
+                
                 await Task.Delay(TimeSpan.FromSeconds(1));
 
                 await multiplexer.CloseAsync();
@@ -261,14 +241,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
-        [Theory]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_SingleKey), IntegrationTestFunctions.streamSingleKey, "a c", "b d", 100)]
-        [InlineData(nameof(IntegrationTestFunctions.StreamsTrigger_MultipleKeys), IntegrationTestFunctions.streamMultipleKeys, "a c e", "b d f", 100)]
-        public async void StreamsTrigger_ScaledOutInstances_DoesntDuplicateEvents(string functionName, string keys, string names, string values, int count)
+        [Fact]
+        public async void StreamsTrigger_ScaledOutInstances_DoesntDuplicateEvents()
         {
-            string[] keyArray = keys.Split(' ');
-            string[] namesArray = names.Split(' ');
-            string[] valuesArray = values.Split(' ');
+            string functionName = nameof(IntegrationTestFunctions.StreamsTrigger);
+            int count = 100;
+            string[] namesArray = new string[] { "a", "c" };
+            string[] valuesArray = new string[] { "b", "d" };
 
             NameValueEntry[] nameValueEntries = new NameValueEntry[namesArray.Length];
             for (int i = 0; i < namesArray.Length; i++)
@@ -277,7 +256,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
-            counts.TryAdd($"Executed '{functionName}' (Succeeded", keyArray.Length * count);
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", count);
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestFunctions.localhostSetting)))
             using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
@@ -288,14 +267,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 functionsProcess2.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 functionsProcess3.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                foreach (string key in keyArray)
+                for(int i = 0; i < count; i++)
                 {
-                    for(int i = 0; i < count; i++)
-                    {
-                        await multiplexer.GetDatabase().StreamAddAsync(key, nameValueEntries);
-                    }
+                    await multiplexer.GetDatabase().StreamAddAsync(IntegrationTestFunctions.streamKey, nameValueEntries);
                 }
-
+                
                 await Task.Delay(TimeSpan.FromSeconds(count / 10));
 
                 await multiplexer.CloseAsync();

@@ -18,48 +18,43 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal bool deleteAfterProcess;
         internal string consumerGroup;
         internal string consumerName;
-        internal StreamPosition[] positions;
 
-        public RedisStreamListener(string name, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, connectionString, keys, pollingInterval, messagesPerWorker, count, executor, logger)
+        public RedisStreamListener(string name, string connectionString, string key, TimeSpan pollingInterval, int messagesPerWorker, int count, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, key, pollingInterval, messagesPerWorker, count, executor, logger)
         {
             this.consumerGroup = consumerGroup;
             this.deleteAfterProcess = deleteAfterProcess;
-            this.positions = this.keys.Select((key) => new StreamPosition(key, StreamPosition.NewMessages)).ToArray();
             this.consumerName = Guid.NewGuid().ToString();
 
-            this.logPrefix = $"[Name:{name}][Trigger:RedisStreamTrigger][ConsumerGroup:{consumerGroup}][Consumer:{consumerName}][Keys:{keys}]";
-            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisStreamTrigger-{consumerGroup}-{keys}");
-            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisStreamTrigger-{consumerGroup}-{keys}");
+            this.logPrefix = $"[Name:{name}][Trigger:RedisStreamTrigger][ConsumerGroup:{consumerGroup}][Key:{key}][Consumer:{consumerName}]";
+            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisStreamTrigger-{consumerGroup}-{key}");
+            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisStreamTrigger-{consumerGroup}-{key}");
         }
 
         public override async void BeforePolling()
         {
             IDatabase db = multiplexer.GetDatabase();
-            foreach (RedisKey key in keys)
+            try
             {
-                try
+                logger?.LogInformation($"{logPrefix} Attempting to create consumer group '{consumerGroup}' for the stream at key '{key}'.");
+                if (!await db.StreamCreateConsumerGroupAsync(key, consumerGroup))
                 {
-                    logger?.LogInformation($"{logPrefix} Attempting to create consumer group '{consumerGroup}' for the stream at key '{key}'.");
-                    if (!await db.StreamCreateConsumerGroupAsync(key, consumerGroup))
-                    {
-                        logger?.LogCritical($"{logPrefix} Could not create consumer group '{consumerGroup}' for the stream at key '{key}'.");
-                        throw new Exception($"Could not create consumer group '{consumerGroup}' for the stream at key '{key}'.");
-                    }
-                    logger?.LogInformation($"{logPrefix} Successfully created consumer group '{consumerGroup}' for the stream at key '{key}'.");
-
+                    logger?.LogCritical($"{logPrefix} Could not create consumer group '{consumerGroup}' for the stream at key '{key}'.");
+                    throw new Exception($"Could not create consumer group '{consumerGroup}' for the stream at key '{key}'.");
                 }
-                catch (RedisServerException e)
+                logger?.LogInformation($"{logPrefix} Successfully created consumer group '{consumerGroup}' for the stream at key '{key}'.");
+
+            }
+            catch (RedisServerException e)
+            {
+                if (e.Message.Contains("BUSYGROUP"))
                 {
-                    if (e.Message.Contains("BUSYGROUP"))
-                    {
-                        logger?.LogInformation($"{logPrefix} Consumer group '{consumerGroup}' for the stream at key '{key}' already exists.");
-                    }
-                    else
-                    {
-                        logger?.LogCritical($"{logPrefix} Could not create consumer group '{consumerGroup}' for the stream at key '{key}'.");
-                        throw;
-                    }
+                    logger?.LogInformation($"{logPrefix} Consumer group '{consumerGroup}' for the stream at key '{key}' already exists.");
+                }
+                else
+                {
+                    logger?.LogCritical($"{logPrefix} Could not create consumer group '{consumerGroup}' for the stream at key '{key}'.");
+                    throw;
                 }
             }
 
@@ -69,25 +64,25 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public override async Task PollAsync(CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            RedisStream[] streams = await db.StreamReadGroupAsync(positions, consumerGroup, consumerName, count);
+            StreamEntry[] entries = await db.StreamReadGroupAsync(key, consumerGroup, consumerName, count: count);
+            logger?.LogDebug($"{logPrefix} Received {entries.Length} elements from the stream at key '{key}'.");
 
-            foreach (RedisStream stream in streams)
+            if (entries.Length > 0)
             {
-                logger?.LogDebug($"{logPrefix} Received {stream.Entries.Length} elements from the stream at key '{stream.Key}'.");
-                foreach (StreamEntry entry in stream.Entries)
+                foreach (StreamEntry entry in entries)
                 {
-                    RedisStreamEntry triggerValue = new RedisStreamEntry(stream.Key, entry.Id, entry.Values.Select(a => new KeyValuePair<string, string>(a.Name.ToString(), a.Value.ToString())).ToArray());
+                    RedisStreamEntry triggerValue = new RedisStreamEntry(key, entry.Id, entry.Values.Select(a => new KeyValuePair<string, string>(a.Name.ToString(), a.Value.ToString())).ToArray());
                     await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
                 }
 
-                RedisValue[] entryIds = stream.Entries.Select(entry => entry.Id).ToArray();
-                long acknowledged = await db.StreamAcknowledgeAsync(stream.Key, consumerGroup, entryIds);
-                logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} elements from the stream at key '{stream.Key}'.");
+                RedisValue[] entryIds = entries.Select(entry => entry.Id).ToArray();
+                long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
+                logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} elements from the stream at key '{key}'.");
 
                 if (deleteAfterProcess)
                 {
-                    long deleted = await db.StreamDeleteAsync(stream.Key, entryIds);
-                    logger?.LogDebug($"{logPrefix} Deleted {deleted} elements from the stream at key '{stream.Key}'.");
+                    long deleted = await db.StreamDeleteAsync(key, entryIds);
+                    logger?.LogDebug($"{logPrefix} Deleted {deleted} elements from the stream at key '{key}'.");
                 }
             }
         }
@@ -95,19 +90,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public async override void BeforeClosing()
         {
             IDatabase db = multiplexer.GetDatabase();
-            foreach (RedisKey key in keys)
-            {
-                logger?.LogInformation($"{logPrefix} Attempting to delete consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'.");
-                long pending = await db.StreamDeleteConsumerAsync(key, consumerGroup, consumerName);
-                logger?.LogInformation($"{logPrefix} Successfully deleted consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'. There were {pending} pending messages for the consumer.");
-            }
+            logger?.LogInformation($"{logPrefix} Attempting to delete consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'.");
+            long pending = await db.StreamDeleteConsumerAsync(key, consumerGroup, consumerName);
+            logger?.LogInformation($"{logPrefix} Successfully deleted consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'. There were {pending} pending messages for the consumer.");
         }
 
         public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
             var metrics = new RedisPollingTriggerBaseMetrics
             {
-                Remaining = keys.Sum((key) => multiplexer.GetDatabase().StreamLength(key)),
+                Remaining = multiplexer.GetDatabase().StreamLength(key),
                 Timestamp = DateTime.UtcNow,
             };
 
