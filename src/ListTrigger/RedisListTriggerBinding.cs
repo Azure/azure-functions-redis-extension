@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,9 +21,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly string key;
         private readonly int count;
         private readonly bool listPopFromBeginning;
+        private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisListTriggerBinding(string connectionString, string key, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning, ILogger logger)
+        public RedisListTriggerBinding(string connectionString, string key, TimeSpan pollingInterval, int messagesPerWorker, int count, bool listPopFromBeginning, Type parameterType, ILogger logger)
         {
             this.connectionString = connectionString;
             this.key = key;
@@ -30,17 +32,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.messagesPerWorker = messagesPerWorker;
             this.count = count;
             this.listPopFromBeginning = listPopFromBeginning;
+            this.parameterType = parameterType;
             this.logger = logger;
         }
 
-        public Type TriggerValueType => typeof(RedisListEntry);
+        public Type TriggerValueType => typeof(RedisValue);
 
         public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>();
-            return Task.FromResult<ITriggerData>(new TriggerData(null, bindingData));
+            RedisValue redisValue = (RedisValue)value;
+            IReadOnlyDictionary<string, object> bindingData = CreateBindingData(redisValue);
+            return Task.FromResult<ITriggerData>(new TriggerData(new RedisValueValueProvider(redisValue, parameterType), bindingData));
         }
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
@@ -59,6 +63,22 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return new RedisListTriggerParameterDescriptor
             {
                 Key = key
+            };
+        }
+
+        internal static IReadOnlyDictionary<string, Type> CreateBindingDataContract()
+        {
+            return new Dictionary<string, Type>()
+            {
+                { "Value", typeof(string) }
+            };
+        }
+
+        internal static IReadOnlyDictionary<string, object> CreateBindingData(RedisValue value)
+        {
+            return new Dictionary<string, object>()
+            {
+                { "Value", value.ToString() }
             };
         }
     }

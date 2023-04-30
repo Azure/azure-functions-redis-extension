@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,19 +45,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             else
             {
-                RedisValue result = listPopFromBeginning ? await db.ListLeftPopAsync(key) : await db.ListRightPopAsync(key);
+                RedisValue value = listPopFromBeginning ? await db.ListLeftPopAsync(key) : await db.ListRightPopAsync(key);
                 logger?.LogDebug($"{logPrefix} Received 1 element from the list at key '{key}'.");
-                if (!result.IsNullOrEmpty)
+                if (!value.IsNullOrEmpty)
                 {
-                    await ExecuteAsync(result, cancellationToken);
+                    await ExecuteAsync(value, cancellationToken);
                 }
             }
         }
 
         private Task ExecuteAsync(RedisValue value, CancellationToken cancellationToken)
         {
-            RedisListEntry triggerValue = new RedisListEntry(key, value);
-            return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+            return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
         }
 
         public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()

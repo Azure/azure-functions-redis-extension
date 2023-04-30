@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             [RedisListTrigger(localhostSetting, "listTest")] string entry,
             ILogger logger)
         {
-            logger.LogInformation("The value from the list: " + entry);
+            logger.LogInformation(entry);
         }
 
         [FunctionName(nameof(StreamsTrigger))]
