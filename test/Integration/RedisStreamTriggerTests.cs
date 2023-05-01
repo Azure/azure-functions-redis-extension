@@ -36,7 +36,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                await multiplexer.GetDatabase().StreamAddAsync(RedisStreamTriggerTestFunctions.streamKey, nameValueEntries);
+                await multiplexer.GetDatabase().StreamAddAsync(functionName, nameValueEntries);
 
                 await Task.Delay(TimeSpan.FromSeconds(1));
 
@@ -75,7 +75,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
                 for (int i = 0; i < count; i++)
                 {
-                    await multiplexer.GetDatabase().StreamAddAsync(RedisStreamTriggerTestFunctions.streamKey, nameValueEntries);
+                    await multiplexer.GetDatabase().StreamAddAsync(functionName, nameValueEntries);
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(count / 10));
@@ -112,13 +112,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { destinationType.FullName, 1},
             };
 
+
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisStreamTriggerTestFunctions.localhostSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 ISubscriber subscriber = multiplexer.GetSubscriber();
 
-                await multiplexer.GetDatabase().StreamAddAsync(RedisStreamTriggerTestFunctions.streamKey, nameValueEntries);
+                await multiplexer.GetDatabase().StreamAddAsync(functionName, nameValueEntries);
                 await Task.Delay(TimeSpan.FromSeconds(1));
 
                 await multiplexer.CloseAsync();
