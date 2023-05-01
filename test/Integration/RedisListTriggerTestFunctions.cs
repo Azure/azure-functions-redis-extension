@@ -8,25 +8,25 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         public const string localhostSetting = "redisLocalhost";
         public const int pollingInterval = 100;
 
-        [FunctionName(nameof(ListTriggerRedisValue))]
-        public static void ListTriggerRedisValue(
-            [RedisListTrigger(localhostSetting, nameof(ListTriggerRedisValue), pollingIntervalInMs: pollingInterval)] RedisValue entry,
+        [FunctionName(nameof(ListTrigger_RedisValue))]
+        public static void ListTrigger_RedisValue(
+            [RedisListTrigger(localhostSetting, nameof(ListTrigger_RedisValue), pollingIntervalInMs: pollingInterval)] RedisValue entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
         }
 
-        [FunctionName(nameof(ListTriggerString))]
-        public static void ListTriggerString(
-            [RedisListTrigger(localhostSetting, nameof(ListTriggerString), pollingIntervalInMs: pollingInterval)] string entry,
+        [FunctionName(nameof(ListTrigger_String))]
+        public static void ListTrigger_String(
+            [RedisListTrigger(localhostSetting, nameof(ListTrigger_String), pollingIntervalInMs: pollingInterval)] string entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
         }
 
-        [FunctionName(nameof(ListTriggerByteArray))]
-        public static void ListTriggerByteArray(
-            [RedisListTrigger(localhostSetting, nameof(ListTriggerByteArray), pollingIntervalInMs: pollingInterval)] byte[] entry,
+        [FunctionName(nameof(ListTrigger_ByteArray))]
+        public static void ListTrigger_ByteArray(
+            [RedisListTrigger(localhostSetting, nameof(ListTrigger_ByteArray), pollingIntervalInMs: pollingInterval)] byte[] entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));

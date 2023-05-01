@@ -16,7 +16,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void ListsTrigger_SuccessfullyTriggers()
         {
-            string functionName = nameof(RedisListTriggerTestFunctions.ListTriggerString);
+            string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_String);
             RedisValue[] valuesArray = new RedisValue[] { "a", "b" };
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents()
         {
-            string functionName = nameof(RedisListTriggerTestFunctions.ListTriggerString);
+            string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_String);
             int count = 100;
             RedisValue[] valuesArray = Enumerable.Range(0, count).Select(x => new RedisValue(x.ToString())).ToArray();
 
@@ -79,9 +79,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTriggerString), typeof(String))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTriggerString), typeof(RedisValue))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTriggerString), typeof(byte[]))]
+        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_String), typeof(string))]
+        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue), typeof(RedisValue))]
+        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_ByteArray), typeof(byte[]))]
         public async void ListTrigger_TypeConversions_WorkCorrectly(string functionName, Type destinationType)
         {
             RedisValue[] valuesArray = new RedisValue[] { "a", "b" };
