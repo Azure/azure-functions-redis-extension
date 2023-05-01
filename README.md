@@ -49,22 +49,22 @@ The `RedisPubSubTrigger` subscribes to a specific channel or channel pattern and
 
 > **Note**
 > In general, functions with this the `RedisPubSubTrigger` should not be scaled out to multiple instances.
-> Each instance will listen and process each message, resulting in duplicate processing.
+> Each functions instance trigger on each message from the channel, resulting in duplicate processing.
 
 #### Inputs
-- `string ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
   - First attempts to resolve the connection string from the "ConnectionStrings" settings, and if not there, will look through the other appsettings for the string.
-- `string Channel`: name of the pubsub channel that the trigger should listen to.
+- `Channel`: name of the pubsub channel that the trigger should listen to.
   - Supports channel patterns.
   - This field can be resolved using `INameResolver`.
 
 #### Avaiable Output Types
-- [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs)
-- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): the Message
-- `string`: the Message
-- `byte[]`: the Message
-- `ReadOnlyMemory<byte>`: the Message
-- `Custom`: The trigger uses JSON.NET serialization/deserialization to map the [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs) value into your custom class. The available fields are [`SubscriptionChannel`](https://github.com/StackExchange/StackExchange.Redis/blob/7ad0add610f913479016bd012ea742d5d74f77b7/src/StackExchange.Redis/ChannelMessageQueue.cs#L41), [`Channel`](https://github.com/StackExchange/StackExchange.Redis/blob/7ad0add610f913479016bd012ea742d5d74f77b7/src/StackExchange.Redis/ChannelMessageQueue.cs#L46), and [`Message`](https://github.com/StackExchange/StackExchange.Redis/blob/7ad0add610f913479016bd012ea742d5d74f77b7/src/StackExchange.Redis/ChannelMessageQueue.cs#L51).
+- [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
+- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The value from the channel.
+- `string`: The value from the channel.
+- `byte[]`: The value from the channel.
+- `ReadOnlyMemory<byte>`: The value from the channel.
+- `Custom`: The trigger uses JSON.NET serialization to map the [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs) value into your custom class. The available fields are [`SubscriptionChannel`](https://github.com/StackExchange/StackExchange.Redis/blob/7ad0add610f913479016bd012ea742d5d74f77b7/src/StackExchange.Redis/ChannelMessageQueue.cs#L41), [`Channel`](https://github.com/StackExchange/StackExchange.Redis/blob/7ad0add610f913479016bd012ea742d5d74f77b7/src/StackExchange.Redis/ChannelMessageQueue.cs#L46), and [`Message`](https://github.com/StackExchange/StackExchange.Redis/blob/7ad0add610f913479016bd012ea742d5d74f77b7/src/StackExchange.Redis/ChannelMessageQueue.cs#L51).
 
 #### Sample
 The following sample listens to the channel "pubsubTest". More samples can be found in the [samples](samples/RedisSamples.cs) or in the [integration tests](test/Integration/RedisPubSubTriggerTestFunctions.cs).
