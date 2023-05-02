@@ -80,7 +80,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void KeyEventTrigger_SingleEvent_SuccessfullyTriggers()
         {
-            string key = "key";
+            string key = "keyTrigger";
             string value = "value";
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
@@ -107,7 +107,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void KeyEventTrigger_AllEvents_SuccessfullyTriggers()
         {
-            string key = "key";
+            string key = "keyTrigger";
             string value = "value";
 
             Dictionary<string, int> counts = new Dictionary<string, int>
