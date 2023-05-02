@@ -4,9 +4,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     public class CustomChannelMessage
     {
-        public string SubscriptionChannel { get; set; }
-        public string Channel { get; set; }
-        public string Message { get; set; }
+        public string SubscriptionChannel { get; }
+        public string Channel { get; }
+        public string Message { get; }
 
         public CustomChannelMessage(string subscriptionChannel, string channel, string message)
         {
