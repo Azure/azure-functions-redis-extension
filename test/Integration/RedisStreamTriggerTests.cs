@@ -94,11 +94,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_NameValueEntryArray), typeof(NameValueEntry[]))]
         [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_ByteArray), typeof(byte[]))]
         [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_String), typeof(string))]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_CustomStreamEntry), typeof(CustomStreamEntry))]
+        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_CustomType), typeof(CustomType))]
         public async void StreamTrigger_TypeConversions_WorkCorrectly(string functionName, Type destinationType)
         {
-            string[] namesArray = new string[] { "a", "c" };
-            string[] valuesArray = new string[] { "b", "d" };
+            string[] namesArray = new string[] { "Name", "c" };
+            string[] valuesArray = new string[] { "Field", "d" };
 
             NameValueEntry[] nameValueEntries = new NameValueEntry[namesArray.Length];
             for (int i = 0; i < namesArray.Length; i++)

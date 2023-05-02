@@ -51,9 +51,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(values));
         }
 
-        [FunctionName(nameof(StreamTrigger_CustomStreamEntry))]
-        public static void StreamTrigger_CustomStreamEntry(
-            [RedisStreamTrigger(localhostSetting, nameof(StreamTrigger_CustomStreamEntry), pollingIntervalInMs: pollingInterval)] CustomStreamEntry entry,
+        [FunctionName(nameof(StreamTrigger_CustomType))]
+        public static void StreamTrigger_CustomType(
+            [RedisStreamTrigger(localhostSetting, nameof(StreamTrigger_CustomType), pollingIntervalInMs: pollingInterval)] CustomType entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));

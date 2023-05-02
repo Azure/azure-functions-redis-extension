@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     public class CustomType
     {

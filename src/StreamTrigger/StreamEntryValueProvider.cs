@@ -44,39 +44,35 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return Task.FromResult<object>(entry);
             }
-            else if (Type.Equals(typeof(NameValueEntry[])))
+            if (Type.Equals(typeof(NameValueEntry[])))
             {
                 return Task.FromResult<object>(entry.Values);
             }
-            else if (Type.Equals(typeof(Dictionary<string, string>)))
+            if (Type.Equals(typeof(Dictionary<string, string>)))
             {
-                return Task.FromResult<object>(entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString()));
+                return Task.FromResult<object>(StreamEntryToDictionary());
             }
-            else if (Type.Equals(typeof(ReadOnlyMemory<byte>)))
+            if (Type.Equals(typeof(ReadOnlyMemory<byte>)))
             {
-                return Task.FromResult<object>(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(RedisUtilities.StreamEntryToValuesJArray(entry).ToString())));
+                return Task.FromResult<object>(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(ToInvokeString())));
             }
-            else if (Type.Equals(typeof(byte[])))
+            if (Type.Equals(typeof(byte[])))
             {
-                return Task.FromResult<object>(Encoding.UTF8.GetBytes(RedisUtilities.StreamEntryToValuesJArray(entry).ToString()));
+                return Task.FromResult<object>(Encoding.UTF8.GetBytes(ToInvokeString()));
             }
-            else if (Type.Equals(typeof(string)))
+            if (Type.Equals(typeof(string)))
             {
-                return Task.FromResult<object>(RedisUtilities.StreamEntryToValuesJArray(entry).ToString());
+                return Task.FromResult<object>(ToInvokeString());
             }
 
-            else
+            try
             {
-                try
-                {
-                    return Task.FromResult(JsonConvert.DeserializeObject(ToInvokeString(), Type));
-                }
-                catch (JsonException e)
-                {
-                    // Give useful error if object in queue is not deserialized properly.
-                    string msg = $@"Binding parameters to complex objects (such as '{Type.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
-                    throw new InvalidOperationException(msg, e);
-                }
+                return Task.FromResult(JsonConvert.DeserializeObject(JsonConvert.SerializeObject(StreamEntryToDictionary()), Type));
+            }
+            catch (JsonException e)
+            {
+                string msg = $@"Binding parameters to complex objects (such as '{Type.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
+                throw new InvalidOperationException(msg, e);
             }
         }
 
@@ -92,6 +88,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 [nameof(StreamEntry.Values)] = RedisUtilities.StreamEntryToValuesJArray(entry)
             };
             return obj.ToString(Formatting.None);
+        }
+
+        internal Dictionary<string, string> StreamEntryToDictionary()
+        {
+            return entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
         }
     }
 }
