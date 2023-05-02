@@ -13,8 +13,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public class RedisPubSubTriggerTests
     {
         [Theory]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleChannel), RedisPubSubTriggerTestFunctions.pubsubChannel, "test")]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleChannels), RedisPubSubTriggerTestFunctions.pubsubChannel, "test")]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleChannel), RedisPubSubTriggerTestFunctions.pubsubChannel, "testValue")]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleChannels), RedisPubSubTriggerTestFunctions.pubsubChannel, "testValue")]
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleChannels), RedisPubSubTriggerTestFunctions.pubsubChannel + "suffix", "testSuffix")]
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllChannels), RedisPubSubTriggerTestFunctions.pubsubChannel + "suffix", "testSuffix")]
         [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllChannels), "prefix" + RedisPubSubTriggerTestFunctions.pubsubChannel, "testPrefix")]
