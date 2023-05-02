@@ -66,24 +66,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             IDatabase db = multiplexer.GetDatabase();
             StreamEntry[] entries = await db.StreamReadGroupAsync(key, consumerGroup, consumerName, count: count);
             logger?.LogDebug($"{logPrefix} Received {entries.Length} elements from the stream at key '{key}'.");
+            await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, cancellationToken)));
+        }
 
-            if (entries.Length > 0)
+        private async Task ExecuteAsync(StreamEntry entry, CancellationToken cancellationToken)
+        {
+            IDatabase db = multiplexer.GetDatabase();
+            RedisStreamEntry triggerValue = new RedisStreamEntry(key, entry.Id, entry.Values.Select(a => new KeyValuePair<string, string>(a.Name.ToString(), a.Value.ToString())).ToArray());
+            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+            
+            RedisValue[] entryIds = new RedisValue[] { entry.Id };
+            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
+            logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} elements from the stream at key '{key}'.");
+
+            if (deleteAfterProcess)
             {
-                foreach (StreamEntry entry in entries)
-                {
-                    RedisStreamEntry triggerValue = new RedisStreamEntry(key, entry.Id, entry.Values.Select(a => new KeyValuePair<string, string>(a.Name.ToString(), a.Value.ToString())).ToArray());
-                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
-                }
-
-                RedisValue[] entryIds = entries.Select(entry => entry.Id).ToArray();
-                long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
-                logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} elements from the stream at key '{key}'.");
-
-                if (deleteAfterProcess)
-                {
-                    long deleted = await db.StreamDeleteAsync(key, entryIds);
-                    logger?.LogDebug($"{logPrefix} Deleted {deleted} elements from the stream at key '{key}'.");
-                }
+                long deleted = await db.StreamDeleteAsync(key, entryIds);
+                logger?.LogDebug($"{logPrefix} Deleted {deleted} elements from the stream at key '{key}'.");
             }
         }
 

@@ -1,8 +1,10 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,11 +42,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(key, count) : await db.ListRightPopAsync(key, count);
                 logger?.LogDebug($"{logPrefix} Received {result.Length} elements from the list at key '{key}'.");
-                foreach (RedisValue value in result)
-                {
-                    RedisListEntry triggerValue = new RedisListEntry(key, value);
-                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
-                };
+                await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
             }
             else
             {
@@ -52,10 +50,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 logger?.LogDebug($"{logPrefix} Received 1 element from the list at key '{key}'.");
                 if (!result.IsNullOrEmpty)
                 {
-                    RedisListEntry triggerValue = new RedisListEntry(key, result);
-                    await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+                    await ExecuteAsync(result, cancellationToken);
                 }
             }
+        }
+
+        private Task ExecuteAsync(RedisValue value, CancellationToken cancellationToken)
+        {
+            RedisListEntry triggerValue = new RedisListEntry(key, value);
+            return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
         }
 
         public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
