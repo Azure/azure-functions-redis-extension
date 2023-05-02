@@ -1,6 +1,8 @@
 ﻿using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 using System;
+using System.Text;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -48,6 +50,27 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             return connectionString;
+        }
+
+        public static object RedisValueConverter(RedisValue value, Type destinationType)
+        {
+            if (destinationType.Equals(typeof(RedisValue)))
+            {
+                return value;
+            }
+            if (destinationType.Equals(typeof(ReadOnlyMemory<byte>)))
+            {
+                return new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(value.ToString()));
+            }
+            if (destinationType.Equals(typeof(byte[])))
+            {
+                return Encoding.UTF8.GetBytes(value.ToString());
+            }
+            if (destinationType.Equals(typeof(string)))
+            {
+                return value.ToString();
+            }
+            return null;
         }
     }
 }

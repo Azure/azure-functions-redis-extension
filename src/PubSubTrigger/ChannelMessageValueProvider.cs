@@ -3,10 +3,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.PubSubTrigger
 {
     /// <summary>
     /// Value provider for <see cref="ChannelMessage"/>.
@@ -23,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public ChannelMessageValueProvider(ChannelMessage message, Type destinationType)
         {
             this.message = message;
-            this.Type = destinationType;
+            Type = destinationType;
         }
 
         /// <summary>
@@ -42,35 +41,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return Task.FromResult<object>(message);
             }
-            if (Type.Equals(typeof(RedisValue)))
-            {
-                return Task.FromResult<object>(message.Message);
-            }
-            else if (Type.Equals(typeof(ReadOnlyMemory<byte>)))
-            {
-                return Task.FromResult<object>(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(message.Message.ToString())));
-            }
-            else if (Type.Equals(typeof(byte[])))
-            {
-                return Task.FromResult<object>(Encoding.UTF8.GetBytes(message.Message.ToString()));
-            }
-            else if (Type.Equals(typeof(string)))
-            {
-                return Task.FromResult<object>(message.Message.ToString());
-            }
 
-            else
+            try
             {
-                try
-                {
-                    return Task.FromResult(JsonConvert.DeserializeObject(ToInvokeString(), Type));
-                }
-                catch (JsonException e)
-                {
-                    // Give useful error if object in queue is not deserialized properly.
-                    string msg = $@"Binding parameters to complex objects (such as '{Type.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
-                    throw new InvalidOperationException(msg, e);
-                }
+                return Task.FromResult(RedisUtilities.RedisValueConverter(message.Message, Type) ?? JsonConvert.DeserializeObject(ToInvokeString(), Type));
+            }
+            catch (JsonException e)
+            {
+                // Give useful error if object in queue is not deserialized properly.
+                string msg = $@"Binding parameters to complex objects (such as '{Type.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
+                throw new InvalidOperationException(msg, e);
             }
         }
 
