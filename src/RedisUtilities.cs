@@ -1,8 +1,10 @@
 ﻿using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -70,7 +72,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return value.ToString();
             }
-            return null;
+
+            try
+            {
+                return JsonConvert.DeserializeObject(value.ToString(), destinationType);
+            }
+            catch (JsonException e)
+            {
+                string msg = $@"Binding parameters to complex objects (such as '{destinationType.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
+                throw new InvalidOperationException(msg, e);
+            }
         }
     }
 }

@@ -41,17 +41,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return Task.FromResult<object>(message);
             }
-
-            try
-            {
-                return Task.FromResult(RedisUtilities.RedisValueTypeConverter(message.Message, Type) ?? JsonConvert.DeserializeObject(ToInvokeString(), Type));
-            }
-            catch (JsonException e)
-            {
-                // Give useful error if object in queue is not deserialized properly.
-                string msg = $@"Binding parameters to complex objects (such as '{Type.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
-                throw new InvalidOperationException(msg, e);
-            }
+            return Task.FromResult(RedisUtilities.RedisValueTypeConverter(message.Message, Type));
         }
 
         /// <summary>
@@ -60,13 +50,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <returns></returns>
         public string ToInvokeString()
         {
-            JObject obj = new JObject()
-            {
-                [nameof(ChannelMessage.SubscriptionChannel)] = message.SubscriptionChannel.ToString(),
-                [nameof(ChannelMessage.Channel)] = message.Channel.ToString(),
-                [nameof(ChannelMessage.Message)] = message.Message.ToString()
-            };
-            return obj.ToString(Formatting.None);
+            return message.Message.ToString();
         }
     }
 }

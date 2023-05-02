@@ -1,12 +1,9 @@
-﻿using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using StackExchange.Redis;
+﻿using StackExchange.Redis;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -16,18 +13,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public class RedisPubSubTriggerTests
     {
         [Theory]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleChannel), RedisPubSubTriggerTestFunctions.pubsubChannel, RedisPubSubTriggerTestFunctions.pubsubChannel, "test")]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleChannels), RedisPubSubTriggerTestFunctions.pubsubMultiple, RedisPubSubTriggerTestFunctions.pubsubChannel, "test")]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleChannels), RedisPubSubTriggerTestFunctions.pubsubMultiple, RedisPubSubTriggerTestFunctions.pubsubChannel + "suffix", "testSuffix")]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllChannels), RedisPubSubTriggerTestFunctions.allChannels, RedisPubSubTriggerTestFunctions.pubsubChannel + "suffix", "testSuffix")]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllChannels), RedisPubSubTriggerTestFunctions.allChannels, "prefix" + RedisPubSubTriggerTestFunctions.pubsubChannel, "testPrefix")]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllChannels), RedisPubSubTriggerTestFunctions.allChannels, "separate", "testSeparate")]
-        public async void PubSubTrigger_SuccessfullyTriggers(string functionName, string subscriptionChannel, string channel, string message)
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleChannel), RedisPubSubTriggerTestFunctions.pubsubChannel, "test")]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleChannels), RedisPubSubTriggerTestFunctions.pubsubChannel, "test")]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleChannels), RedisPubSubTriggerTestFunctions.pubsubChannel + "suffix", "testSuffix")]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllChannels), RedisPubSubTriggerTestFunctions.pubsubChannel + "suffix", "testSuffix")]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllChannels), "prefix" + RedisPubSubTriggerTestFunctions.pubsubChannel, "testPrefix")]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllChannels), "separate", "testSeparate")]
+        public async void PubSubTrigger_SuccessfullyTriggers(string functionName, string channel, string message)
         {
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
                 { $"Executed '{functionName}' (Succeeded", 1},
-                { JsonSerializer.Serialize(new CustomChannelMessage(subscriptionChannel, channel, message)), 1},
+                { message, 1},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisPubSubTriggerTestFunctions.localhostSetting)))
@@ -47,20 +44,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleKey), RedisPubSubTriggerTestFunctions.keyspaceChannel, RedisPubSubTriggerTestFunctions.keyspaceChannel)]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleKeys), RedisPubSubTriggerTestFunctions.keyspaceMultiple, RedisPubSubTriggerTestFunctions.keyspaceChannel)]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleKeys), RedisPubSubTriggerTestFunctions.keyspaceMultiple, RedisPubSubTriggerTestFunctions.keyspaceChannel + "suffix")]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllKeys), RedisPubSubTriggerTestFunctions.keyspaceChannelAll, RedisPubSubTriggerTestFunctions.keyspaceChannel)]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllKeys), RedisPubSubTriggerTestFunctions.keyspaceChannelAll, RedisPubSubTriggerTestFunctions.keyspaceChannel + "suffix")]
-        public async void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string subscriptionChannel, string channel)
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleKey), RedisPubSubTriggerTestFunctions.keyspaceChannel)]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleKeys), RedisPubSubTriggerTestFunctions.keyspaceChannel)]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.MultipleKeys), RedisPubSubTriggerTestFunctions.keyspaceChannel + "suffix")]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllKeys), RedisPubSubTriggerTestFunctions.keyspaceChannel)]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.AllKeys), RedisPubSubTriggerTestFunctions.keyspaceChannel + "suffix")]
+        public async void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string channel)
         {
             string keyspace = "__keyspace@0__:";
             string key = channel.Substring(channel.IndexOf(keyspace) + keyspace.Length);
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
                 { $"Executed '{functionName}' (Succeeded", 2},
-                { JsonSerializer.Serialize(new CustomChannelMessage(subscriptionChannel, channel, "set")), 1},
-                { JsonSerializer.Serialize(new CustomChannelMessage(subscriptionChannel, channel, "del")), 1},
+                { "set", 1},
+                { "del", 1},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisPubSubTriggerTestFunctions.localhostSetting)))
@@ -88,7 +85,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
                 { $"Executed '{nameof(RedisPubSubTriggerTestFunctions.SingleEvent)}' (Succeeded", 1},
-                { JsonSerializer.Serialize(new CustomChannelMessage(RedisPubSubTriggerTestFunctions.keyeventChannelSet, RedisPubSubTriggerTestFunctions.keyeventChannelSet, key)), 1},
+                { key, 1},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisPubSubTriggerTestFunctions.localhostSetting)))
@@ -116,8 +113,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
                 { $"Executed '{nameof(RedisPubSubTriggerTestFunctions.AllEvents)}' (Succeeded", 2},
-                { JsonSerializer.Serialize(new CustomChannelMessage(RedisPubSubTriggerTestFunctions.keyeventChannelAll, "__keyevent@0__:set", key)), 1},
-                { JsonSerializer.Serialize(new CustomChannelMessage(RedisPubSubTriggerTestFunctions.keyeventChannelAll, "__keyevent@0__:del", key)), 1},
+                { key, 2},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisPubSubTriggerTestFunctions.localhostSetting)))
@@ -138,10 +134,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.ChannelMessage_SingleChannel), typeof(ChannelMessage))]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.RedisValue_SingleChannel), typeof(RedisValue))]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.String_SingleChannel), typeof(string))]
-        [InlineData(nameof(RedisPubSubTriggerTestFunctions.CustomChannelMessage_SingleChannel), typeof(CustomChannelMessage))]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleChannel_ChannelMessage), typeof(ChannelMessage))]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleChannel_RedisValue), typeof(RedisValue))]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleChannel_String), typeof(string))]
+        [InlineData(nameof(RedisPubSubTriggerTestFunctions.SingleChannel_CustomType), typeof(CustomType))]
         public async void PubSubTrigger_TypeConversions_WorkCorrectly(string functionName, Type destinationType)
         {
             Dictionary<string, int> counts = new Dictionary<string, int>
@@ -156,7 +152,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 ISubscriber subscriber = multiplexer.GetSubscriber();
 
-                subscriber.Publish(RedisPubSubTriggerTestFunctions.pubsubChannel, "test");
+                subscriber.Publish(RedisPubSubTriggerTestFunctions.pubsubChannel, JsonSerializer.Serialize(new CustomType() { Field = "feeld", Name = "naim", Random = "ran" }));
                 await Task.Delay(TimeSpan.FromSeconds(1));
 
                 await multiplexer.CloseAsync();
