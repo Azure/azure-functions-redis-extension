@@ -5,7 +5,7 @@ using StackExchange.Redis;
 using System;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.PubSubTrigger
+namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
     /// Value provider for <see cref="ChannelMessage"/>.
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.PubSubTrigger
 
             try
             {
-                return Task.FromResult(RedisUtilities.RedisValueConverter(message.Message, Type) ?? JsonConvert.DeserializeObject(ToInvokeString(), Type));
+                return Task.FromResult(RedisUtilities.RedisValueTypeConverter(message.Message, Type) ?? JsonConvert.DeserializeObject(ToInvokeString(), Type));
             }
             catch (JsonException e)
             {

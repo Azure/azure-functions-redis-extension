@@ -52,7 +52,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return connectionString;
         }
 
-        public static object RedisValueConverter(RedisValue value, Type destinationType)
+        public static object RedisValueTypeConverter(RedisValue value, Type destinationType)
         {
             if (destinationType.Equals(typeof(RedisValue)))
             {
