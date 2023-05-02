@@ -58,7 +58,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             return new RedisListTriggerParameterDescriptor
             {
-                Keys = keys
+                Key = key
             };
         }
     }

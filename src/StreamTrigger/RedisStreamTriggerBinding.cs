@@ -60,7 +60,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             return new RedisStreamTriggerParameterDescriptor
             {
-                Keys = keys
+                Key = key
             };
         }
     }

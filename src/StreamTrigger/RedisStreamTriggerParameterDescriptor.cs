@@ -6,11 +6,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal sealed class RedisStreamTriggerParameterDescriptor : TriggerParameterDescriptor
     {
-        internal string Keys { get; set; }
+        internal string Key { get; set; }
 
         public override string GetTriggerReason(IDictionary<string, string> arguments)
         {
-            return $"Redis stream entry detected from key '{Keys}' at {DateTime.UtcNow:O}.";
+            return $"Redis stream entry detected from key '{Key}' at {DateTime.UtcNow:O}.";
         }
     }
 }
