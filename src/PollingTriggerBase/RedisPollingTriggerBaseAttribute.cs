@@ -12,14 +12,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// Initializes a new <see cref="RedisPollingTriggerBaseAttribute"/>.
         /// </summary>
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
-        /// <param name="keys">Keys to read from, space-delimited.</param>
+        /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in ms.</param>
         /// <param name="messagesPerWorker">The number of messages each functions instance is expected to handle.</param>
         /// <param name="count">Number of elements to pull from Redis at one time.</param>
-        public RedisPollingTriggerBaseAttribute(string connectionStringSetting, string keys, int pollingIntervalInMs, int messagesPerWorker, int count)
+        public RedisPollingTriggerBaseAttribute(string connectionStringSetting, string key, int pollingIntervalInMs, int messagesPerWorker, int count)
         {
             this.ConnectionStringSetting = connectionStringSetting;
-            this.Keys = keys;
+            this.Key = key;
             this.PollingIntervalInMs = pollingIntervalInMs;
             this.MessagesPerWorker = messagesPerWorker;
             this.Count = count;
@@ -33,10 +33,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public string ConnectionStringSetting { get; }
 
         /// <summary>
-        /// Keys to read from, space-delimited.
+        /// Key to read from.
         /// </summary>
         [AutoResolve]
-        public string Keys { get; }
+        public string Key { get; }
 
         /// <summary>
         /// How often to poll Redis in milliseconds.

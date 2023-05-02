@@ -15,10 +15,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         public const string keyeventChannelAll = "__keyevent@0__:*";
         public const string keyspaceChannelAll = "__keyspace@0__:*";
         public const string all = "*";
-        public const string listSingleKey = "listSingleKey";
-        public const string listMultipleKeys = "listKey1 listKey2 listKey3";
-        public const string streamSingleKey = "streamSingleKey";
-        public const string streamMultipleKeys = "streamKey1 streamKey2 streamKey3";
+        public const string listKey = "listKey";
+        public const string streamKey = "streamKey";
         public const int pollingInterval = 100;
         public const int count = 100;
 
@@ -86,33 +84,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             logger.LogInformation(JsonSerializer.Serialize(message));
         }
 
-        [FunctionName(nameof(ListTrigger_SingleKey))]
-        public static void ListTrigger_SingleKey(
-            [RedisListTrigger(localhostSetting, listSingleKey, pollingIntervalInMs: pollingInterval)] string entry,
+        [FunctionName(nameof(ListTrigger))]
+        public static void ListTrigger(
+            [RedisListTrigger(localhostSetting, listKey, pollingIntervalInMs: pollingInterval)] string entry,
             ILogger logger)
         {
             logger.LogInformation(string.Format(format, entry));
         }
 
-        [FunctionName(nameof(ListsTrigger_MultipleKeys))]
-        public static void ListsTrigger_MultipleKeys(
-            [RedisListTrigger(localhostSetting, listMultipleKeys, pollingIntervalInMs: pollingInterval)] string entry,
-            ILogger logger)
-        {
-            logger.LogInformation(string.Format(format, entry));
-        }
-
-        [FunctionName(nameof(StreamsTrigger_SingleKey))]
-        public static void StreamsTrigger_SingleKey(
-            [RedisStreamTrigger(localhostSetting, streamSingleKey, pollingIntervalInMs: pollingInterval)] RedisStreamEntry entry,
-            ILogger logger)
-        {
-            logger.LogInformation(JsonSerializer.Serialize(entry));
-        }
-
-        [FunctionName(nameof(StreamsTrigger_MultipleKeys))]
-        public static void StreamsTrigger_MultipleKeys(
-            [RedisStreamTrigger(localhostSetting, streamMultipleKeys, pollingIntervalInMs: pollingInterval)] RedisStreamEntry entry,
+        [FunctionName(nameof(StreamsTrigger))]
+        public static void StreamsTrigger(
+            [RedisStreamTrigger(localhostSetting, streamKey, pollingIntervalInMs: pollingInterval)] RedisStreamEntry entry,
             ILogger logger)
         {
             logger.LogInformation(JsonSerializer.Serialize(entry));

@@ -82,9 +82,7 @@ The `RedisListsTrigger` pops elements from a list and surfaces those elements to
 
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
-- `Keys`: Keys to read from, space-delimited.
-  - Multiple keys only supported on Redis 7.0+ using [`LMPOP`](https://redis.io/commands/lmpop/).
-  - Listens to only the first key given in the argument using [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/) on Redis versions less than 7.0.
+- `Key`: Key to read from.
   - This field can be resolved using `INameResolver`.
 - (optional) `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: 1000
@@ -121,8 +119,7 @@ Each function creates a new random GUID to use as its consumer name within the g
 
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
-- `Keys`: Keys to read from, space-delimited.
-  - Uses [`XREADGROUP`](https://redis.io/commands/xreadgroup/).
+- `Key`: Key to read from.
   - This field can be resolved using `INameResolver`.
 - (optional) `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: 1000
