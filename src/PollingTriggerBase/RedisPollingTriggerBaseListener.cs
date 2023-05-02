@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal RedisKey[] keys;
         internal TimeSpan pollingInterval;
         internal int messagesPerWorker;
-        internal int batchSize;
+        internal int count;
         internal ITriggeredFunctionExecutor executor;
         internal ILogger logger;
 
@@ -33,14 +33,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
 
-        public RedisPollingTriggerBaseListener(string name, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPollingTriggerBaseListener(string name, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.name = name;
             this.connectionString = connectionString;
             this.keys = keys.Split(' ').Select(key => new RedisKey(key)).ToArray();
             this.pollingInterval = pollingInterval;
             this.messagesPerWorker = messagesPerWorker;
-            this.batchSize = batchSize;
+            this.count = count;
             this.executor = executor;
             this.logger = logger;
         }

@@ -17,10 +17,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <param name="keys">Keys to read from, space-delimited.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in milliseconds. Default: 1000</param>
         /// <param name="messagesPerWorker">The number of messages each functions instance is expected to handle. Default: 100</param>
-        /// <param name="batchSize">Number of elements to pull from a Redis list at one time. Default: 10</param>
+        /// <param name="count">Number of elements to pull from a Redis list at one time. Default: 10</param>
         /// <param name="listPopFromBeginning">Decides if the function will pop elements from the front or end of the list. Default: true</param>
-        public RedisListTriggerAttribute(string connectionStringSetting, string keys, int pollingIntervalInMs = 1000, int messagesPerWorker = 100, int batchSize = 10, bool listPopFromBeginning = true)
-            : base(connectionStringSetting, keys, pollingIntervalInMs, messagesPerWorker, batchSize)
+        public RedisListTriggerAttribute(string connectionStringSetting, string keys, int pollingIntervalInMs = 1000, int messagesPerWorker = 100, int count = 10, bool listPopFromBeginning = true)
+            : base(connectionStringSetting, keys, pollingIntervalInMs, messagesPerWorker, count)
         {
             ListPopFromBeginning = listPopFromBeginning;
         }

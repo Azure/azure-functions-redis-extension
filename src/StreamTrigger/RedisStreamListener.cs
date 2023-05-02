@@ -20,8 +20,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string consumerName;
         internal StreamPosition[] positions;
 
-        public RedisStreamListener(string name, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int batchSize, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, connectionString, keys, pollingInterval, messagesPerWorker, batchSize, executor, logger)
+        public RedisStreamListener(string name, string connectionString, string keys, TimeSpan pollingInterval, int messagesPerWorker, int count, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, keys, pollingInterval, messagesPerWorker, count, executor, logger)
         {
             this.consumerGroup = consumerGroup;
             this.deleteAfterProcess = deleteAfterProcess;
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public override async Task PollAsync(CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            RedisStream[] streams = await db.StreamReadGroupAsync(positions, consumerGroup, consumerName, batchSize);
+            RedisStream[] streams = await db.StreamReadGroupAsync(positions, consumerGroup, consumerName, count);
 
             foreach (RedisStream stream in streams)
             {
