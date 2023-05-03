@@ -60,11 +60,11 @@ The `RedisPubSubTrigger` subscribes to a specific channel or channel pattern and
 
 #### Avaiable Output Types
 - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
-- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The value from the channel.
-- `string`: The value from the channel.
-- `byte[]`: The value from the channel.
-- `ReadOnlyMemory<byte>`: The value from the channel.
-- `Custom`: The trigger uses JSON.NET serialization to map the [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs) value into your custom class. The available fields are [`SubscriptionChannel`](https://github.com/StackExchange/StackExchange.Redis/blob/7ad0add610f913479016bd012ea742d5d74f77b7/src/StackExchange.Redis/ChannelMessageQueue.cs#L41), [`Channel`](https://github.com/StackExchange/StackExchange.Redis/blob/7ad0add610f913479016bd012ea742d5d74f77b7/src/StackExchange.Redis/ChannelMessageQueue.cs#L46), and [`Message`](https://github.com/StackExchange/StackExchange.Redis/blob/7ad0add610f913479016bd012ea742d5d74f77b7/src/StackExchange.Redis/ChannelMessageQueue.cs#L51).
+- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The message from the channel.
+- `string`: The message from the channel.
+- `byte[]`: The message from the channel.
+- `ReadOnlyMemory<byte>`: The message from the channel.
+- `Custom`: The trigger uses JSON.NET serialization to map the message from the channel into your custom type.
 
 #### Sample
 The following sample listens to the channel "pubsubTest". More samples can be found in the [samples](samples/RedisSamples.cs) or in the [integration tests](test/Integration/RedisPubSubTriggerTestFunctions.cs).
