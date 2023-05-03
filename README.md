@@ -135,13 +135,14 @@ Each function creates a new random GUID to use as its consumer name within the g
 - `Dictionary<string, string>`: The values contained within the entry as a Dictionary.
 - `string`, `byte[]`, `ReadOnlyMemory<byte>`: The stream entry serialized as JSON in the following format:
     ```
-    {"Id":<Id>,"Values":[{"field1":"value1"},{"field2":"value2"},{"field3":"value3"}]}`
+    {"Id":<Id>,"Values":[{"field1":"value1"},{"field2":"value2"},{"field3":"value3"}]}
     ```
 - `Custom`: The trigger uses JSON.NET serialization to map the values contained within the entry into the custom type.
   This is done by first turning the values within the stream into a Dictionary, and then deserializing that Dictionary into the custom type.
 
 #### Sample
-The following sample polls the key "streamTest" at a Redis instance defined in local.settings.json at the key "redisConnectionStringSetting"
+The following sample polls the key "streamTest" at a Redis instance defined in local.settings.json at the key "redisConnectionStringSetting".
+More samples can be found in the [samples](samples/RedisSamples.cs) or in the [integration tests](test/Integration/RedisStreamTriggerTestFunctions.cs).
 ```c#
 [FunctionName(nameof(StreamsTrigger))]
 public static void StreamsTrigger(
