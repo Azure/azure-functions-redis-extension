@@ -15,7 +15,7 @@ trigger:
 variables:
   # It is a release build if it is triggered by the main branch.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
-  ${{ if parameters['isReleaseBuild'] }}:
+  ${{ if variables['isReleaseBuild'] }}:
     majorVersion: 0
     minorVersion: 2
     majorMinorVersion: $[ format('{0}.{1}', variables['majorVersion'], variables['minorVersion']) ]
