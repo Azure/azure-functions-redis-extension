@@ -26,8 +26,8 @@ variables:
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
 
 jobs:
-  - job: test
-    displayName: Build Debug, Test, Build Release
+  - job: Extension
+    displayName: WebJobs.Extensions.Redis NuGet package
     steps:
       - task: UseDotNet@2
         displayName: Install .NET SDK
@@ -49,22 +49,22 @@ jobs:
           script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
 
       - task: DotNetCoreCLI@2
-        displayName: Test
+        displayName: Test Debug
         inputs:
           command: test
           arguments: --configuration Debug
 
       - task: DotNetCoreCLI@2
+        displayName: Pack Release
         condition: eq(variables.isReleaseBuild, 'True')
-        displayName: Build & Pack Release
         inputs:
           command: custom
           custom: pack
           arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
 
       - task: PublishBuildArtifacts@1
+        displayName: Publish Artifact
         condition: eq(variables.isReleaseBuild, 'True')
-        displayName: Publish
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
