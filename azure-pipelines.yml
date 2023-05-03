@@ -13,21 +13,21 @@ trigger:
       - main
 
 variables:
-  majorVersion: 0
-  minorVersion: 2
-  majorMinorVersion: $[ format('{0}.{1}', variables['majorVersion'], variables['minorVersion']) ]
-  fullVersion: $[ format('{0}.{1}', variables['majorMinorVersion'], counter(variables['majorMinorVersion'], 0)) ]
-  ${{ if parameters['previewBuild'] }}:
-    releaseVersion: $[ format('{0}-{1}', variables['fullVersion'], 'preview') ]
-  ${{ else }}:
-    releaseVersion: fullVersion
-
   # It is a release build if it is triggered by the main branch.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
+  ${{ if variables['isReleaseBuild'] }}:
+    majorVersion: 0
+    minorVersion: 2
+    majorMinorVersion: $[ format('{0}.{1}', variables['majorVersion'], variables['minorVersion']) ]
+    fullVersion: $[ format('{0}.{1}', variables['majorMinorVersion'], counter(variables['majorMinorVersion'], 0)) ]
+    ${{ if parameters['previewBuild'] }}:
+      releaseVersion: $[ format('{0}-{1}', variables['fullVersion'], 'preview') ]
+    ${{ else }}:
+      releaseVersion: fullVersion
 
 jobs:
-  - job: test
-    displayName: Build Debug, Test
+  - job: Extension
+    displayName: WebJobs.Extensions.Redis NuGet package
     steps:
       - task: UseDotNet@2
         displayName: Install .NET SDK
@@ -49,92 +49,22 @@ jobs:
           script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
 
       - task: DotNetCoreCLI@2
-        displayName: Test
+        displayName: Test Debug
         inputs:
           command: test
           arguments: --configuration Debug
 
-  - job: build
-    displayName: Build Release, Generate & Sign Nuget Package
-    condition: eq(variables.isReleaseBuild, 'True')
-    steps:
       - task: DotNetCoreCLI@2
-        displayName: Build
-        inputs:
-          command: build
-          arguments: --configuration Release -property:Version=$(releaseVersion)
-
-      - task: EsrpCodeSigning@2
-        displayName: Sign .dll
-        inputs:
-          connectedServiceName: 'redis-codesign'
-          folderPath: src/bin/Release/netstandard2.0
-          pattern: Microsoft.Azure.WebJobs.Extensions.Redis.dll
-          signConfigType: inlineSignParams
-          inlineOperation: |
-            [
-              {
-                "KeyCode": "CP-230012",
-                "OperationCode": "SigntoolSign",
-                "Parameters": {
-                  "OpusName": "Microsoft",
-                  "OpusInfo": "http://www.microsoft.com",
-                  "FileDigest": "/fd \"SHA256\"",
-                  "PageHash": "/NPH",
-                  "TimeStamp": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
-                },
-                "ToolName": "sign",
-                "ToolVersion": "1.0"
-              },
-              {
-                "KeyCode": "CP-230012",
-                "OperationCode": "SigntoolVerify",
-                "Parameters": {},
-                "ToolName": "sign",
-                "ToolVersion": "1.0"
-              }
-            ]
-
-      - task: DotNetCoreCLI@2
-        displayName: Pack
+        displayName: Pack Release
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
-          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj -property:Configuration=Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory) --no-build
-
-      - task: EsrpCodeSigning@2
-        displayName: Sign .nupkg
-        inputs:
-          connectedServiceName: 'redis-codesign'
-          folderPath: $(Build.ArtifactStagingDirectory)
-          pattern: Microsoft.Azure.WebJobs.Extensions.Redis.*.nupkg
-          signConfigType: inlineSignParams
-          inlineOperation: |
-            [
-              {
-                "KeyCode": "CP-401405",
-                "OperationCode": "NuGetSign",
-                "Parameters": {},
-                "ToolName": "sign",
-                "ToolVersion": "1.0"
-              },
-              {
-                "KeyCode": "CP-401405",
-                "OperationCode": "NuGetVerify",
-                "Parameters": {},
-                "ToolName": "sign",
-                "ToolVersion": "1.0"
-              }
-            ]
-
-      - task: DeleteFiles@1
-        displayName: Cleanup Directory
-        inputs:
-          sourceFolder: $(Build.ArtifactStagingDirectory)
-          contents: CodeSignSummary*.md
+          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
 
       - task: PublishBuildArtifacts@1
-        displayName: Publish
+        displayName: Publish Extension
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
