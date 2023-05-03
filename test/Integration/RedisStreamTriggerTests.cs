@@ -97,8 +97,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_CustomType), typeof(CustomType))]
         public async void StreamTrigger_TypeConversions_WorkCorrectly(string functionName, Type destinationType)
         {
-            string[] namesArray = new string[] { "Name", "c" };
-            string[] valuesArray = new string[] { "Field", "d" };
+            string[] namesArray = new string[] { nameof(CustomType.Name), "randomName" };
+            string[] valuesArray = new string[] { nameof(CustomType.Field), "someField" };
 
             NameValueEntry[] nameValueEntries = new NameValueEntry[namesArray.Length];
             for (int i = 0; i < namesArray.Length; i++)
@@ -111,7 +111,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { $"Executed '{functionName}' (Succeeded", 1},
                 { destinationType.FullName, 1},
             };
-
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisStreamTriggerTestFunctions.localhostSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
