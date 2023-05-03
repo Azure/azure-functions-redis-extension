@@ -67,4 +67,4 @@ jobs:
         condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-          artifactName: 'drop-extension'
+          artifactName: 'drop'
