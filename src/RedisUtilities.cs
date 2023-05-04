@@ -58,38 +58,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return value;
             }
-            if (destinationType.Equals(typeof(bool)))
-            {
-                return (bool)value;
-            }
-            if (destinationType.Equals(typeof(int)))
-            {
-                return (int)value;
-            }
-            if (destinationType.Equals(typeof(uint)))
-            {
-                return (uint)value;
-            }
-            if (destinationType.Equals(typeof(long)))
-            {
-                return (long)value;
-            }
-            if (destinationType.Equals(typeof(ulong)))
-            {
-                return (ulong)value;
-            }
-            if (destinationType.Equals(typeof(double)))
-            {
-                return (double)value;
-            }
-            if (destinationType.Equals(typeof(decimal)))
-            {
-                return (decimal)value;
-            }
-            if (destinationType.Equals(typeof(float)))
-            {
-                return (float)value;
-            }
             if (destinationType.Equals(typeof(string)))
             {
                 return (string)value;

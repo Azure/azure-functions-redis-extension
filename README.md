@@ -16,7 +16,7 @@ There are three triggers in the Azure Functions Redis Extension:
     mkdir RedisFunctions
     cd RedisFunctions
     func init --worker-runtime dotnet
-    ````
+    ```
 1. Install the Redis Extension using `dotnet add package Microsoft.Azure.WebJobs.Extensions.Redis --prerelease`.
 For private preview, these are the following steps to add the nuget package to your project:
    1. Create a `NuGet.Config` file in the project folder (`RedisFunctions` in the above step):
@@ -61,7 +61,6 @@ The `RedisPubSubTrigger` subscribes to a specific channel or channel pattern and
 #### Avaiable Output Types
 - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs),`string`,`byte[]`,`ReadOnlyMemory<byte>`: The message from the channel.
-- `bool`,`int`,`uint`,`long`,`ulong`,`double`,`decimal`,`float`: Uses [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs) converters if the underlying message from the channel can be converted.
 - `Custom`: The trigger uses JSON.NET serialization to map the message from the channel into a custom type.
 
 #### Sample
@@ -96,7 +95,6 @@ The `RedisListTrigger` pops elements from a list and surfaces those elements to 
 
 #### Avaiable Output Types
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs),`string`,`byte[]`,`ReadOnlyMemory<byte>`: The entry from the list.
-- `bool`,`int`,`uint`,`long`,`ulong`,`double`,`decimal`,`float`: Uses [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs) converters if the underlying entry from the list can be converted.
 - `Custom`: The trigger uses JSON.NET serialization to map the entry from the list into a custom type.
 
 #### Sample
