@@ -133,9 +133,9 @@ Each function creates a new random GUID to use as its consumer name within the g
 - [`StackExchange.Redis.StreamEntry`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs): The value returned by `StackExchange.Redis`.
 - `NameValueEntry[]`: The values contained within the entry as the underlying `StackExchange.Redis` type.
 - `Dictionary<string, string>`: The values contained within the entry as a Dictionary.
-- `string`, `byte[]`, `ReadOnlyMemory<byte>`: The stream entry serialized as JSON in the following format:
+- `string`, `byte[]`, `ReadOnlyMemory<byte>`: The stream entry serialized as JSON (UTF8 encoded for byte types) in the following format:
     ```
-    {"Id":<Id>,"Values":[{"field1":"value1"},{"field2":"value2"},{"field3":"value3"}]}
+    {"Id":<Id>,"Values":{"field1":"value1","field2":"value2","field3":"value3"}}
     ```
 - `Custom`: The trigger uses JSON.NET serialization to map the values contained within the entry into the custom type.
   This is done by first turning the values within the stream into a Dictionary, and then deserializing that Dictionary into the custom type.

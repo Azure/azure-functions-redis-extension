@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -82,9 +84,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        public static JArray StreamEntryToValuesJArray(StreamEntry entries)
+        internal static Dictionary<string, string> StreamEntryToDictionary(StreamEntry entry)
         {
-            return JArray.FromObject(entry.Values.Select(value => new JObject() { [value.Name.ToString()] = value.Value.ToString() }));
+            return entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
         }
     }
 }

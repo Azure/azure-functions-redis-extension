@@ -50,7 +50,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             if (Type.Equals(typeof(Dictionary<string, string>)))
             {
-                return Task.FromResult<object>(StreamEntryToDictionary());
+                return Task.FromResult<object>(RedisUtilities.StreamEntryToDictionary(entry));
             }
             if (Type.Equals(typeof(ReadOnlyMemory<byte>)))
             {
@@ -67,7 +67,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             try
             {
-                return Task.FromResult(JsonConvert.DeserializeObject(JsonConvert.SerializeObject(StreamEntryToDictionary()), Type));
+                return Task.FromResult(JsonConvert.DeserializeObject(JsonConvert.SerializeObject(RedisUtilities.StreamEntryToDictionary(entry)), Type));
             }
             catch (JsonException e)
             {
@@ -85,14 +85,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             JObject obj = new JObject()
             {
                 [nameof(StreamEntry.Id)] = entry.Id.ToString(),
-                [nameof(StreamEntry.Values)] = RedisUtilities.StreamEntryToValuesJArray(entry)
+                [nameof(StreamEntry.Values)] = JObject.FromObject(RedisUtilities.StreamEntryToDictionary(entry))
             };
             return obj.ToString(Formatting.None);
-        }
-
-        internal Dictionary<string, string> StreamEntryToDictionary()
-        {
-            return entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
         }
     }
 }

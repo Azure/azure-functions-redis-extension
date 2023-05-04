@@ -74,7 +74,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 { "Key", typeof(string) },
                 { nameof(StreamEntry.Id), typeof(string) },
-                { nameof(StreamEntry.Values), typeof(string) },
+                { nameof(StreamEntry.Values), typeof(Dictionary<string, string>) },
             };
         }
 
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 { "Key", key },
                 { nameof(StreamEntry.Id), entry.Id.ToString() },
-                { nameof(StreamEntry.Values), RedisUtilities.StreamEntryToValuesJArray(entry).ToString() },
+                { nameof(StreamEntry.Values), RedisUtilities.StreamEntryToDictionary(entry) },
             };
         }
     }
