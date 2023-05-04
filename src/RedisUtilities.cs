@@ -62,20 +62,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             if (destinationType.Equals(typeof(ReadOnlyMemory<byte>)))
             {
-                return new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(value.ToString()));
+                return (ReadOnlyMemory<byte>)value;
             }
             if (destinationType.Equals(typeof(byte[])))
             {
-                return Encoding.UTF8.GetBytes(value.ToString());
+                return (byte[])value;
             }
             if (destinationType.Equals(typeof(string)))
             {
-                return value.ToString();
+                return (string)value;
             }
 
             try
             {
-                return JsonConvert.DeserializeObject(value.ToString(), destinationType);
+                return JsonConvert.DeserializeObject((string)value, destinationType);
             }
             catch (JsonException e)
             {
