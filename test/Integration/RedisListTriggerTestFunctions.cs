@@ -31,5 +31,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
         }
+
+        [FunctionName(nameof(ListTrigger_CustomType))]
+        public static void ListTrigger_CustomType(
+            [RedisListTrigger(localhostSetting, nameof(ListTrigger_CustomType), pollingIntervalInMs: pollingInterval)] CustomType entry,
+            ILogger logger)
+        {
+            logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
+        }
     }
 }

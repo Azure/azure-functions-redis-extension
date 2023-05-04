@@ -82,24 +82,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_String), typeof(string))]
         [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue), typeof(RedisValue))]
         [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_ByteArray), typeof(byte[]))]
+        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_CustomType), typeof(CustomType))]
         public async void ListTrigger_TypeConversions_WorkCorrectly(string functionName, Type destinationType)
         {
-            RedisValue[] valuesArray = new RedisValue[] { "a", "b" };
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
-            counts.TryAdd($"Executed '{functionName}' (Succeeded", valuesArray.Length);
-            foreach (string value in valuesArray)
-            {
-                counts.AddOrUpdate(destinationType.FullName, 1, (s, c) => c + 1);
-            }
-
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
+            counts.TryAdd(destinationType.FullName, 1);
+            
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 ISubscriber subscriber = multiplexer.GetSubscriber();
 
-                await multiplexer.GetDatabase().ListLeftPushAsync(functionName, valuesArray);
+                await multiplexer.GetDatabase().ListLeftPushAsync(functionName, JsonSerializer.Serialize(new CustomType() { Field = "feeld", Name = "naim", Random = "ran" }));
                 await Task.Delay(TimeSpan.FromSeconds(1));
 
                 await multiplexer.CloseAsync();

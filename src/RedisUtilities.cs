@@ -60,17 +60,49 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return value;
             }
-            if (destinationType.Equals(typeof(ReadOnlyMemory<byte>)))
+            if (destinationType.Equals(typeof(bool)))
             {
-                return (ReadOnlyMemory<byte>)value;
+                return (bool)value;
             }
-            if (destinationType.Equals(typeof(byte[])))
+            if (destinationType.Equals(typeof(int)))
             {
-                return (byte[])value;
+                return (int)value;
+            }
+            if (destinationType.Equals(typeof(long)))
+            {
+                return (long)value;
+            }
+            if (destinationType.Equals(typeof(uint)))
+            {
+                return (uint)value;
+            }
+            if (destinationType.Equals(typeof(long)))
+            {
+                return (long)value;
+            }
+            if (destinationType.Equals(typeof(double)))
+            {
+                return (double)value;
+            }
+            if (destinationType.Equals(typeof(decimal)))
+            {
+                return (decimal)value;
+            }
+            if (destinationType.Equals(typeof(float)))
+            {
+                return (float)value;
             }
             if (destinationType.Equals(typeof(string)))
             {
                 return (string)value;
+            }
+            if (destinationType.Equals(typeof(byte[])))
+{
+                return (byte[])value;
+            }
+            if (destinationType.Equals(typeof(ReadOnlyMemory<byte>)))
+            {
+                return (ReadOnlyMemory<byte>)value;
             }
 
             try

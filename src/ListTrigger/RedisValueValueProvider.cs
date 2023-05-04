@@ -37,36 +37,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <exception cref="InvalidOperationException"></exception>
         public Task<object> GetValueAsync()
         {
-            if (Type.Equals(typeof(RedisValue)))
-            {
-                return Task.FromResult<object>(value);
-            }
-            else if (Type.Equals(typeof(ReadOnlyMemory<byte>)))
-            {
-                return Task.FromResult<object>(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(value.ToString())));
-            }
-            else if (Type.Equals(typeof(byte[])))
-            {
-                return Task.FromResult<object>(Encoding.UTF8.GetBytes(value.ToString()));
-            }
-            else if (Type.Equals(typeof(string)))
-            {
-                return Task.FromResult<object>(value.ToString());
-            }
-
-            else
-            {
-                try
-                {
-                    return Task.FromResult(JsonConvert.DeserializeObject(ToInvokeString(), Type));
-                }
-                catch (JsonException e)
-                {
-                    // Give useful error if object in queue is not deserialized properly.
-                    string msg = $@"Binding parameters to complex objects (such as '{Type.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
-                    throw new InvalidOperationException(msg, e);
-                }
-            }
+            return Task.FromResult(RedisUtilities.RedisValueTypeConverter(value, Type));
         }
 
         /// <summary>
