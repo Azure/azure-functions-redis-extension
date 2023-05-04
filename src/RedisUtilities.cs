@@ -3,8 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -68,10 +66,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return (int)value;
             }
-            if (destinationType.Equals(typeof(long)))
-            {
-                return (long)value;
-            }
             if (destinationType.Equals(typeof(uint)))
             {
                 return (uint)value;
@@ -79,6 +73,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (destinationType.Equals(typeof(long)))
             {
                 return (long)value;
+            }
+            if (destinationType.Equals(typeof(ulong)))
+            {
+                return (ulong)value;
             }
             if (destinationType.Equals(typeof(double)))
             {
@@ -97,7 +95,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 return (string)value;
             }
             if (destinationType.Equals(typeof(byte[])))
-{
+            {
                 return (byte[])value;
             }
             if (destinationType.Equals(typeof(ReadOnlyMemory<byte>)))
