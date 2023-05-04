@@ -61,7 +61,7 @@ The `RedisPubSubTrigger` subscribes to a specific channel or channel pattern and
 #### Avaiable Output Types
 - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs),`string`,`byte[]`,`ReadOnlyMemory<byte>`: The message from the channel.
-- `Custom`: The trigger uses JSON.NET serialization to map the message from the channel into a custom type.
+- `Custom`: The trigger uses JSON.NET serialization to map the message from the channel from a `string` into a custom type.
 
 #### Sample
 The following sample listens to the channel "pubsubTest". More samples can be found in the [samples](samples/RedisSamples.cs) or in the [integration tests](test/Integration/RedisPubSubTriggerTestFunctions.cs).
@@ -95,7 +95,7 @@ The `RedisListTrigger` pops elements from a list and surfaces those elements to 
 
 #### Avaiable Output Types
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs),`string`,`byte[]`,`ReadOnlyMemory<byte>`: The entry from the list.
-- `Custom`: The trigger uses JSON.NET serialization to map the entry from the list into a custom type.
+- `Custom`: The trigger uses JSON.NET serialization to map the entry from the list from a `string` into a custom type.
 
 #### Sample
 The following sample polls the key "listTest" at a Redis instance defined in local.settings.json at the key "redisConnectionStringSetting"
