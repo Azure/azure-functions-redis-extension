@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -97,6 +98,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         private static string GetPrefix()
         {
             return Path.Combine("bin", "Debug", "net6.0");
+        }
+
+        internal static string GetLogValue(object value)
+        {
+            return value.GetType().FullName + ":" + JsonConvert.SerializeObject(value);
         }
     }
 }

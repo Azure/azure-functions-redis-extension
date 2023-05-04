@@ -1,6 +1,10 @@
 ﻿using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -48,6 +52,36 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             return connectionString;
+        }
+
+        public static object RedisValueTypeConverter(RedisValue value, Type destinationType)
+        {
+            if (destinationType.Equals(typeof(RedisValue)))
+            {
+                return value;
+            }
+            if (destinationType.Equals(typeof(ReadOnlyMemory<byte>)))
+            {
+                return (ReadOnlyMemory<byte>)value;
+            }
+            if (destinationType.Equals(typeof(byte[])))
+            {
+                return (byte[])value;
+            }
+            if (destinationType.Equals(typeof(string)))
+            {
+                return (string)value;
+            }
+
+            try
+            {
+                return JsonConvert.DeserializeObject((string)value, destinationType);
+            }
+            catch (JsonException e)
+            {
+                string msg = $@"Binding parameters to complex objects (such as '{destinationType.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
+                throw new InvalidOperationException(msg, e);
+            }
         }
     }
 }
