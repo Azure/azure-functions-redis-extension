@@ -1,10 +1,9 @@
 ﻿using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -25,20 +24,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
-                
+
                 using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
                     await multiplexer.GetDatabase().ListLeftPushAsync(functionName, valuesArray);
-                    
+
                     await Task.Delay(TimeSpan.FromSeconds(1));
 
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();
                 };
                 var incorrect = counts.Where(pair => pair.Value != 0);
-                Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
+                Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
             }
         }
 
@@ -55,7 +54,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
-                
+
                 using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
                 using (Process functionsProcess2 = IntegrationTestHelpers.StartFunction(functionName, 7072))
                 using (Process functionsProcess3 = IntegrationTestHelpers.StartFunction(functionName, 7073))
@@ -65,7 +64,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     functionsProcess3.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
                     await multiplexer.GetDatabase().ListLeftPushAsync(functionName, valuesArray);
-                    
+
                     await Task.Delay(TimeSpan.FromSeconds(count / 10));
 
                     await multiplexer.CloseAsync();
@@ -75,7 +74,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 };
             }
             var incorrect = counts.Where(pair => pair.Value != 0);
-            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
+            Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
         [Theory]
@@ -89,21 +88,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
             counts.TryAdd(destinationType.FullName, 1);
-            
+
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 ISubscriber subscriber = multiplexer.GetSubscriber();
 
-                await multiplexer.GetDatabase().ListLeftPushAsync(functionName, JsonSerializer.Serialize(new CustomType() { Field = "feeld", Name = "naim", Random = "ran" }));
+                await multiplexer.GetDatabase().ListLeftPushAsync(functionName, JsonConvert.SerializeObject(new CustomType() { Field = "feeld", Name = "naim", Random = "ran" }));
                 await Task.Delay(TimeSpan.FromSeconds(1));
 
                 await multiplexer.CloseAsync();
                 functionsProcess.Kill();
             };
             var incorrect = counts.Where(pair => pair.Value != 0);
-            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
+            Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
     }
 }
