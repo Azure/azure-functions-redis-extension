@@ -1,3 +1,4 @@
+using Microsoft.Azure.WebJobs.Extensions.Redis;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -11,6 +12,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         [FunctionName(nameof(PubSubTrigger))]
         public static void PubSubTrigger(
             [RedisPubSubTrigger(localhostSetting, "pubsubTest")] string message,
+            ILogger logger)
+        {
+            logger.LogInformation(message);
+        }
+
+        [FunctionName(nameof(PubSubTriggerChannelPattern))]
+        public static void PubSubTriggerChannelPattern(
+            [RedisPubSubTrigger(localhostSetting, "pubsub*")] string message,
             ILogger logger)
         {
             logger.LogInformation(message);

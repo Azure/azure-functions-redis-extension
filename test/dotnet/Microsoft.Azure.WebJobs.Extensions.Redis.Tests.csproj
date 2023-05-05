@@ -27,6 +27,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Microsoft.Azure.WebJobs.Extensions.Redis.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.Azure.WebJobs.Extensions.Redis.csproj" />
   </ItemGroup>
 </Project>

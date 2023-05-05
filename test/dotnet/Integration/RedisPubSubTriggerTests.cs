@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests
 {
     [Collection("RedisTriggerTests")]
     public class RedisPubSubTriggerTests

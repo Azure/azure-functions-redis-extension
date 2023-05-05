@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using StackExchange.Redis;
 using System;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests
 {
     public static class RedisPubSubTriggerTestFunctions
     {
