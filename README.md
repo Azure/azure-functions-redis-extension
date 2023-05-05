@@ -112,7 +112,7 @@ public static void ListsTrigger(
 ### `RedisStreamTrigger`
 The `RedisStreamTrigger` reads elements from a stream and surfaces those elements to the function.
 The trigger polls Redis at a configurable fixed interval, and uses [`XREADGROUP`](https://redis.io/commands/xreadgroup/) to read elements from the stream.
-Each function creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
+Each functions worker creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
