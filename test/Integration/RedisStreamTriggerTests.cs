@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 functionsProcess.Kill();
             };
             var incorrect = counts.Where(pair => pair.Value != 0);
-            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
+            Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 functionsProcess3.Kill();
             };
             var incorrect = counts.Where(pair => pair.Value != 0);
-            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
+            Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
         [Theory]
@@ -125,7 +125,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 functionsProcess.Kill();
             };
             var incorrect = counts.Where(pair => pair.Value != 0);
-            Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
+            Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
     }
 }

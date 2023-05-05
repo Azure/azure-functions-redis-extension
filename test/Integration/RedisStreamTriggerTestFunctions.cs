@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Collections.Generic;
-using System.Text.Json;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
