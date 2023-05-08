@@ -57,12 +57,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation("The value from the list: " + entry);
         }
 
-        [FunctionName(nameof(StreamsTrigger))]
-        public static void StreamsTrigger(
-            [RedisStreamTrigger(localhostSetting, "streamTest")] KeyValuePair<string, string>[] entry,
+        [FunctionName(nameof(StreamTrigger))]
+        public static void StreamTrigger(
+            [RedisStreamTrigger(localhostSetting, "streamTest")] string entry,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(entry));
+            logger.LogInformation(entry);
         }
     }
 }

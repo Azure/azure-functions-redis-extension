@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 
-namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Tests
+namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
 {
     internal class Program
     {

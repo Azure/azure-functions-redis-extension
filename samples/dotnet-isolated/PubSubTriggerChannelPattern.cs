@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Tests
+namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
 {
     public class PubSubTriggerChannelPattern
     {
