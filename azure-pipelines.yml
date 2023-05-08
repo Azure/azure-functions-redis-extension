@@ -49,10 +49,10 @@ jobs:
           script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
 
       - task: DotNetCoreCLI@2
-        displayName: Test Debug
+        displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
         inputs:
           command: test
-          arguments: --configuration Debug
+          arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug --collect "Code Coverage"
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.WebJobs.Extensions.Redis Release
