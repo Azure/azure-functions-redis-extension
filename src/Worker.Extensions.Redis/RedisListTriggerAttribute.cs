@@ -12,9 +12,9 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// </summary>
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="key">Key to read from.</param>
-        /// <param name="pollingIntervalInMs">How often to poll Redis in milliseconds. Default: 1000</param>
-        /// <param name="messagesPerWorker">The number of messages each functions instance is expected to handle. Default: 100</param>
-        /// <param name="count">Number of elements to pull from a Redis list at one time. Default: 10</param>
+        /// <param name="pollingIntervalInMs">How often to poll Redis in ms.</param>
+        /// <param name="messagesPerWorker">The number of messages each functions instance is expected to handle.</param>
+        /// <param name="count">Number of elements to pull from Redis at one time.</param>
         /// <param name="listPopFromBeginning">Decides if the function will pop elements from the front or end of the list. Default: true</param>
         public RedisListTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int messagesPerWorker = 100, int count = 10, bool listPopFromBeginning = true)
         {
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         public string ConnectionStringSetting { get; }
 
         /// <summary>
-        /// Keys to read from, space-delimited.
+        /// Key to read from.
         /// </summary>
         public string Key { get; }
 
