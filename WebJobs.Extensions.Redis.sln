@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Ext
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples", "samples\dotnet-isolated\Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.csproj", "{4758640E-3E39-47C7-BEEB-B33343F51759}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis", "src\Webjobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj", "{7DFDBFBA-8354-40FE-97F6-84D5089A144F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis", "src\WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj", "{7DFDBFBA-8354-40FE-97F6-84D5089A144F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.Worker.Extensions.Redis", "src\Worker.Extensions.Redis\Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj", "{B024F04D-6096-4603-8532-049047248A17}"
 EndProject

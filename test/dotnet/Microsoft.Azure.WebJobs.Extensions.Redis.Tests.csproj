@@ -18,7 +18,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Webjobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj" />
+    <ProjectReference Include="..\..\src\WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
