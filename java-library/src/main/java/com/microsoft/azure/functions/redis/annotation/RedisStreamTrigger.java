@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  * <pre>
  * &#64;FunctionName("RedisStreamExample")
  * public void run(
- *         &#64;RedisStreamTrigger(connectionStringSetting = "ConnectionString", keys = "streamkey") String entry,
+ *         &#64;RedisStreamTrigger(connectionStringSetting = "ConnectionString", key = "streamkey") String entry,
  *         final ExecutionContext context) {
  *     context.getLogger().info("Java Redis Stream trigger function processed a entry: " + entry);
  * }
@@ -56,39 +56,42 @@ public @interface RedisStreamTrigger {
     String dataType() default "";
 
     /**
-     * Keys to read from, space-delimited.
-     * Uses <a href=https://redis.io/commands/xreadgroup/><code>XREADGROUP</code></a>.
-     * @return Keys to read from, space-delimited.
-    */
-    String keys();
+     * Key to read from.
+     * @return Key to read from.
+     */
+    String key();
 
     /**
      * How often to poll Redis in milliseconds.
      * @return How often to poll Redis in milliseconds.
      */
-    int pollingIntervalInMs();
+    int pollingIntervalInMs() default 1000;
 
     /**
-     * How many messages each functions worker should process. Used to determine how many workers the function should scale to.
+     * How many messages each functions worker should process.
+     * Used to determine how many workers the function should scale to.
+     * For example, if the messagesPerWorker is 10,
+     * and there are 1500 elements remaining in the list,
+     * the functions host will attempt to scale up to 150 instances.
      * @return How many messages each functions worker should process.
      */
-    int messagesPerWorker();
+    int messagesPerWorker() default 100;
 
     /**
      * Number of elements to pull from Redis at one time.
      * @return Number of elements to pull from Redis at one time.
      */
-    int batchSize();
+    int count() default 10;
 
     /**
      * The name of the consumer group that the function will use.
      * @return The name of the consumer group that the function will use.
      */
-    String consumerGroup();
+    String consumerGroup() default "AzureFunctionRedisExtension";
 
     /**
      * If the listener will delete the stream entries after the function runs.
      * @return If the listener will delete the stream entries after the function runs.
      */
-    boolean deleteAfterProcess();
+    boolean deleteAfterProcess() default false;
 }

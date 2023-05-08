@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  * <pre>
  * &#64;FunctionName("RedisListExample")
  * public void run(
- *         &#64;RedisListTrigger(connectionStringSetting = "ConnectionString", keys = "listkey") String entry,
+ *         &#64;RedisListTrigger(connectionStringSetting = "ConnectionString", key = "listkey") String entry,
  *         final ExecutionContext context) {
  *     context.getLogger().info("Java Redis List trigger function processed a list entry: " + entry);
  * }
@@ -56,36 +56,36 @@ public @interface RedisListTrigger {
     String dataType() default "";
 
     /**
-     * Keys to read from, space-delimited.
-     * Multiple keys only supported on Redis 7.0+ using <a href=https://redis.io/commands/lmpop/><code>LMPOP</code></a>.
-     * Listens to only the first key given in the argument using <a href=https://redis.io/commands/lpop/><code>LPOP</code></a>/<a href=https://redis.io/commands/rpop/><code>RPOP</code></a> on Redis versions less than 7.0.
-     * @return Keys to read from, space-delimited.
+     * Key to read from.
+     * @return Key to read from.
      */
-    String keys();
+    String key();
 
     /**
      * How often to poll Redis in milliseconds.
      * @return How often to poll Redis in milliseconds.
      */
-    int pollingIntervalInMs();
+    int pollingIntervalInMs() default 1000;
 
     /**
-     * How many messages each functions worker should process. Used to determine how many workers the function should scale to.
+     * How many messages each functions worker should process.
+     * Used to determine how many workers the function should scale to.
+     * For example, if the messagesPerWorker is 10,
+     * and there are 1500 elements remaining in the list,
+     * the functions host will attempt to scale up to 150 instances.
      * @return How many messages each functions worker should process.
      */
-    int messagesPerWorker();
+    int messagesPerWorker() default 100;
 
     /**
      * Number of elements to pull from Redis at one time.
-     * Only supported on Redis 6.2+ using the <code>COUNT</code> argument in <a href=https://redis.io/commands/lpop/><code>LPOP</code></a>/<a href=https://redis.io/commands/rpop/><code>RPOP</code></a>.
-     * Defaults to 1 on Redis versions less than 6.2.
      * @return Number of elements to pull from Redis at one time.
      */
-    int batchSize();
+    int count() default 10;
 
     /**
-     * Determines whether to pop elements from the beginning using <a href=https://redis.io/commands/lpop/><code>LPOP</code></a> or to pop elements from the end using <a href=https://redis.io/commands/rpop/><code>RPOP</code></a>.
+     * Determines whether to pop elements from the beginning using LPOP or to pop elements from the end using RPOP.
      * @return Whether to pop elements from the beginning or end of the list.
      */
-    boolean listPopFromBeginning();
+    boolean listPopFromBeginning() default true;
 }
