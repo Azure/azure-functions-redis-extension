@@ -52,7 +52,7 @@ jobs:
         displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
         inputs:
           command: test
-          arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug --collect "Code Coverage"
+          arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.WebJobs.Extensions.Redis Release
@@ -60,7 +60,7 @@ jobs:
         inputs:
           command: custom
           custom: pack
-          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+          arguments: $(Build.SourcesDirectory)/src/WebJobs.Extensions.Redis/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.Functions.Worker.Extensions.Redis Release
@@ -68,7 +68,7 @@ jobs:
         inputs:
           command: custom
           custom: pack
-          arguments: $(Build.SourcesDirectory)/Worker.Extensions.Redis/src/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+          arguments: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
 
       - task: PublishBuildArtifacts@1
         displayName: Publish Extension

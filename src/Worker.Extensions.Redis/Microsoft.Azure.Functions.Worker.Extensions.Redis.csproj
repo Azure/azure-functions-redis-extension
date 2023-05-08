@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Abstractions" />
+    <InternalsVisibleTo Include="Microsoft.Azure.Worker.Functions.Extensions.Redis.Tests" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32505.426
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis", "src\Microsoft.Azure.WebJobs.Extensions.Redis.csproj", "{423175AE-9728-4962-9E09-E8673899F979}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis.Samples", "samples\dotnet\Microsoft.Azure.WebJobs.Extensions.Redis.Samples.csproj", "{8670685A-EDA8-4965-8E9D-C5E6DAF7AAB5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis.Tests", "test\dotnet\Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj", "{E6BF14A5-6F7A-4DF6-9C25-6B35AEA6DBD4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.Worker.Extensions.Redis", "Worker.Extensions.Redis\src\Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj", "{707D128C-2955-4053-823A-C4219D591DDA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples", "samples\dotnet-isolated\Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.csproj", "{4758640E-3E39-47C7-BEEB-B33343F51759}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis", "src\Webjobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj", "{7DFDBFBA-8354-40FE-97F6-84D5089A144F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.Worker.Extensions.Redis", "src\Worker.Extensions.Redis\Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj", "{B024F04D-6096-4603-8532-049047248A17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{423175AE-9728-4962-9E09-E8673899F979}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{423175AE-9728-4962-9E09-E8673899F979}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{423175AE-9728-4962-9E09-E8673899F979}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{423175AE-9728-4962-9E09-E8673899F979}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8670685A-EDA8-4965-8E9D-C5E6DAF7AAB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8670685A-EDA8-4965-8E9D-C5E6DAF7AAB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8670685A-EDA8-4965-8E9D-C5E6DAF7AAB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -31,14 +27,18 @@ Global
 		{E6BF14A5-6F7A-4DF6-9C25-6B35AEA6DBD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6BF14A5-6F7A-4DF6-9C25-6B35AEA6DBD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6BF14A5-6F7A-4DF6-9C25-6B35AEA6DBD4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{707D128C-2955-4053-823A-C4219D591DDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{707D128C-2955-4053-823A-C4219D591DDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{707D128C-2955-4053-823A-C4219D591DDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{707D128C-2955-4053-823A-C4219D591DDA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4758640E-3E39-47C7-BEEB-B33343F51759}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4758640E-3E39-47C7-BEEB-B33343F51759}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4758640E-3E39-47C7-BEEB-B33343F51759}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4758640E-3E39-47C7-BEEB-B33343F51759}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DFDBFBA-8354-40FE-97F6-84D5089A144F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DFDBFBA-8354-40FE-97F6-84D5089A144F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DFDBFBA-8354-40FE-97F6-84D5089A144F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DFDBFBA-8354-40FE-97F6-84D5089A144F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B024F04D-6096-4603-8532-049047248A17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B024F04D-6096-4603-8532-049047248A17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B024F04D-6096-4603-8532-049047248A17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B024F04D-6096-4603-8532-049047248A17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
