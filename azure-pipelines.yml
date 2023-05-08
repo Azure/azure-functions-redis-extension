@@ -27,7 +27,7 @@ variables:
 
 jobs:
   - job: Extension
-    displayName: WebJobs.Extensions.Redis NuGet package
+    displayName: dotnet and dotnet-isolated NuGet packages
     steps:
       - task: UseDotNet@2
         displayName: Install .NET SDK
@@ -55,16 +55,24 @@ jobs:
           arguments: --configuration Debug
 
       - task: DotNetCoreCLI@2
-        displayName: Pack Release
-        condition: eq(variables.isReleaseBuild, 'True')
+        displayName: Pack Microsoft.Azure.WebJobs.Extensions.Redis Release
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
           arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
 
+      - task: DotNetCoreCLI@2
+        displayName: Pack Microsoft.Azure.Functions.Worker.Extensions.Redis Release
+        # condition: eq(variables.isReleaseBuild, 'True')
+        inputs:
+          command: custom
+          custom: pack
+          arguments: $(Build.SourcesDirectory)/Worker.Extensions.Redis/src/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+
       - task: PublishBuildArtifacts@1
         displayName: Publish Extension
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'

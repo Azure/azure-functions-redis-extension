@@ -26,10 +26,10 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <DebugType>embedded</DebugType>
 
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Abstractions" />
   </ItemGroup>
