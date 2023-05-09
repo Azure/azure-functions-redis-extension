@@ -45,10 +45,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             int messagesPerWorker = attribute.MessagesPerWorker;
             int count = attribute.Count;
             TimeSpan pollingInterval = TimeSpan.FromMilliseconds(attribute.PollingIntervalInMs);
-            string consumerGroup = RedisUtilities.ResolveString(nameResolver, attribute.ConsumerGroup, nameof(attribute.ConsumerGroup));
             bool deleteAfterProcess = attribute.DeleteAfterProcess;
 
-            return Task.FromResult<ITriggerBinding>(new RedisStreamTriggerBinding(connectionString, key, pollingInterval, messagesPerWorker, count, consumerGroup, deleteAfterProcess, parameter.ParameterType, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisStreamTriggerBinding(connectionString, key, pollingInterval, messagesPerWorker, count, deleteAfterProcess, logger));
         }
     }
 }
