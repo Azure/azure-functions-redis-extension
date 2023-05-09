@@ -4,7 +4,7 @@
 
   <groupId>com.microsoft.azure.functions</groupId>
   <artifactId>azure-functions-java-library-redis</artifactId>
-  <version>0.0.0</version>
+  <version>${revision}</version>
   <packaging>jar</packaging>
 
   <parent>

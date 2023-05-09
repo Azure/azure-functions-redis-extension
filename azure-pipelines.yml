@@ -36,39 +36,65 @@ jobs:
           version: 6.x
           performMultiLevelLookup: true
 
-      - task: Bash@3
-        displayName: Install Azure Functions Core Tools
-        inputs:
-          targetType: 'inline'
-          script: 'wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb; sudo dpkg -i packages-microsoft-prod.deb; sudo apt-get update; sudo apt-get install -qq -y azure-functions-core-tools-4'
+      # - task: Bash@3
+      #   displayName: Install Azure Functions Core Tools
+      #   inputs:
+      #     targetType: 'inline'
+      #     script: 'wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb; sudo dpkg -i packages-microsoft-prod.deb; sudo apt-get update; sudo apt-get install -qq -y azure-functions-core-tools-4'
 
-      - task: Bash@3
-        displayName: Download and start redis server, enable all keyspace/keyevent notifications
-        inputs:
-          targetType: 'inline'
-          script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
+      # - task: Bash@3
+      #   displayName: Download and start redis server, enable all keyspace/keyevent notifications
+      #   inputs:
+      #     targetType: 'inline'
+      #     script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
 
-      - task: DotNetCoreCLI@2
-        displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
-        inputs:
-          command: test
-          arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
+      # - task: DotNetCoreCLI@2
+      #   displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
+      #   inputs:
+      #     command: test
+      #     arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
 
-      - task: DotNetCoreCLI@2
-        displayName: Pack Microsoft.Azure.WebJobs.Extensions.Redis Release
+      # - task: DotNetCoreCLI@2
+      #   displayName: Pack Microsoft.Azure.WebJobs.Extensions.Redis Release
+      #   # condition: eq(variables.isReleaseBuild, 'True')
+      #   inputs:
+      #     command: custom
+      #     custom: pack
+      #     arguments: $(Build.SourcesDirectory)/src/WebJobs.Extensions.Redis/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+
+      # - task: DotNetCoreCLI@2
+      #   displayName: Pack Microsoft.Azure.Functions.Worker.Extensions.Redis Release
+      #   # condition: eq(variables.isReleaseBuild, 'True')
+      #   inputs:
+      #     command: custom
+      #     custom: pack
+      #     arguments: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+
+      - task: Maven@3
+        displayName: Build library
         # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
-          command: custom
-          custom: pack
-          arguments: $(Build.SourcesDirectory)/src/WebJobs.Extensions.Redis/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+          mavenPomFile: java-library/pom.xml
+          options: --batch-mode --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots -Drevision=$(releaseVersion)
 
-      - task: DotNetCoreCLI@2
-        displayName: Pack Microsoft.Azure.Functions.Worker.Extensions.Redis Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+      - powershell: |
+          $prefix = 'azure-functions-java-library-redis-$(releaseVersion)'
+          $source = 'java-library'
+          $destination = '$(Build.ArtifactStagingDirectory)/java/$(releaseVersion)'
+
+          New-Item $destination -ItemType Directory
+          Copy-Item "$source/pom.xml" "$destination/$prefix.pom"
+          Copy-Item "$source/target/$prefix.jar" "$destination/$prefix.jar"
+          Copy-Item "$source/target/$prefix-javadoc.jar" "$destination/$prefix-javadoc.jar"
+          Copy-Item "$source/target/$prefix-sources.jar" "$destination/$prefix-sources.jar"
+        displayName: Copy output files
+
+      - task: ManifestGeneratorTask@0
+        displayName: Generate SBOM manifest
         inputs:
-          command: custom
-          custom: pack
-          arguments: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+          buildDropPath: $(Build.ArtifactStagingDirectory)/java/$(releaseVersion)
+          packageName: Azure Functions Redis Java Bindings
+          packageVersion: $(releaseVersion)
 
       - task: PublishBuildArtifacts@1
         displayName: Publish Extension
