@@ -24,7 +24,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisStreamTriggerBinding(string connectionString, string key, TimeSpan pollingInterval, int messagesPerWorker, int count, bool deleteAfterProcess, ILogger logger)
+        public RedisStreamTriggerBinding(string connectionString, string key, TimeSpan pollingInterval, int messagesPerWorker, int count, bool deleteAfterProcess, Type parameterType, ILogger logger)
         {
             this.connectionString = connectionString;
             this.key = key;
