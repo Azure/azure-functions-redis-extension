@@ -56,7 +56,7 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.WebJobs.Extensions.Redis Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
@@ -64,7 +64,7 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.Functions.Worker.Extensions.Redis Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
@@ -72,7 +72,7 @@ jobs:
 
       - task: PublishBuildArtifacts@1
         displayName: Publish Extension
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
