@@ -48,7 +48,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string consumerGroup = RedisUtilities.ResolveString(nameResolver, attribute.ConsumerGroup, nameof(attribute.ConsumerGroup));
             bool deleteAfterProcess = attribute.DeleteAfterProcess;
 
-            return Task.FromResult<ITriggerBinding>(new RedisStreamTriggerBinding(connectionString, key, pollingInterval, messagesPerWorker, count, consumerGroup, deleteAfterProcess, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisStreamTriggerBinding(connectionString, key, pollingInterval, messagesPerWorker, count, consumerGroup, deleteAfterProcess, parameter.ParameterType, logger));
         }
     }
 }

@@ -72,8 +72,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private async Task ExecuteAsync(StreamEntry entry, CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            RedisStreamEntry triggerValue = new RedisStreamEntry(key, entry.Id, entry.Values.Select(a => new KeyValuePair<string, string>(a.Name.ToString(), a.Value.ToString())).ToArray());
-            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = triggerValue }, cancellationToken);
+            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = entry }, cancellationToken);
             
             RedisValue[] entryIds = new RedisValue[] { entry.Id };
             long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);

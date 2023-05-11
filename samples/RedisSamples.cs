@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Text.Json;
+using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
@@ -48,12 +47,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation(entry);
         }
 
-        [FunctionName(nameof(StreamsTrigger))]
-        public static void StreamsTrigger(
-            [RedisStreamTrigger(localhostSetting, "streamTest")] KeyValuePair<string, string>[] entry,
+        [FunctionName(nameof(StreamTrigger))]
+        public static void StreamTrigger(
+            [RedisStreamTrigger(localhostSetting, "streamTest")] string entry,
             ILogger logger)
         {
-            logger.LogInformation(JsonSerializer.Serialize(entry));
+            logger.LogInformation(entry);
         }
     }
 }

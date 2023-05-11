@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -80,6 +82,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 string msg = $@"Binding parameters to complex objects (such as '{destinationType.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
                 throw new InvalidOperationException(msg, e);
             }
+        }
+
+        internal static Dictionary<string, string> StreamEntryToDictionary(StreamEntry entry)
+        {
+            return entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
         }
     }
 }

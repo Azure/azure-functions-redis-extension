@@ -6,7 +6,7 @@ This repository contains the triggers and bindings to use in your [Azure Functio
 There are three triggers in the Azure Functions Redis Extension:
 - `RedisPubSubTrigger` triggers on [Redis pubsub messages](https://redis.io/docs/manual/pubsub/)
 - `RedisListTrigger` triggers on [Redis lists](https://redis.io/docs/data-types/lists/)
-- `RedisStreamsTrigger` triggers on [Redis streams](https://redis.io/docs/data-types/streams/)
+- `RedisStreamTrigger` triggers on [Redis streams](https://redis.io/docs/data-types/streams/)
 
 ## Getting Started
 1. [Set up an Azure Cache for Redis instance](https://learn.microsoft.com/azure/azure-cache-for-redis/quickstart-create-redis) or [install Redis locally](https://redis.io/download/).
@@ -109,10 +109,10 @@ public static void ListsTrigger(
 }
 ```
 
-### `RedisStreamsTrigger`
-The `RedisStreamsTrigger` pops elements from a stream and surfaces those elements to the function.
+### `RedisStreamTrigger`
+The `RedisStreamTrigger` reads elements from a stream and surfaces those elements to the function.
 The trigger polls Redis at a configurable fixed interval, and uses [`XREADGROUP`](https://redis.io/commands/xreadgroup/) to read elements from the stream.
-Each function creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
+Each functions worker creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
@@ -130,24 +130,26 @@ Each function creates a new random GUID to use as its consumer name within the g
   - Default: "AzureFunctionRedisExtension"
 
 #### Avaiable Output Types
-- `string`: The values contained within the entry as a list of JSON objects.
-  - `[{"name":"value"},{"name2":"value2"}]`
-- `KeyValuePair<string, string>[]`: The values contained within the entry as an array of KeyValuePairs.
-- `IReadOnlyDictionary<string, string>`: The values contained within the entry as an IReadOnlyDictionary.
-- `RedisStreamEntry`: This class wraps [`StreamEntry` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs).
-  - `string Key`: The stream key that the function was triggered on.
-  - `string Id`: The ID assigned to the entry.
-  - `KeyValuePair<string, string>[] Values`: The values contained within the entry.
+- [`StackExchange.Redis.StreamEntry`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs): The value returned by `StackExchange.Redis`.
+- `NameValueEntry[]`: The values contained within the entry as the underlying `StackExchange.Redis` type.
+- `Dictionary<string, string>`: The values contained within the entry as a Dictionary.
+- `string`, `byte[]`, `ReadOnlyMemory<byte>`: The stream entry serialized as JSON (UTF-8 encoded for byte types) in the following format:
+    ```
+    {"Id":"1658354934941-0","Values":{"field1":"value1","field2":"value2","field3":"value3"}}
+    ```
+- `Custom`: The trigger uses Json.NET serialization to map the values contained within the entry into the custom type.
+  This is done by first turning the values within the stream into a Dictionary, and then deserializing that Dictionary into the custom type.
 
 #### Sample
-The following sample polls the key "streamTest" at a Redis instance defined in local.settings.json at the key "redisConnectionStringSetting"
+The following sample polls the key `streamTest` at a Redis instance defined in _local.settings.json_ at the key `redisConnectionStringSetting`.
+More samples can be found in the [samples](samples/RedisSamples.cs) or in the [integration tests](test/Integration/RedisStreamTriggerTestFunctions.cs).
 ```c#
 [FunctionName(nameof(StreamsTrigger))]
 public static void StreamsTrigger(
-    [RedisStreamsTrigger("redisConnectionStringSetting", "streamTest")] RedisStreamEntry entry,
+    [RedisStreamTrigger("redisConnectionStringSetting", "streamTest")] string entry,
     ILogger logger)
 {
-    logger.LogInformation(JsonSerializer.Serialize(entry));
+    logger.LogInformation(entry);
 }
 ```
 
