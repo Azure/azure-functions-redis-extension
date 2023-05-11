@@ -54,17 +54,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 logger?.LogInformation($"{logPrefix} Connecting to Redis.");
                 multiplexer = await ConnectionMultiplexer.ConnectAsync(connectionString);
+                serverVersion = multiplexer.GetServers()[0].Version;
+                BeforePolling();
+                _ = Task.Run(() => Loop(cancellationToken));
             }
-
-            if (!multiplexer.IsConnected)
-            {
-                logger?.LogCritical($"{logPrefix} Failed to connect to cache.");
-                throw new ArgumentException("Failed to connect to cache.");
-            }
-
-            serverVersion = multiplexer.GetServers()[0].Version;
-            BeforePolling();
-            _ = Task.Run(() => Loop(cancellationToken));
         }
 
         /// <summary>
