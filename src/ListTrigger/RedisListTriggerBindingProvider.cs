@@ -47,7 +47,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             TimeSpan pollingInterval = TimeSpan.FromMilliseconds(attribute.PollingIntervalInMs);
             bool listPopFromBeginning = attribute.ListPopFromBeginning;
 
-            return Task.FromResult<ITriggerBinding>(new RedisListTriggerBinding(connectionString, key, pollingInterval, messagesPerWorker, count, listPopFromBeginning, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisListTriggerBinding(connectionString, key, pollingInterval, messagesPerWorker, count, listPopFromBeginning, parameter.ParameterType, logger));
         }
     }
 }

@@ -3,8 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -60,17 +58,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return value;
             }
-            if (destinationType.Equals(typeof(ReadOnlyMemory<byte>)))
+            if (destinationType.Equals(typeof(string)))
             {
-                return (ReadOnlyMemory<byte>)value;
+                return (string)value;
             }
             if (destinationType.Equals(typeof(byte[])))
             {
                 return (byte[])value;
             }
-            if (destinationType.Equals(typeof(string)))
+            if (destinationType.Equals(typeof(ReadOnlyMemory<byte>)))
             {
-                return (string)value;
+                return (ReadOnlyMemory<byte>)value;
             }
 
             try

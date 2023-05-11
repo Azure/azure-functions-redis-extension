@@ -5,7 +5,7 @@
 This repository contains the triggers and bindings to use in your [Azure Functions](https://learn.microsoft.com/azure/azure-functions/functions-get-started) and [WebJobs](https://learn.microsoft.com/azure/app-service/webjobs-sdk-how-to).
 There are three triggers in the Azure Functions Redis Extension:
 - `RedisPubSubTrigger` triggers on [Redis pubsub messages](https://redis.io/docs/manual/pubsub/)
-- `RedisListsTrigger` triggers on [Redis lists](https://redis.io/docs/data-types/lists/)
+- `RedisListTrigger` triggers on [Redis lists](https://redis.io/docs/data-types/lists/)
 - `RedisStreamsTrigger` triggers on [Redis streams](https://redis.io/docs/data-types/streams/)
 
 ## Getting Started
@@ -60,11 +60,8 @@ The `RedisPubSubTrigger` subscribes to a specific channel or channel pattern and
 
 #### Avaiable Output Types
 - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
-- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The message from the channel.
-- `string`: The message from the channel.
-- `byte[]`: The message from the channel.
-- `ReadOnlyMemory<byte>`: The message from the channel.
-- `Custom`: The trigger uses JSON.NET serialization to map the message from the channel into your custom type.
+- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs),`string`,`byte[]`,`ReadOnlyMemory<byte>`: The message from the channel.
+- `Custom`: The trigger uses JSON.NET serialization to map the message from the channel from a `string` into a custom type.
 
 #### Sample
 The following sample listens to the channel "pubsubTest". More samples can be found in the [samples](samples/RedisSamples.cs) or in the [integration tests](test/Integration/RedisPubSubTriggerTestFunctions.cs).
@@ -79,8 +76,8 @@ public static void PubSubTrigger(
 ```
 
 
-### `RedisListsTrigger`
-The `RedisListsTrigger` pops elements from a list and surfaces those elements to the function. The trigger polls Redis at a configurable fixed interval, and uses [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/)/[`LMPOP`](https://redis.io/commands/lmpop/) to pop elements from the lists.
+### `RedisListTrigger`
+The `RedisListTrigger` pops elements from a list and surfaces those elements to the function. The trigger polls Redis at a configurable fixed interval, and uses [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/)/[`LMPOP`](https://redis.io/commands/lmpop/) to pop elements from the lists.
 
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
@@ -97,20 +94,18 @@ The `RedisListsTrigger` pops elements from a list and surfaces those elements to
   - Default: true
 
 #### Avaiable Output Types
-- `string`: The list entry.
-- `RedisListEntry`: This class somewhat wraps [`ListPopResult` from StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/ListPopResult.cs).
-  - `string Key`: The list key that the function was triggered on.
-  - `string Element`: The list entry.
+- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs),`string`,`byte[]`,`ReadOnlyMemory<byte>`: The entry from the list.
+- `Custom`: The trigger uses JSON.NET serialization to map the entry from the list from a `string` into a custom type.
 
 #### Sample
 The following sample polls the key "listTest" at a Redis instance defined in local.settings.json at the key "redisConnectionStringSetting"
 ```c#
 [FunctionName(nameof(ListsTrigger))]
 public static void ListsTrigger(
-    [RedisListsTrigger("redisConnectionStringSetting", "listTest")] RedisListEntry entry,
+    [RedisListTrigger("redisConnectionStringSetting", "listTest")] string entry,
     ILogger logger)
 {
-    logger.LogInformation(JsonSerializer.Serialize(entry));
+    logger.LogInformation($"The entry pushed to the list listTest: '{entry}'");
 }
 ```
 
