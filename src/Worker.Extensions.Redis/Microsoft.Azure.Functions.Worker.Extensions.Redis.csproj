@@ -1,21 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>Microsoft.Azure.WebJobs.Extensions.Redis</AssemblyName>
-    <RootNamespace>Microsoft.Azure.WebJobs.Extensions.Redis</RootNamespace>
+    <AssemblyName>Microsoft.Azure.Functions.Worker.Extensions.Redis</AssemblyName>
+    <RootNamespace>Microsoft.Azure.Functions.Worker.Extensions.Redis</RootNamespace>
     <Version>0.0.0</Version>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-    <PackageId>Microsoft.Azure.WebJobs.Extensions.Redis</PackageId>
+    <PackageId>Microsoft.Azure.Functions.Worker.Extensions.Redis</PackageId>
     <Authors>Microsoft</Authors>
     <Company>Microsoft</Company>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
 
-    <Product>Redis Extension for Azure Functions</Product>
-    <Description>This package contains binding extensions for Redis.</Description>
+    <Product>Redis extension for .NET isolated Azure Functions.</Product>
+    <Description>Redis extension for .NET isolated Azure Functions.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/Azure/azure-functions-redis-extension</RepositoryUrl>
@@ -31,10 +31,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.37" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.104" />
-    <InternalsVisibleTo Include="Microsoft.Azure.WebJobs.Extensions.Redis.Tests" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Abstractions" Version="1.1.1" />
+    <InternalsVisibleTo Include="Microsoft.Azure.Worker.Functions.Extensions.Redis.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="Microsoft.Azure.Functions.Worker.Extensions.Abstractions.ExtensionInformationAttribute">
+      <_Parameter1>Microsoft.Azure.WebJobs.Extensions.Redis</_Parameter1>
+      <_Parameter2>$(Version)</_Parameter2>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>
