@@ -183,7 +183,7 @@ jobs:
 
       - powershell: |
           $prefix = 'azure-functions-java-library-redis-$(releaseVersion)'
-          $source = 'java-library'
+          $source = '$(Build.SourcesDirectory)/src/java-library'
           $destination = '$(Build.ArtifactStagingDirectory)/java/$(releaseVersion)'
 
           New-Item $destination -ItemType Directory
