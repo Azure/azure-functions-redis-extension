@@ -48,11 +48,11 @@ jobs:
           targetType: 'inline'
           script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
 
-      # - task: DotNetCoreCLI@2
-      #   displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
-      #   inputs:
-      #     command: test
-      #     arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
+      - task: DotNetCoreCLI@2
+        displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
+        inputs:
+          command: test
+          arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
 
       - task: DotNetCoreCLI@2
         displayName: Build Microsoft.Azure.WebJobs.Extensions.Redis Release
@@ -134,7 +134,7 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.WebJobs.Extensions.Redis Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
@@ -142,7 +142,7 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.Functions.Worker.Extensions.Redis Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
@@ -175,8 +175,8 @@ jobs:
             ]
 
       - task: Maven@3
-        displayName: Build library
-        # condition: eq(variables.isReleaseBuild, 'True')
+        displayName: Build Java Annotations
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           mavenPomFile: $(Build.SourcesDirectory)/src/java-library/pom.xml
           options: --batch-mode --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots -Drevision=$(releaseVersion)
@@ -191,20 +191,20 @@ jobs:
           Copy-Item "$source/target/$prefix.jar" "$destination/$prefix.jar"
           Copy-Item "$source/target/$prefix-javadoc.jar" "$destination/$prefix-javadoc.jar"
           Copy-Item "$source/target/$prefix-sources.jar" "$destination/$prefix-sources.jar"
-        displayName: Copy output files
-        # condition: eq(variables.isReleaseBuild, 'True')
+        displayName: Copy Java Annotations to staging directory
+        condition: eq(variables.isReleaseBuild, 'True')
 
       - task: ManifestGeneratorTask@0
         displayName: Generate SBOM manifest
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           buildDropPath: $(Build.ArtifactStagingDirectory)/java/$(releaseVersion)
           packageName: Azure Functions Redis Java Bindings
           packageVersion: $(releaseVersion)
 
       - task: PublishBuildArtifacts@1
-        displayName: Publish Extension
-        # condition: eq(variables.isReleaseBuild, 'True')
+        displayName: Publish Packages
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
