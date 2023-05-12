@@ -48,22 +48,22 @@ jobs:
           targetType: 'inline'
           script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
 
-      # - task: DotNetCoreCLI@2
-      #   displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
-      #   inputs:
-      #     command: test
-      #     arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
+      - task: DotNetCoreCLI@2
+        displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
+        inputs:
+          command: test
+          arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
 
       - task: DotNetCoreCLI@2
         displayName: Build Microsoft.Azure.WebJobs.Extensions.Redis Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: build
           arguments: $(Build.SourcesDirectory)/src/WebJobs.Extensions.Redis/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign Microsoft.Azure.WebJobs.Extensions.Redis.dll Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
           folderPath: $(Build.SourcesDirectory)/src/WebJobs.Extensions.Redis/bin/Release/netstandard2.0
@@ -95,14 +95,14 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Build Microsoft.Azure.Functions.Worker.Extensions.Redis Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: build
           arguments: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign Microsoft.Azure.Functions.Worker.Extensions.Redis.dll Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
           folderPath: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/bin/Release/netstandard2.0
@@ -134,7 +134,7 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.WebJobs.Extensions.Redis Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
@@ -142,7 +142,7 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.Functions.Worker.Extensions.Redis Release
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
@@ -150,7 +150,7 @@ jobs:
 
       - task: EsrpCodeSigning@2
         displayName: Sign NuGet Packages
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
           folderPath: $(Build.ArtifactStagingDirectory)
@@ -176,7 +176,7 @@ jobs:
 
       - task: PublishBuildArtifacts@1
         displayName: Publish Extension
-        # condition: eq(variables.isReleaseBuild, 'True')
+        condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
