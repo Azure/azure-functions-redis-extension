@@ -1,0 +1,16 @@
+{
+  "bindings": [
+    {
+      "type": "redisListTrigger",
+      "listPopFromBeginning": true,
+      "connectionStringSetting": "redisLocalhost",
+      "key": "listTest",
+      "pollingIntervalInMs": 1000,
+      "messagesPerWorker": 100,
+      "count": 10,
+      "name": "entry",
+      "direction": "in"
+    }
+  ],
+  "scriptFile": "__init__.py"
+}

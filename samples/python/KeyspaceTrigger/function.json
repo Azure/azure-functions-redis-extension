@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "type": "redisPubSubTrigger",
+      "connectionStringSetting": "redisLocalhost",
+      "channel": "__keyspace@0__:keyspaceTest",
+      "name": "message",
+      "direction": "in"
+    }
+  ],
+  "scriptFile": "__init__.py"
+}
