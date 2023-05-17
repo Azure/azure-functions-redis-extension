@@ -3,7 +3,7 @@
     {
       "type": "redisPubSubTrigger",
       "connectionStringSetting": "redisLocalhost",
-      "channel": "pubsubTest",
+      "channel": "__keyevent@0__:del",
       "name": "message",
       "direction": "in"
     }
