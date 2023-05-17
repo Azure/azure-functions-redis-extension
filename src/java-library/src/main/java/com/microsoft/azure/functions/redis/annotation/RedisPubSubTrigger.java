@@ -10,6 +10,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import com.microsoft.azure.functions.annotation.CustomBinding;
 
 /**
  * <p>
@@ -31,6 +32,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
+@CustomBinding(direction = "in", name = "", type = "redisPubSubTrigger")
 public @interface RedisPubSubTrigger {
     /**
      * The variable name used in function.json.

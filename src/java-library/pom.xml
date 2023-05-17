@@ -13,7 +13,7 @@
     <version>8.0.1</version>
   </parent>
 
-  <name>Microsoft Azure Functions Java Redis Types</name>
+  <name>Microsoft Azure Functions Java Redis Annotations</name>
   <description>This package contains Java annotations to interact with Azure Functions Redis Extension.</description>
 
   <properties>
