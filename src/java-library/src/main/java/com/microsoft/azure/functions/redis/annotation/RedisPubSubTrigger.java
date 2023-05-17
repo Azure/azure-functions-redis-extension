@@ -39,12 +39,6 @@ public @interface RedisPubSubTrigger {
     String name();
 
     /**
-     * Setting name for Redis connection string.
-     * @return Setting name for Redis connection string.
-     */
-    String connectionStringSetting() default "";
-
-    /**
      * <p>Defines how Functions runtime should treat the parameter value. Possible values are:</p>
      * <ul>
      *     <li>"": get the value as a string, and try to deserialize to actual parameter type like POJO</li>
@@ -54,6 +48,12 @@ public @interface RedisPubSubTrigger {
      * @return The dataType which will be used by the Functions runtime.
      */
     String dataType() default "";
+
+    /**
+     * Setting name for Redis connection string.
+     * @return Setting name for Redis connection string.
+     */
+    String connectionStringSetting();
 
     /**
      * Redis pubsub channel. Supports channel patterns.
