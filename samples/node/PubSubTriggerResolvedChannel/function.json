@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "type": "redisPubSubTrigger",
+      "connectionStringSetting": "redisLocalhost",
+      "channel": "%pubsubChannel%",
+      "name": "message",
+      "direction": "in"
+    }
+  ],
+  "scriptFile": "index.js"
+}

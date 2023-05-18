@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "type": "redisPubSubTrigger",
+      "connectionStringSetting": "redisLocalhost",
+      "channel": "__keyevent@0__:del",
+      "name": "message",
+      "direction": "in"
+    }
+  ],
+  "scriptFile": "__init__.py"
+}
