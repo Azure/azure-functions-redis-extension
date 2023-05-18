@@ -176,14 +176,14 @@ jobs:
 
       - task: Maven@3
         displayName: Build Java Annotations
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
-          mavenPomFile: $(Build.SourcesDirectory)/src/java-library/pom.xml
+          mavenPomFile: $(Build.SourcesDirectory)/src/azure-functions-java-library-redis/pom.xml
           options: --batch-mode --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots -Drevision=$(releaseVersion)
 
       - powershell: |
-          $prefix = 'azure-functions-java-library-redis-$(releaseVersion)'
-          $source = '$(Build.SourcesDirectory)/src/java-library'
+          $prefix = 'azure-functions-azure-functions-java-library-redis-redis-$(releaseVersion)'
+          $source = '$(Build.SourcesDirectory)/src/azure-functions-java-library-redis'
           $destination = '$(Build.ArtifactStagingDirectory)/java/$(releaseVersion)'
 
           New-Item $destination -ItemType Directory
@@ -192,11 +192,11 @@ jobs:
           Copy-Item "$source/target/$prefix-javadoc.jar" "$destination/$prefix-javadoc.jar"
           Copy-Item "$source/target/$prefix-sources.jar" "$destination/$prefix-sources.jar"
         displayName: Copy Java Annotations to staging directory
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
 
       - task: ManifestGeneratorTask@0
         displayName: Generate SBOM manifest
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           buildDropPath: $(Build.ArtifactStagingDirectory)/java/$(releaseVersion)
           packageName: Azure Functions Redis Java Bindings
@@ -204,7 +204,7 @@ jobs:
 
       - task: PublishBuildArtifacts@1
         displayName: Publish Packages
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
