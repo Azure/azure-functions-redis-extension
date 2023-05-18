@@ -56,17 +56,17 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Build Microsoft.Azure.WebJobs.Extensions.Redis Release
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: build
-          arguments: $(Build.SourcesDirectory)/src/WebJobs.Extensions.Redis/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=0.0.0
+          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign Microsoft.Azure.WebJobs.Extensions.Redis.dll Release
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
-          folderPath: $(Build.SourcesDirectory)/src/WebJobs.Extensions.Redis/bin/Release/netstandard2.0
+          folderPath: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis/bin/Release/netstandard2.0
           pattern: Microsoft.Azure.WebJobs.Extensions.Redis.dll
           signConfigType: inlineSignParams
           inlineOperation: |
@@ -95,14 +95,14 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Build Microsoft.Azure.Functions.Worker.Extensions.Redis Release
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: build
           arguments: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign Microsoft.Azure.Functions.Worker.Extensions.Redis.dll Release
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
           folderPath: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/bin/Release/netstandard2.0
@@ -134,15 +134,15 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.WebJobs.Extensions.Redis Release
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
-          arguments: $(Build.SourcesDirectory)/src/WebJobs.Extensions.Redis/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release --no-build -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis/Microsoft.Azure.WebJobs.Extensions.Redis.csproj --configuration Release --no-build -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
 
       - task: DotNetCoreCLI@2
         displayName: Pack Microsoft.Azure.Functions.Worker.Extensions.Redis Release
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: custom
           custom: pack
@@ -150,7 +150,7 @@ jobs:
 
       - task: EsrpCodeSigning@2
         displayName: Sign NuGet Packages
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
           folderPath: $(Build.ArtifactStagingDirectory)
@@ -176,7 +176,7 @@ jobs:
 
       - task: Maven@3
         displayName: Build Java Annotations
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           mavenPomFile: $(Build.SourcesDirectory)/src/azure-functions-java-library-redis/pom.xml
           options: --batch-mode --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots -Drevision=$(releaseVersion)
@@ -192,11 +192,11 @@ jobs:
           Copy-Item "$source/target/$prefix-javadoc.jar" "$destination/$prefix-javadoc.jar"
           Copy-Item "$source/target/$prefix-sources.jar" "$destination/$prefix-sources.jar"
         displayName: Copy Java Annotations to staging directory
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
 
       - task: ManifestGeneratorTask@0
         displayName: Generate SBOM manifest
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           buildDropPath: $(Build.ArtifactStagingDirectory)/java/$(releaseVersion)
           packageName: Azure Functions Redis Java Bindings
@@ -204,7 +204,7 @@ jobs:
 
       - task: PublishBuildArtifacts@1
         displayName: Publish Packages
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'
