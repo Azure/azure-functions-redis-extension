@@ -78,7 +78,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     await multiplexer.GetDatabase().StreamAddAsync(functionName, nameValueEntries);
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(count / 10));
+                await Task.Delay(TimeSpan.FromSeconds(count / 5));
 
                 await multiplexer.CloseAsync();
                 functionsProcess1.Kill();
