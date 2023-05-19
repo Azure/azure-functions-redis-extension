@@ -15,15 +15,14 @@ trigger:
 variables:
   # It is a release build if it is triggered by the main branch.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
-  ${{ if variables['isReleaseBuild'] }}:
-    majorVersion: 0
-    minorVersion: 2
-    majorMinorVersion: $[ format('{0}.{1}', variables['majorVersion'], variables['minorVersion']) ]
-    fullVersion: $[ format('{0}.{1}', variables['majorMinorVersion'], counter(variables['majorMinorVersion'], 0)) ]
-    ${{ if parameters['previewBuild'] }}:
-      releaseVersion: $[ format('{0}-{1}', variables['fullVersion'], 'preview') ]
-    ${{ else }}:
-      releaseVersion: fullVersion
+  majorVersion: 0
+  minorVersion: 3
+  patchVersion: $[ counter(format('{0}.{1}-{2}', variables['majorVersion'], variables['minorVersion'], variables['isReleaseBuild']), 0) ]
+  fullVersion: $[ format('{0}.{1}.{2}', variables['majorMinorVersion'], variables['patchVersion'] ]
+  ${{ if parameters['previewBuild'] }}:
+    releaseVersion: $[ format('{0}-{1}', variables['fullVersion'], 'preview') ]
+  ${{ else }}:
+    releaseVersion: fullVersion
 
 jobs:
   - job: Extension
