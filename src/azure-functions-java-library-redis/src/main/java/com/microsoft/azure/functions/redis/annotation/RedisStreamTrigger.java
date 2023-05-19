@@ -14,7 +14,7 @@ import com.microsoft.azure.functions.annotation.CustomBinding;
 
 /**
  * <p>
- * Java annotation used to bind a parameter to Redis stream entry.
+ * Java annotation used to bind a parameter to a Redis stream entry.
  * </p>
  *
  * <p>
@@ -86,8 +86,8 @@ public @interface RedisStreamTrigger {
     int count() default 10;
 
     /**
-     * If the listener will delete the stream entries after the function runs.
-     * @return If the listener will delete the stream entries after the function runs.
+     * Whether the listener will delete the stream entries after the function runs.
+     * @return Whether the listener will delete the stream entries after the function runs.
      */
     boolean deleteAfterProcess() default false;
 }

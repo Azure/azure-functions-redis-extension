@@ -14,7 +14,7 @@ import com.microsoft.azure.functions.annotation.CustomBinding;
 
 /**
  * <p>
- * Java annotation used to bind a parameter to Redis list entry.
+ * Java annotation used to bind a parameter to a Redis list entry.
  * </p>
  *
  * <p>

@@ -14,7 +14,7 @@ import com.microsoft.azure.functions.annotation.CustomBinding;
 
 /**
  * <p>
- * Java annotation used to bind a parameter to Redis pubsub message.
+ * Java annotation used to bind a parameter to a Redis pub/sub message.
  * </p>
  *
  * <p>
