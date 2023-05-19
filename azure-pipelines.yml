@@ -98,14 +98,14 @@ jobs:
         # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: build
-          arguments: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion)
+          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.Functions.Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign Microsoft.Azure.Functions.Worker.Extensions.Redis.dll Release
         # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
-          folderPath: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/bin/Release/netstandard2.0
+          folderPath: $(Build.SourcesDirectory)/src/Microsoft.Azure.Functions.Worker.Extensions.Redis/bin/Release/netstandard2.0
           pattern: Microsoft.Azure.Functions.Worker.Extensions.Redis.dll
           signConfigType: inlineSignParams
           inlineOperation: |
@@ -146,7 +146,7 @@ jobs:
         inputs:
           command: custom
           custom: pack
-          arguments: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release --no-build -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.Functions.Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release --no-build -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign NuGet Packages
