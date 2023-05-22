@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32505.426
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis", "src\WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj", "{56770F4A-A42C-48E6-B616-BCEA1832D412}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis.Samples", "samples\dotnet\Microsoft.Azure.WebJobs.Extensions.Redis.Samples.csproj", "{287FA4E2-FABB-4E53-B3C0-B920A594E9C2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis.Tests", "test\dotnet\Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj", "{0EF5AB9B-DB6A-4992-AA3F-F0A1BD18010D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.Worker.Extensions.Redis", "src\Worker.Extensions.Redis\Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj", "{08B92018-7703-408C-96FF-22A029D94BE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.Worker.Extensions.Redis", "src\Microsoft.Azure.Functions.Worker.Extensions.Redis\Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj", "{D52E32D7-FB14-4952-AA6E-D16399139E4A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis", "src\Microsoft.Azure.WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj", "{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{56770F4A-A42C-48E6-B616-BCEA1832D412}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56770F4A-A42C-48E6-B616-BCEA1832D412}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56770F4A-A42C-48E6-B616-BCEA1832D412}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56770F4A-A42C-48E6-B616-BCEA1832D412}.Release|Any CPU.Build.0 = Release|Any CPU
 		{287FA4E2-FABB-4E53-B3C0-B920A594E9C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{287FA4E2-FABB-4E53-B3C0-B920A594E9C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{287FA4E2-FABB-4E53-B3C0-B920A594E9C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -29,10 +25,14 @@ Global
 		{0EF5AB9B-DB6A-4992-AA3F-F0A1BD18010D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EF5AB9B-DB6A-4992-AA3F-F0A1BD18010D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EF5AB9B-DB6A-4992-AA3F-F0A1BD18010D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{08B92018-7703-408C-96FF-22A029D94BE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{08B92018-7703-408C-96FF-22A029D94BE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{08B92018-7703-408C-96FF-22A029D94BE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{08B92018-7703-408C-96FF-22A029D94BE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D52E32D7-FB14-4952-AA6E-D16399139E4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D52E32D7-FB14-4952-AA6E-D16399139E4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D52E32D7-FB14-4952-AA6E-D16399139E4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D52E32D7-FB14-4952-AA6E-D16399139E4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
