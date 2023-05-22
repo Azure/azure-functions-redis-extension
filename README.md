@@ -22,7 +22,7 @@ See the following docs for details on setup and samples of the Redis triggers:
 The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces messages received to the function.
 
 > **Note**
-> This trigger is only available on the [Premium plan](https://learn.microsoft.com/azure/azure-functions/premium-plan) and [Dedicated plan](https://learn.microsoft.com/en-us/azure/azure-functions/dedicated-plan) because Redis pub/sub requires clients to always be actively listening to receive all messages.
+> This trigger is only available on the [Premium plan](https://learn.microsoft.com/azure/azure-functions/premium-plan) and [Dedicated plan](https://learn.microsoft.com/azure/azure-functions/dedicated-plan) because Redis pub/sub requires clients to always be actively listening to receive all messages.
 > There is a chance your function may miss messages on a consumption plan.
 
 > **Note**
@@ -68,7 +68,7 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
 - `Count`: Number of entries to pop from Redis at one time. These are processed in parallel.
   - Default: `10`
   - Only supported on Redis 6.2+ using the `COUNT` argument in [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/).
-- `ListPopFromBeginning`: determines whether to pop elements from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop elements from the end using [`RPOP`](https://redis.io/commands/rpop/).
+- `ListPopFromBeginning`: determines whether to pop entries from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop entries from the end using [`RPOP`](https://redis.io/commands/rpop/).
   - Default: `true`
 
 #### Avaiable Output Types

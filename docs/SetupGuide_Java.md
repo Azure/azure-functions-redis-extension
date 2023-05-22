@@ -1,13 +1,13 @@
 ## Setup Function Project
-1. Follow the [Configure your local environment](https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-java#configure-your-environment) instructions for java.
-1. Install the [.NET SDK](https://aka.ms/dotnet-download)
-1. Create a java function project with `mvn archetype:generate -DarchetypeGroupId=com.microsoft.azure -DarchetypeArtifactId=azure-functions-archetype -DjavaVersion=8`
+1. Follow the [Configure your local environment](https://learn.microsoft.com/azure/azure-functions/create-first-function-vs-code-java#configure-your-environment) instructions for java.
+2. Install the [.NET SDK](https://aka.ms/dotnet-download)
+3. Create a java function project with `mvn archetype:generate -DarchetypeGroupId=com.microsoft.azure -DarchetypeArtifactId=azure-functions-archetype -DjavaVersion=8`
    - Remove the `test` folder for now.
-1. Install the Redis Extension (manually for now, while the extension has not a part of the extension bundle)
+4. Install the Redis Extension (manually for now, while the extension has not a part of the Microsoft.Azure.Functions.ExtensionBundle)
    1. Remove `extensionBundle` from `host.json`
-   1. Run `func extensions install --package Microsoft.Azure.WebJobs.Extensions.Redis --version <version>`
+   2. Run `func extensions install --package Microsoft.Azure.WebJobs.Extensions.Redis --version <version>`
       - `<version>` should be the latest version of the extension from [NuGet](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.Redis)
-   1. Add the java library for Redis bindings to the pom.xml file:
+   3. Add the java library for Redis bindings to the pom.xml file:
       ```xml
       <dependency>
         <groupId>com.microsoft.azure.functions</groupId>
@@ -15,7 +15,7 @@
         <version>[0.0.0,)</version>
       </dependency>
       ```
-1. Replace the existing `Function.java` file with the following code:
+5. Replace the existing `Function.java` file with the following code:
     ```java
     import com.microsoft.azure.functions.*;
     import com.microsoft.azure.functions.annotation.*;

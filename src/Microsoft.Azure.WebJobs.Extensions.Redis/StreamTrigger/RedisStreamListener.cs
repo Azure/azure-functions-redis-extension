@@ -65,7 +65,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             IDatabase db = multiplexer.GetDatabase();
             StreamEntry[] entries = await db.StreamReadGroupAsync(key, consumerGroup, consumerName, count: count);
-            logger?.LogDebug($"{logPrefix} Received {entries.Length} elements from the stream at key '{key}'.");
+            logger?.LogDebug($"{logPrefix} Received {entries.Length} entries from the stream at key '{key}'.");
             await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, cancellationToken)));
         }
 
@@ -73,15 +73,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             IDatabase db = multiplexer.GetDatabase();
             await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = entry }, cancellationToken);
-            
+
             RedisValue[] entryIds = new RedisValue[] { entry.Id };
             long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
-            logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} elements from the stream at key '{key}'.");
+            logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
 
             if (deleteAfterProcess)
             {
                 long deleted = await db.StreamDeleteAsync(key, entryIds);
-                logger?.LogDebug($"{logPrefix} Deleted {deleted} elements from the stream at key '{key}'.");
+                logger?.LogDebug($"{logPrefix} Deleted {deleted} entries from the stream at key '{key}'.");
             }
         }
 

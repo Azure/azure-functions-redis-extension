@@ -30,7 +30,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (serverVersion < RedisUtilities.Version62 && count > 1)
             {
-                logger?.LogWarning($"{logPrefix} The cache's version ({serverVersion}) is lower than 6.2 and does not support the COUNT argument in lpop/rpop. Defaulting to lpop/rpop without the COUNT argument, which pulls a single element from the list at a time.");
+                logger?.LogWarning($"{logPrefix} The cache's version ({serverVersion}) is lower than 6.2 and does not support the COUNT argument in lpop/rpop. Defaulting to lpop/rpop without the COUNT argument, which pulls a single entry from the list at a time.");
             }
         }
 
@@ -40,13 +40,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (serverVersion >= RedisUtilities.Version62)
             {
                 RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(key, count) : await db.ListRightPopAsync(key, count);
-                logger?.LogDebug($"{logPrefix} Received {result.Length} elements from the list at key '{key}'.");
+                logger?.LogDebug($"{logPrefix} Received {result.Length} entries from the list at key '{key}'.");
                 await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
             }
             else
             {
                 RedisValue value = listPopFromBeginning ? await db.ListLeftPopAsync(key) : await db.ListRightPopAsync(key);
-                logger?.LogDebug($"{logPrefix} Received 1 element from the list at key '{key}'.");
+                logger?.LogDebug($"{logPrefix} Received 1 entry from the list at key '{key}'.");
                 if (!value.IsNullOrEmpty)
                 {
                     await ExecuteAsync(value, cancellationToken);
