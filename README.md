@@ -9,23 +9,13 @@ There are three triggers in this extension:
 - `RedisStreamTrigger` triggers on [Redis stream entries](https://redis.io/docs/data-types/streams/)
 
 ## Getting Started
-1. [Set up an Azure Cache for Redis instance](https://learn.microsoft.com/azure/azure-cache-for-redis/quickstart-create-redis) or [install Redis locally](https://redis.io/download/).
-2. Install the [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local).
-3. Create a function:
-    ```cmd
-    mkdir RedisFunctions
-    cd RedisFunctions
-    func init --worker-runtime <language>
-    ```
-4. Install the Redis Extension (while the extension has not yet been added to the bundle)
-   - dotnet:
-     1. `dotnet add package Microsoft.Azure.WebJobs.Extensions.Redis --prerelease`
-   - dotnet-isolated:
-     1. Run `dotnet add package Microsoft.Azure.Functions.Worker.Extensions.Redis --prerelease`
-     2. Run `func extensions install --package Microsoft.Azure.WebJobs.Extensions.Redis --version <version>`
-   - all others:
-     1. Remove `extensionBundle` from `host.json`
-     2. Run `func extensions install --package Microsoft.Azure.WebJobs.Extensions.Redis --version <version>`
+See the following docs for details on setup and samples of the Redis triggers:
+- [Dotnet (c# in-process)](docs/SetupGuide_Dotnet.md)
+- [Dotnet-Isolated (c# out-of-process)](docs/SetupGuide_DotnetIsolated.md)
+- [Java](docs/SetupGuide_Java.md)
+- [Python](docs/SetupGuide_Python.md)
+- [Javascript](docs/SetupGuide_Javascript.md)
+- [Powershell](docs/SetupGuide_Powershell.md)
 
 ## Usage
 ### `RedisPubSubTrigger`
