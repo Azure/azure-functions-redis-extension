@@ -7,7 +7,7 @@
     cd RedisFunctions
     func init --worker-runtime python
     ```
-4. Install the Redis Extension (manually for now, while the extension has not a part of the Microsoft.Azure.Functions.ExtensionBundle)
+4. Install the Redis Extension (manually for now, while the extension has not been added to the Microsoft.Azure.Functions.ExtensionBundle)
    1. Remove `extensionBundle` from `host.json`
    2. Run `func extensions install --package Microsoft.Azure.WebJobs.Extensions.Redis --version <version>`
       - `<version>` should be the latest version of the extension from [NuGet](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.Redis)

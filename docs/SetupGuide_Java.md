@@ -3,7 +3,7 @@
 2. Install the [.NET SDK](https://aka.ms/dotnet-download)
 3. Create a java function project with `mvn archetype:generate -DarchetypeGroupId=com.microsoft.azure -DarchetypeArtifactId=azure-functions-archetype -DjavaVersion=8`
    - Remove the `test` folder for now.
-4. Install the Redis Extension (manually for now, while the extension has not a part of the Microsoft.Azure.Functions.ExtensionBundle)
+4. Install the Redis Extension (manually for now, while the extension has not been added to the Microsoft.Azure.Functions.ExtensionBundle)
    1. Remove `extensionBundle` from `host.json`
    2. Run `func extensions install --package Microsoft.Azure.WebJobs.Extensions.Redis --version <version>`
       - `<version>` should be the latest version of the extension from [NuGet](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.Redis)
