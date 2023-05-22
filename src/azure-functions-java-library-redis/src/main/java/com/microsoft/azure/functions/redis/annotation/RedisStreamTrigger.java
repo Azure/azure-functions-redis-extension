@@ -73,15 +73,15 @@ public @interface RedisStreamTrigger {
      * How many messages each functions worker should process.
      * Used to determine how many workers the function should scale to.
      * For example, if the messagesPerWorker is 10,
-     * and there are 1500 elements remaining in the list,
+     * and there are 1500 entries remaining in the list,
      * the functions host will attempt to scale up to 150 instances.
      * @return How many messages each functions worker should process.
      */
     int messagesPerWorker() default 100;
 
     /**
-     * Number of elements to pull from Redis at one time.
-     * @return Number of elements to pull from Redis at one time.
+     * Number of entries to pull from Redis at one time.
+     * @return Number of entries to pull from Redis at one time.
      */
     int count() default 10;
 
