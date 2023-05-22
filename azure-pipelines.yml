@@ -18,7 +18,7 @@ variables:
   majorVersion: 0
   minorVersion: 3
   patchVersion: $[ counter(format('{0}.{1}-{2}', variables['majorVersion'], variables['minorVersion'], variables['isReleaseBuild']), 0) ]
-  fullVersion: $[ format('{0}.{1}.{2}', variables['majorVersion'], variables['minorVersion'], variables['patchVersion'] ]
+  fullVersion: $[ format('{0}.{1}.{2}', variables['majorVersion'], variables['minorVersion'], variables['patchVersion']) ]
   ${{ if parameters['previewBuild'] }}:
     releaseVersion: $[ format('{0}-{1}', variables['fullVersion'], 'preview') ]
   ${{ else }}:
