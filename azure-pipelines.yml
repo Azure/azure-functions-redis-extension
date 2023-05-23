@@ -185,7 +185,7 @@ jobs:
         displayName: Build Java Annotations
         # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
-          mavenPomFile: $(Build.SourcesDirectory)/src/azure-functions-java-library-redis/poxmlm.
+          mavenPomFile: $(Build.SourcesDirectory)/src/azure-functions-java-library-redis/pom.xml
           options: --batch-mode --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots
 
       - powershell: |
