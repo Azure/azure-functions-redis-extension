@@ -1,7 +1,7 @@
 ## Setup Function Project
-1. Follow the [Configure your local environment](https://learn.microsoft.com/azure/azure-functions/create-first-function-cli-node?pivots=nodejs-model-v4&tabs=azure-cli%2Cbrowser#configure-your-local-environment) instructions for Javascript.
+1. Follow the [Configure your local environment](https://learn.microsoft.com/azure/azure-functions/create-first-function-cli-node?pivots=nodejs-model-v4&tabs=azure-cli%2Cbrowser#configure-your-local-environment) instructions for JavaScript.
 2. Install the [.NET SDK](https://aka.ms/dotnet-download)
-3. Create a node function project with the following commands:
+3. Create a Node.js function project with the following commands:
    ```
     mkdir RedisFunctions
     cd RedisFunctions
@@ -19,7 +19,7 @@
      "bindings": [
        {
          "type": "redisPubSubTrigger",
-         "connectionStringSetting": "redisLocalhost",
+         "connectionStringSetting": "Redis",
          "channel": "pubsubTest",
          "name": "message",
          "direction": "in"
@@ -32,7 +32,7 @@
    `index.js`:
    ```js
    module.exports = async function (context, entry) {
-      context.log('Javascript function triggered on pubsub message \'' + message + '\' from channel \'pubsubTest\'.');
+      context.log('JavaScript function triggered on pub/sub message \'' + message + '\' from channel \'pubsubTest\'.');
    }
    ```
 
@@ -56,9 +56,9 @@
    ```
    func start
    ```
-1. Connect to your redis cache using [redis-cli](https://redis.io/docs/ui/cli/), [RedisInsight](https://redis.com/redis-enterprise/redis-insight/) or some other redis client.
+1. Connect to your Redis cache using [redis-cli](https://redis.io/docs/ui/cli/), [RedisInsight](https://redis.com/redis-enterprise/redis-insight/) or some other Redis client.
 1. Publish a message to the channel `pubsubTest`:
    ```
-   publish pubsubTest testing
+   PUBLISH pubsubTest testing
    ```
 1. Your function should trigger!

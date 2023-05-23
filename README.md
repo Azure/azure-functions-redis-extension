@@ -10,12 +10,12 @@ There are three triggers in this extension:
 
 ## Getting Started
 See the following docs for details on setup and samples of the Redis triggers:
-- [Dotnet (c# in-process)](docs/SetupGuide_Dotnet.md)
-- [Dotnet-Isolated (c# out-of-process)](docs/SetupGuide_DotnetIsolated.md)
+- [C# (in-process)](docs/SetupGuide_Dotnet.md)
+- [C# (out-of-process)](docs/SetupGuide_DotnetIsolated.md)
 - [Java](docs/SetupGuide_Java.md)
 - [Python](docs/SetupGuide_Python.md)
-- [Javascript](docs/SetupGuide_Javascript.md)
-- [Powershell](docs/SetupGuide_Powershell.md)
+- [JavaScript](docs/SetupGuide_JavaScript.md)
+- [PowerShell](docs/SetupGuide_PowerShell.md)
 
 ## Usage
 ### `RedisPubSubTrigger`
@@ -30,7 +30,7 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
 > Each instance will trigger on each message from the channel, resulting in duplicate processing.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Channel`: pubsub channel that the trigger should listen to.
   - Supports channel patterns.
   - This field can be resolved using `INameResolver`.
@@ -46,7 +46,7 @@ More samples can be found in the [samples](samples/dotnet/RedisSamples.cs) or in
 ```c#
 [FunctionName(nameof(PubSubTrigger))]
 public static void PubSubTrigger(
-    [RedisPubSubTrigger("redisConnectionStringSetting", "pubsubTest")] string message,
+    [RedisPubSubTrigger("Redis", "pubsubTest")] string message,
     ILogger logger)
 {
     logger.LogInformation($"The message broadcast to channel pubsubTest: '{message}'");
@@ -58,7 +58,7 @@ public static void PubSubTrigger(
 The `RedisListTrigger` pops entries from a list and surfaces those entries to the function. The trigger polls Redis at a configurable fixed interval, and uses [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/) to pop entries from the lists.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Key`: Key to read from.
   - This field can be resolved using `INameResolver`.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
@@ -81,7 +81,7 @@ More samples can be found in the [samples](samples/dotnet/RedisSamples.cs) or in
 ```c#
 [FunctionName(nameof(ListsTrigger))]
 public static void ListsTrigger(
-    [RedisListTrigger("redisConnectionStringSetting", "listTest")] string entry,
+    [RedisListTrigger("Redis", "listTest")] string entry,
     ILogger logger)
 {
     logger.LogInformation($"The entry pushed to the list listTest: '{entry}'");
@@ -95,7 +95,7 @@ The consumer group for all function instances will be the ID of the function (eg
 Each functions instance creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Key`: Key to read from.
   - This field can be resolved using `INameResolver`.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
@@ -122,7 +122,7 @@ More samples can be found in the [samples](samples/dotnet/RedisSamples.cs) or in
 ```c#
 [FunctionName(nameof(StreamsTrigger))]
 public static void StreamsTrigger(
-    [RedisStreamTrigger("redisConnectionStringSetting", "streamTest")] string entry,
+    [RedisStreamTrigger("Redis", "streamTest")] string entry,
     ILogger logger)
 {
     logger.LogInformation($"The entry pushed to the list listTest: '{entry}'");

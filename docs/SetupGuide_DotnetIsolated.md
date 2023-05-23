@@ -30,7 +30,7 @@
         public void Run(
         [RedisPubSubTrigger("Redis", "pubsubTest")] string message)
         {
-        logger.LogInformation($".Net out-of-process function triggered on pubsub message '{message}' from channel 'pubsubTest'.");
+        logger.LogInformation($".NET out-of-process function triggered on pub/sub message '{message}' from channel 'pubsubTest'.");
         }
     }
     ```
@@ -55,10 +55,10 @@
    ```
    func start
    ```
-1. Connect to your redis cache using [redis-cli](https://redis.io/docs/ui/cli/), [RedisInsight](https://redis.com/redis-enterprise/redis-insight/) or some other redis client.
+1. Connect to your Redis cache using [redis-cli](https://redis.io/docs/ui/cli/), [RedisInsight](https://redis.com/redis-enterprise/redis-insight/) or some other Redis client.
 1. Publish a message to the channel `pubsubTest`:
    ```
-   publish pubsubTest testing
+   PUBLISH pubsubTest testing
    ```
 1. Your function should trigger!
 

@@ -19,7 +19,7 @@
      "bindings": [
        {
          "type": "redisPubSubTrigger",
-         "connectionStringSetting": "redisLocalhost",
+         "connectionStringSetting": "Redis",
          "channel": "pubsubTest",
          "name": "message",
          "direction": "in"
@@ -34,7 +34,7 @@
    import logging
 
    def main(message: str):
-       logging.info("Python function triggered on pubsub message '" + message + "' from channel 'pubsubTest'.")
+       logging.info("Python function triggered on pub/sub message '" + message + "' from channel 'pubsubTest'.")
    ```
 
 ## Setup Redis Cache
@@ -57,9 +57,9 @@
    ```
    func start
    ```
-1. Connect to your redis cache using [redis-cli](https://redis.io/docs/ui/cli/), [RedisInsight](https://redis.com/redis-enterprise/redis-insight/) or some other redis client.
+1. Connect to your Redis cache using [redis-cli](https://redis.io/docs/ui/cli/), [RedisInsight](https://redis.com/redis-enterprise/redis-insight/) or some other Redis client.
 1. Publish a message to the channel `pubsubTest`:
    ```
-   publish pubsubTest testing
+   PUBLISH pubsubTest testing
    ```
 1. Your function should trigger!
