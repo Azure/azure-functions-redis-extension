@@ -1,7 +1,7 @@
 ## Setup Function Project
 1. Follow the [Configure your local environment](https://learn.microsoft.com/azure/azure-functions/create-first-function-cli-python?pivots=python-mode-configuration&tabs=azure-cli%2Cbash#configure-your-local-environment) instructions for python.
 2. Install the [.NET SDK](https://aka.ms/dotnet-download)
-3. Create a python function project with the following commands:
+3. Create a Python function project with the following commands:
    ```
     mkdir RedisFunctions
     cd RedisFunctions

@@ -1,5 +1,5 @@
 ## Setup Function Project
-1. Follow the [Configure your local environment](https://learn.microsoft.com/azure/azure-functions/create-first-function-vs-code-java#configure-your-environment) instructions for java.
+1. Follow the [Configure your local environment](https://learn.microsoft.com/azure/azure-functions/create-first-function-vs-code-java#configure-your-environment) instructions for Java.
 1. Install the [.NET SDK](https://aka.ms/dotnet-download)
 1. Create a Java function project with `mvn archetype:generate -DarchetypeGroupId=com.microsoft.azure -DarchetypeArtifactId=azure-functions-archetype -DjavaVersion=8`
 1. Remove the `test` folder for now.
