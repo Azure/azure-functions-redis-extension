@@ -1,17 +1,17 @@
 ## Setup Function Project
 1. Follow the [Configure your local environment](https://learn.microsoft.com/azure/azure-functions/create-first-function-cli-python?pivots=python-mode-configuration&tabs=azure-cli%2Cbash#configure-your-local-environment) instructions for python.
-2. Install the [.NET SDK](https://aka.ms/dotnet-download)
-3. Create a Python function project with the following commands:
+1. Install the [.NET SDK](https://aka.ms/dotnet-download)
+1. Create a Python function project with the following commands:
    ```
     mkdir RedisFunctions
     cd RedisFunctions
     func init --worker-runtime python
     ```
-4. Install the Redis Extension (manually for now, while the extension has not been added to the Microsoft.Azure.Functions.ExtensionBundle)
+1. Install the Redis Extension (manually for now, while the extension has not been added to the Microsoft.Azure.Functions.ExtensionBundle)
    1. Remove `extensionBundle` from `host.json`
-   2. Run `func extensions install --package Microsoft.Azure.WebJobs.Extensions.Redis --version <version>`
+   1. Run `func extensions install --package Microsoft.Azure.WebJobs.Extensions.Redis --version <version>`
       - `<version>` should be the latest version of the extension from [NuGet](https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.Redis)
-5. Create a folder `PubSubTrigger`, and add the following two files into the folder:
+1. Create a folder `PubSubTrigger`, and add the following two files into the folder:
 
    `function.json`:
    ```json
