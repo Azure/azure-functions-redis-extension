@@ -174,11 +174,19 @@ jobs:
             ]
 
       - task: Maven@3
+        displayName: Set library version
+        condition: eq(variables.isReleaseBuild, 'True')
+        inputs:
+          mavenPomFile: $(Build.SourcesDirectory)/src/azure-functions-java-library-redis/pom.xml
+          goals: versions:set
+          options: --batch-mode --define=newVersion=$(releaseVersion) --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots
+
+      - task: Maven@3
         displayName: Build Java Annotations
         condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           mavenPomFile: $(Build.SourcesDirectory)/src/azure-functions-java-library-redis/pom.xml
-          options: --batch-mode --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots -Drevision=$(releaseVersion)
+          options: --batch-mode --define=org.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --update-snapshots
 
       - powershell: |
           $prefix = 'azure-functions-java-library-redis-$(releaseVersion)'
