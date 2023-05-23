@@ -15,15 +15,14 @@ trigger:
 variables:
   # It is a release build if it is triggered by the main branch.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
-  ${{ if variables['isReleaseBuild'] }}:
-    majorVersion: 0
-    minorVersion: 2
-    majorMinorVersion: $[ format('{0}.{1}', variables['majorVersion'], variables['minorVersion']) ]
-    fullVersion: $[ format('{0}.{1}', variables['majorMinorVersion'], counter(variables['majorMinorVersion'], 0)) ]
-    ${{ if parameters['previewBuild'] }}:
-      releaseVersion: $[ format('{0}-{1}', variables['fullVersion'], 'preview') ]
-    ${{ else }}:
-      releaseVersion: fullVersion
+  majorVersion: 0
+  minorVersion: 3
+  patchVersion: $[ counter(format('{0}.{1}-{2}', variables['majorVersion'], variables['minorVersion'], variables['isReleaseBuild']), 0) ]
+  fullVersion: $[ format('{0}.{1}.{2}', variables['majorVersion'], variables['minorVersion'], variables['patchVersion']) ]
+  ${{ if parameters['previewBuild'] }}:
+    releaseVersion: $[ format('{0}-{1}', variables['fullVersion'], 'preview') ]
+  ${{ else }}:
+    releaseVersion: fullVersion
 
 jobs:
   - job: Extension
@@ -98,14 +97,14 @@ jobs:
         condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           command: build
-          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.Functions.Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion)
+          arguments: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release -property:Version=$(releaseVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign Microsoft.Azure.Functions.Worker.Extensions.Redis.dll Release
         condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           connectedServiceName: 'redis-codesign'
-          folderPath: $(Build.SourcesDirectory)/src/Microsoft.Azure.Functions.Worker.Extensions.Redis/bin/Release/netstandard2.0
+          folderPath: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/bin/Release/netstandard2.0
           pattern: Microsoft.Azure.Functions.Worker.Extensions.Redis.dll
           signConfigType: inlineSignParams
           inlineOperation: |
@@ -146,7 +145,7 @@ jobs:
         inputs:
           command: custom
           custom: pack
-          arguments: $(Build.SourcesDirectory)/src/Microsoft.Azure.Functions.Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release --no-build -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
+          arguments: $(Build.SourcesDirectory)/src/Worker.Extensions.Redis/Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj --configuration Release --no-build -property:Version=$(releaseVersion) --output $(Build.ArtifactStagingDirectory)/dotnet/$(releaseVersion)
 
       - task: EsrpCodeSigning@2
         displayName: Sign NuGet Packages
@@ -204,7 +203,7 @@ jobs:
 
       - task: PublishBuildArtifacts@1
         displayName: Publish Extension
-        condition: eq(variables.isReleaseBuild, 'True')
+        # condition: eq(variables.isReleaseBuild, 'True')
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: 'drop'

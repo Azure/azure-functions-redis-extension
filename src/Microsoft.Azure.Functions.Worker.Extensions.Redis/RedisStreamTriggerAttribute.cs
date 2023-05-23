@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in ms.</param>
         /// <param name="messagesPerWorker">The number of messages each functions instance is expected to handle.</param>
-        /// <param name="count">Number of elements to pull from Redis at one time.</param>
+        /// <param name="count">Number of entries to pull from Redis at one time.</param>
         /// <param name="deleteAfterProcess">Decides if the function will delete the stream entries after processing. Default: false</param>
         public RedisStreamTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int messagesPerWorker = 100, int count = 10, bool deleteAfterProcess = false)
         {
@@ -46,13 +46,13 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// The number of messages each functions instance is expected to handle.
         /// Used to determine how many workers the function should scale to.
         /// For example, if the number of <see cref="MessagesPerWorker">MessagesPerWorker</see> is 10,
-        /// and there are 1500 elements remaining in the list,
+        /// and there are 1500 entries remaining in the list,
         /// the functions host will attempt to scale up to 150 instances.
         /// </summary>
         public int MessagesPerWorker { get; }
 
         /// <summary>
-        /// Number of elements to pull from Redis at one time.
+        /// Number of entries to pull from Redis at one time.
         /// </summary>
         public int Count { get; }
 
