@@ -5,6 +5,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
     public static class RedisSamples
     {
+
+        //Testing pull request!
+
         public const string localhostSetting = "redisLocalhost";
 
         [FunctionName(nameof(PubSubTrigger))]
@@ -22,6 +25,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         {
             logger.LogInformation(message);
         }
+
+
 
         [FunctionName(nameof(KeyspaceTrigger))]
         public static void KeyspaceTrigger(
