@@ -47,7 +47,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation(entry);
         }
 
-        //phoebe was here
+        //phoebe was here today
         [FunctionName(nameof(StreamTrigger))]
         public static void StreamTrigger(
             [RedisStreamTrigger(localhostSetting, "streamTest")] string entry,
