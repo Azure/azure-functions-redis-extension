@@ -5,6 +5,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
     public static class RedisSamples
     {
+        //Nadia was here
         public const string localhostSetting = "redisLocalhost";
 
         [FunctionName(nameof(PubSubTrigger))]
