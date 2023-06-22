@@ -23,8 +23,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation(message);
         }
 
-
-
         [FunctionName(nameof(KeyspaceTrigger))]
         public static void KeyspaceTrigger(
             [RedisPubSubTrigger(localhostSetting, "__keyspace@0__:keyspaceTest")] string message,
