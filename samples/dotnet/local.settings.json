@@ -6,6 +6,7 @@
     "pubsubChannel": "resolvedChannel"
   },
   "ConnectionStrings": {
-    "redisLocalhost": "127.0.0.1:6379"
+    "redisLocalhost": "127.0.0.1:6379",
+    "CosmosDBConnection": "ConnectionString"
   }
 }
