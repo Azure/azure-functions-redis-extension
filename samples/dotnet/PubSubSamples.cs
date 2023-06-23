@@ -21,7 +21,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(WritePubSubMessageToCosmosAsync))]
         public static async Task WritePubSubMessageToCosmosAsync(
-            [RedisPubSubTrigger(localhostSetting, "PubSubChannel")] string message,
+            [RedisPubSubTrigger(localhostSetting, "PubSubChannel")] ChannelMessage pubSubMessage,
              [CosmosDB(
                 databaseName: "DatabaseId",
                 containerName: "ContainerId",
@@ -30,13 +30,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         {
             PubSubData redisData = new PubSubData(
                 id: Guid.NewGuid().ToString(),
-                channel: "PubSubChannel",
-                message: message,
+                channel: pubSubMessage.Channel,
+                message: pubSubMessage.Message,
                 timestamp: DateTime.UtcNow
                 );
             
             await cosmosOut.AddAsync(redisData);
-            logger.LogInformation($"message: \"{message}\" from channel: \"{"PubSubChannel"}\" stored in cosmos container: \"{"ContainerId"}\" with id: \"{redisData.id}\"");
+            logger.LogInformation($"message: \"{redisData.message}\" from channel: \"{redisData.channel}\" stored in cosmos container: \"{"ContainerId"}\" with id: \"{redisData.id}\"");
         }
 
         //keyspace notifications must be set to KEAm for this to trigger
