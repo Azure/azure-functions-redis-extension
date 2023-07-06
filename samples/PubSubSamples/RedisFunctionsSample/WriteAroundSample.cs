@@ -15,7 +15,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         private static readonly IDatabaseAsync s_redisDb =
             ConnectionMultiplexer.ConnectAsync("<cache-name>.redis.cache.windows.net:6380,password=<access-key>,ssl=True,abortConnect=False,tiebreaker=").Result.GetDatabase();
 
-
         //Write-Around caching: triggers when there is a direct write to CosmosDB, then writes asynchronously to Redis
         [FunctionName(nameof(WriteAroundAsync))]
         public static async Task WriteAroundAsync([CosmosDBTrigger(
