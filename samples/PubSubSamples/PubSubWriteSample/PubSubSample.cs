@@ -5,18 +5,20 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 using Microsoft.Azure.WebJobs.Extensions.Redis;
 using StackExchange.Redis;
+using System.Configuration;
 
 namespace PubSubDemo
 {
     public class PubSubSample
     {
+
         public const string localhostSetting = "redisLocalhost";
         public const string cosmosDbConnectionSetting = "CosmosDBConnection";
 
         private static readonly IDatabaseAsync s_redisDb =
-            ConnectionMultiplexer.ConnectAsync("<cache-name>.redis.cache.windows.net:6380,password=<access-key>,ssl=True,abortConnect=False,tiebreaker=").Result.GetDatabase();
-        
-        
+            ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase();
+
+
         //Pub/sub Write-Behind: writes pub sub messages from Redis to CosmosDB
         [FunctionName(nameof(WritePubSubMessageToCosmosAsync))]
         public static async Task WritePubSubMessageToCosmosAsync(

@@ -11,7 +11,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string cosmosDbConnectionSetting = "CosmosDBConnection";
 
         private static readonly IDatabaseAsync s_redisDb =
-            ConnectionMultiplexer.ConnectAsync("<cache-name>.redis.cache.windows.net:6380,password=<access-key>,ssl=True,abortConnect=False,tiebreaker=").Result.GetDatabase();
+            ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase();
 
 
         //write-through caching: Write to Redis then synchronously write to CosmosDB
