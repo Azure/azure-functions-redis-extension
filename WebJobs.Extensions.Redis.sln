@@ -11,15 +11,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis", "src\Microsoft.Azure.WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj", "{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSubSample", "samples\PubSubSamples\PubSubDemo\PubSubSample.csproj", "{A7A84560-D15A-49C7-937B-D41B2EAAFC41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSubWriteSample", "samples\PubSubSamples\PubSubWriteSample\PubSubWriteSample.csproj", "{0CCC6463-4528-45CC-AE07-81B050317BA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadThroughSample", "samples\PubSubSamples\ReadThroughDemo\ReadThroughSample.csproj", "{2566DBE6-15C3-40EE-B2A5-47218D7E0D14}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadThroughSample", "samples\PubSubSamples\ReadThroughSample\ReadThroughSample.csproj", "{6AEDAA28-1BD6-4074-9AA4-E867F700406A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteAroundSample", "samples\PubSubSamples\RedisFunctionsDemo\WriteAroundSample.csproj", "{2195153C-DB57-4DB2-8256-0FD1D2E3A5A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteAroundSample", "samples\PubSubSamples\RedisFunctionsSample\WriteAroundSample.csproj", "{29330EDF-B969-47D9-BCB0-D3D145280C04}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteBehindSample", "samples\PubSubSamples\WriteBehindDemo\WriteBehindSample.csproj", "{DB20D9F8-D709-48C2-8867-79036D6FEFF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteBehindSample", "samples\PubSubSamples\WriteBehindSample\WriteBehindSample.csproj", "{B54FECBB-B5DB-4053-9C83-4C1A6BFEA9B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteThroughSample", "samples\PubSubSamples\WriteThroughDemo\WriteThroughSample.csproj", "{C0E49014-F399-4367-B1DF-A744DBA191A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteThroughSample", "samples\PubSubSamples\WriteThroughSample\WriteThroughSample.csproj", "{6B184726-CE88-4F51-86FD-9AA115692414}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,26 +43,26 @@ Global
 		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A7A84560-D15A-49C7-937B-D41B2EAAFC41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A7A84560-D15A-49C7-937B-D41B2EAAFC41}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A7A84560-D15A-49C7-937B-D41B2EAAFC41}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A7A84560-D15A-49C7-937B-D41B2EAAFC41}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2566DBE6-15C3-40EE-B2A5-47218D7E0D14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2566DBE6-15C3-40EE-B2A5-47218D7E0D14}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2566DBE6-15C3-40EE-B2A5-47218D7E0D14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2566DBE6-15C3-40EE-B2A5-47218D7E0D14}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2195153C-DB57-4DB2-8256-0FD1D2E3A5A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2195153C-DB57-4DB2-8256-0FD1D2E3A5A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2195153C-DB57-4DB2-8256-0FD1D2E3A5A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2195153C-DB57-4DB2-8256-0FD1D2E3A5A0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DB20D9F8-D709-48C2-8867-79036D6FEFF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB20D9F8-D709-48C2-8867-79036D6FEFF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DB20D9F8-D709-48C2-8867-79036D6FEFF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DB20D9F8-D709-48C2-8867-79036D6FEFF1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C0E49014-F399-4367-B1DF-A744DBA191A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C0E49014-F399-4367-B1DF-A744DBA191A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C0E49014-F399-4367-B1DF-A744DBA191A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C0E49014-F399-4367-B1DF-A744DBA191A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CCC6463-4528-45CC-AE07-81B050317BA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CCC6463-4528-45CC-AE07-81B050317BA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CCC6463-4528-45CC-AE07-81B050317BA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CCC6463-4528-45CC-AE07-81B050317BA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AEDAA28-1BD6-4074-9AA4-E867F700406A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AEDAA28-1BD6-4074-9AA4-E867F700406A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AEDAA28-1BD6-4074-9AA4-E867F700406A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AEDAA28-1BD6-4074-9AA4-E867F700406A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29330EDF-B969-47D9-BCB0-D3D145280C04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29330EDF-B969-47D9-BCB0-D3D145280C04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29330EDF-B969-47D9-BCB0-D3D145280C04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29330EDF-B969-47D9-BCB0-D3D145280C04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B54FECBB-B5DB-4053-9C83-4C1A6BFEA9B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B54FECBB-B5DB-4053-9C83-4C1A6BFEA9B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B54FECBB-B5DB-4053-9C83-4C1A6BFEA9B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B54FECBB-B5DB-4053-9C83-4C1A6BFEA9B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B184726-CE88-4F51-86FD-9AA115692414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B184726-CE88-4F51-86FD-9AA115692414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B184726-CE88-4F51-86FD-9AA115692414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B184726-CE88-4F51-86FD-9AA115692414}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
