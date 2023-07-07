@@ -10,12 +10,8 @@ namespace PubSubDemo
 {
     public class PubSubSample
     {
-
         public const string localhostSetting = "redisLocalhost";
         public const string cosmosDbConnectionSetting = "CosmosDBConnection";
-
-        private static readonly IDatabaseAsync s_redisDb =
-            ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase();
 
 
         //Pub/sub Write-Behind: writes pub sub messages from Redis to Cosmos DB
@@ -24,7 +20,7 @@ namespace PubSubDemo
             [RedisPubSubTrigger(localhostSetting, "PubSubChannel")] ChannelMessage pubSubMessage,
              [CosmosDB(
                 databaseName: "DatabaseId",
-                containerName: "ContainerId",
+                containerName: "PSContainerId",
                 Connection = cosmosDbConnectionSetting)]IAsyncCollector<PubSubData> cosmosOut,
             ILogger logger)
         {
@@ -38,7 +34,7 @@ namespace PubSubDemo
 
             //write the PubSubData object to Cosmos DB
             await cosmosOut.AddAsync(redisData);
-            logger.LogInformation($"Message: \"{redisData.message}\" from Channel: \"{redisData.channel}\" stored in Cosmos DB container: \"{"ContainerId"}\" with id: \"{redisData.id}\"");
+            logger.LogInformation($"Message: \"{redisData.message}\" from Channel: \"{redisData.channel}\" stored in Cosmos DB container: \"{"PSContainerId"}\" with id: \"{redisData.id}\"");
         }
     }
 }

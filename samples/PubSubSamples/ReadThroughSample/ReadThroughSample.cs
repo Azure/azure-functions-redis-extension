@@ -13,9 +13,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     {
         public const string localhostSetting = "redisLocalhost";
         public const string cosmosDbConnectionSetting = "CosmosDBConnection";
-
-        private static readonly IDatabaseAsync s_redisDb =
-            ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase();
+      
+        private static readonly Lazy<IDatabaseAsync> s_redisDb = new Lazy<IDatabaseAsync>(() =>
+            ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase());
 
 
         //keyspace notifications must be set to KEAm for this to trigger
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             var item = response.FirstOrDefault(defaultValue: null);
             if (item != null)
             {
-                await s_redisDb.StringSetAsync(item.key, item.value);
+                await s_redisDb.Value.StringSetAsync(item.key, item.value);
                 logger.LogInformation($"Key: \"{item.key}\", Value: \"{item.value}\" added to Redis.");
             }
             else

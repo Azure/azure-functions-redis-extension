@@ -10,8 +10,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string localhostSetting = "redisLocalhost";
         public const string cosmosDbConnectionSetting = "CosmosDBConnection";
 
-        private static readonly IDatabaseAsync s_redisDb =
-            ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase();
+        private static readonly IDatabase s_redisDb =
+            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(localhostSetting)).GetDatabase();
 
 
         //write-through caching: Write to Redis then synchronously write to Cosmos DB
@@ -24,14 +24,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 Connection = cosmosDbConnectionSetting)]out dynamic redisData,
            ILogger logger)
         {
-          //get the Redis data synchronously
-            IDatabase redisDb = s_redisDb.Multiplexer.GetDatabase();
-
             //assign the data from Redis to a dynamic object that will be written to Cosmos DB
             redisData = new RedisData(
                 id: Guid.NewGuid().ToString(),
                 key: newKey,
-                value: redisDb.StringGet(newKey),
+                value: s_redisDb.StringGet(newKey),
                 timestamp: DateTime.UtcNow
             );
 
