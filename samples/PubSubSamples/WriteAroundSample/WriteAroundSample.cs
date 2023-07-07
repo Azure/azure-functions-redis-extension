@@ -23,22 +23,22 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             containerName: "ContainerId",
             Connection = cosmosDbConnectionSetting,
             LeaseContainerName = "leases", LeaseContainerPrefix = "Write-Around-")]IReadOnlyList<RedisData> input,
-            ILogger log)
+            ILogger logger)
         {
             //if the list is empty, return
             if (input == null || input.Count <= 0) return;
 
-            //for each item upladed to cosmos, write it to redis
+            //for each item upladed to cosmos, write it to Redis
             foreach (var document in input)
             {
                 //if the key/value pair is already in Redis, throw an exception
                 if (await s_redisDb.StringGetAsync(document.key) == document.value)
                 {
-                    throw new Exception($"The Key/Value pair is already in Azure Redis cache. ");
+                    throw new Exception($"ERROR: Key: \"{document.key}\", Value: \"{document.value}\" pair is already in Azure Redis Cache.");
                 }
-
+                //Write the key/value pair to Redis
                 await s_redisDb.StringSetAsync(document.key, document.value);
-                log.LogInformation($"Saved item with key: \"{document.key}\" and value: \"{document.value}\" in Azure Redis cache");
+                logger.LogInformation($"Key: \"{document.key}\", Value: \"{document.value}\" added to Redis.");
             }
         }
     }

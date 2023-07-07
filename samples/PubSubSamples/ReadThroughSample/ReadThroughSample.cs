@@ -19,7 +19,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
 
         //keyspace notifications must be set to KEAm for this to trigger
-        //read-through caching: Read from Redis, if not found, read from Cosmos, then write to Redis
+        //read-through caching: Read from Redis, if not found, read from Cosmos DB, then write to Redis
         [FunctionName(nameof(ReadThroughAsync))]
         public static async Task ReadThroughAsync(
             [RedisPubSubTrigger(localhostSetting, "__keyevent@0__:keymiss")] string missedkey,
@@ -40,7 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 .ToFeedIterator();
             var response = await feed.ReadNextAsync();
 
-            //if the key is found in cosmos, add  the most recently updated to Redis
+            //if the key is found in Cosmos DB, add  the most recently updated to Redis
             var item = response.FirstOrDefault(defaultValue: null);
             if (item != null)
             {
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             }
             else
             {
-                //if the key isnt found in cosmos, throw an exception
+                //if the key isnt found in Cosmos DB, throw an exception
                 throw new Exception($"ERROR: Key: \"{missedkey}\" not found in Redis or Cosmos DB. Try adding the Key-Value pair to Redis or Cosmos DB.");
             }
         }

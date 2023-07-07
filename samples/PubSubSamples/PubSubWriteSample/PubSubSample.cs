@@ -14,7 +14,7 @@ namespace PubSubDemo
         public const string cosmosDbConnectionSetting = "CosmosDBConnection";
 
 
-        //Pub/sub Write-Behind: writes pub sub messages from Redis to Cosmos DB
+        //Pub/sub Write-Behind: writes pubsub messages from Redis to Cosmos DB
         [FunctionName(nameof(WritePubSubMessageToCosmosAsync))]
         public static async Task WritePubSubMessageToCosmosAsync(
             [RedisPubSubTrigger(localhostSetting, "PubSubChannel")] ChannelMessage pubSubMessage,
