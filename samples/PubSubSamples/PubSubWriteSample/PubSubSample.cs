@@ -2,10 +2,9 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 using Microsoft.Azure.WebJobs.Extensions.Redis;
 using StackExchange.Redis;
-using System.Configuration;
+using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 
 namespace PubSubDemo
 {
@@ -19,7 +18,7 @@ namespace PubSubDemo
             ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase();
 
 
-        //Pub/sub Write-Behind: writes pub sub messages from Redis to CosmosDB
+        //Pub/sub Write-Behind: writes pub sub messages from Redis to Cosmos DB
         [FunctionName(nameof(WritePubSubMessageToCosmosAsync))]
         public static async Task WritePubSubMessageToCosmosAsync(
             [RedisPubSubTrigger(localhostSetting, "PubSubChannel")] ChannelMessage pubSubMessage,
@@ -37,9 +36,9 @@ namespace PubSubDemo
                 timestamp: DateTime.UtcNow
                 );
 
-            //write the PubSubData object to Cosmos
+            //write the PubSubData object to Cosmos DB
             await cosmosOut.AddAsync(redisData);
-            logger.LogInformation($"message: \"{redisData.message}\" from channel: \"{redisData.channel}\" stored in cosmos container: \"{"ContainerId"}\" with id: \"{redisData.id}\"");
+            logger.LogInformation($"Message: \"{redisData.message}\" from Channel: \"{redisData.channel}\" stored in Cosmos DB container: \"{"ContainerId"}\" with id: \"{redisData.id}\"");
         }
     }
 }

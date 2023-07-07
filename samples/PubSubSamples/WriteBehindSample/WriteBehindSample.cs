@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase();
 
 
-        //write-behind caching: Write to Redis, then write to Cosmos asynchonously
+        //write-behind caching: Write to Redis, then write to Cosmos DB asynchronously
         [FunctionName(nameof(WriteBehindAsync))]
         public static async Task WriteBehindAsync(
             [RedisPubSubTrigger(localhostSetting, "__keyevent@0__:set")] string newKey,
@@ -25,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 Connection = cosmosDbConnectionSetting)]IAsyncCollector<RedisData> cosmosOut,
             ILogger logger)
         {
-            //load data from redis into a record
+            //load data from Redis into a record
             RedisData redisData = new RedisData(
                 id: Guid.NewGuid().ToString(),
                 key: newKey,
@@ -33,9 +33,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 timestamp: DateTime.UtcNow
                 );
 
-            //write the record to cosmos
+            //write the record to Cosmos DB
             await cosmosOut.AddAsync(redisData);
-            logger.LogInformation($"key: \"{newKey}\" value: \"{redisData.value}\" addedd to cosmosdb container: \"{"ContainerId"}\" at id: \"{redisData.id}\"");
+            logger.LogInformation($"Key: \"{newKey}\", Value: \"{redisData.value}\" added to Cosmos DB container: \"{"ContainerId"}\" at id: \"{redisData.id}\"");
         }
 
     }

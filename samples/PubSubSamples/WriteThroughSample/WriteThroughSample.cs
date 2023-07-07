@@ -14,7 +14,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase();
 
 
-        //write-through caching: Write to Redis then synchronously write to CosmosDB
+        //write-through caching: Write to Redis then synchronously write to Cosmos DB
         [FunctionName(nameof(WriteThrough))]
         public static void WriteThrough(
            [RedisPubSubTrigger(localhostSetting, "__keyevent@0__:set")] string newKey,
@@ -24,10 +24,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 Connection = cosmosDbConnectionSetting)]out dynamic redisData,
            ILogger logger)
         {
-          //get the redisDB synchronously
+          //get the Redis data synchronously
             IDatabase redisDb = s_redisDb.Multiplexer.GetDatabase();
 
-            //assign the data from redis to a dyncmic object that will be written to cosmos
+            //assign the data from Redis to a dynamic object that will be written to Cosmos DB
             redisData = new RedisData(
                 id: Guid.NewGuid().ToString(),
                 key: newKey,
@@ -35,7 +35,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 timestamp: DateTime.UtcNow
             );
 
-            logger.LogInformation($"key: \"{newKey}\" value: \"{redisData.value}\" addedd to cosmosdb container: \"{"ContainerId"}\" at id: \"{redisData.id}\"");
+            logger.LogInformation($"Key: \"{newKey}\", Value: \"{redisData.value}\" addedd to Cosmos DB container: \"{"ContainerId"}\" at id: \"{redisData.id}\"");
         }
     }
 }

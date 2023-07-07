@@ -1,5 +1,5 @@
-﻿using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -13,10 +13,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string cosmosDbConnectionSetting = "CosmosDBConnection";
 
         private static readonly IDatabaseAsync s_redisDb =
-            ConnectionMultiplexer.ConnectAsync("Rmac-Redis.redis.cache.windows.net:6380,password=t4sI8OxL5Ncwvo1fI6sxiJ6h5EzZtAAmmAzCaKZPSmE=,ssl=True,abortConnect=False,tiebreaker=").Result.GetDatabase();
+            ConnectionMultiplexer.ConnectAsync(Environment.GetEnvironmentVariable(localhostSetting)).Result.GetDatabase();
 
 
-        //Write-Around caching: triggers when there is a direct write to CosmosDB, then writes asynchronously to Redis
+        //Write-Around caching: triggers when there is a direct write to Cosmos DB, then writes asynchronously to Redis
         [FunctionName(nameof(WriteAroundAsync))]
         public static async Task WriteAroundAsync([CosmosDBTrigger(
             databaseName: "DatabaseId",
@@ -31,10 +31,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             //for each item upladed to cosmos, write it to redis
             foreach (var document in input)
             {
-                //if the key/value pair is already in redis, throw an exception
+                //if the key/value pair is already in Redis, throw an exception
                 if (await s_redisDb.StringGetAsync(document.key) == document.value)
                 {
-                    throw new Exception($"The key/value pair is already in Azure Redis cache. ");
+                    throw new Exception($"The Key/Value pair is already in Azure Redis cache. ");
                 }
 
                 await s_redisDb.StringSetAsync(document.key, document.value);

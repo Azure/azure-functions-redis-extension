@@ -29,7 +29,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 Connection = cosmosDbConnectionSetting)]CosmosClient client,
             ILogger logger)
         {
-            //get the cosmos database and container to read from
+            //get the Cosmos DB database and the container to read from
             Container cosmosContainer = client.GetContainer("DatabaseId", "ContainerId");
             var queryable = cosmosContainer.GetItemLinqQueryable<RedisData>();
 
@@ -45,12 +45,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             if (item != null)
             {
                 await s_redisDb.StringSetAsync(item.key, item.value);
-                logger.LogInformation($"key: \"{item.key}\" value: \"{item.value}\" addedd to Redis");
+                logger.LogInformation($"Key: \"{item.key}\", Value: \"{item.value}\" added to Redis.");
             }
             else
             {
                 //if the key isnt found in cosmos, throw an exception
-                throw new Exception($"ERROR: key: \"{missedkey}\" not found in Redis or cosmosdb. Try adding the key-value pair to Redis or Cosmos");
+                throw new Exception($"ERROR: Key: \"{missedkey}\" not found in Redis or Cosmos DB. Try adding the Key-Value pair to Redis or Cosmos DB.");
             }
         }
     }
