@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                     values[i++] = new NameValueEntry(entry.Key, entry.Value);
                 }
 
-                redisDB.StreamAddAsync("stream2", values);
+                redisDB.StreamAddAsync("streamTest", values);
             }
         }
     }
