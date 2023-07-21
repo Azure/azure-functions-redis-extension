@@ -11,6 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis", "src\Microsoft.Azure.WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj", "{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteThroughSample", "samples\StreamTriggerSamples\WriteThroughSample\WriteThroughSample.csproj", "{4694859F-5637-4F06-9CFD-374643391703}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteBehindSample", "samples\StreamTriggerSamples\WriteBehindSample\WriteBehindSample.csproj", "{F0CE09C5-2AEA-4AFF-A2DE-9C4D05AC28DF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosToRedis", "samples\StreamTriggerSamples\CosmosToRedis\CosmosToRedis\CosmosToRedis.csproj", "{6300E42C-35F8-4DF0-9BFB-66C7B2ED253E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StreamTriggerTests", "testStreamTrigger\StreamTriggerTests\StreamTriggerTests.csproj", "{442261E8-69D5-4BE7-ADF6-79D10117CCEE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +41,22 @@ Global
 		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4694859F-5637-4F06-9CFD-374643391703}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4694859F-5637-4F06-9CFD-374643391703}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4694859F-5637-4F06-9CFD-374643391703}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4694859F-5637-4F06-9CFD-374643391703}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0CE09C5-2AEA-4AFF-A2DE-9C4D05AC28DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0CE09C5-2AEA-4AFF-A2DE-9C4D05AC28DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0CE09C5-2AEA-4AFF-A2DE-9C4D05AC28DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0CE09C5-2AEA-4AFF-A2DE-9C4D05AC28DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6300E42C-35F8-4DF0-9BFB-66C7B2ED253E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6300E42C-35F8-4DF0-9BFB-66C7B2ED253E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6300E42C-35F8-4DF0-9BFB-66C7B2ED253E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6300E42C-35F8-4DF0-9BFB-66C7B2ED253E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{442261E8-69D5-4BE7-ADF6-79D10117CCEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{442261E8-69D5-4BE7-ADF6-79D10117CCEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{442261E8-69D5-4BE7-ADF6-79D10117CCEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{442261E8-69D5-4BE7-ADF6-79D10117CCEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
