@@ -9,30 +9,40 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
     public static class PubSubSample
     {
-        public const string localhostSetting = "redisLocalhost";
-        public const string cosmosDbConnectionSetting = "CosmosDBConnection";
-        public const string cosmosDBDatabaseName = "DatabaseId";
-        public const string cosmosDBContainerName = "ContainerId";
-        public const string cosmosDBPubSubContainerName = "PSContainerId";
+        //Connection string settings that will be resolved from local.settings.json file
+        public const string redisConnectionSetting = "RedisConnectionString";
+        public const string cosmosDbConnectionSetting = "CosmosDbConnectionString";
+
+        //Cosmos DB settings that will be resolved from local.settings.json file
+        public const string databaseSetting = "%CosmosDbDatabaseId%";
+        public const string containerSetting = "%CosmosDbContainerId%";
+        public const string pubSubContainerSetting = "%PubSubContainerId%";
+        public const string pubSubChannelSetting = "%PubSubChannel%";
 
         private static readonly IConnectionMultiplexer s_redisConnection =
-            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(localhostSetting));
+            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable($"ConnectionStrings:{redisConnectionSetting}"));
 
         private static readonly IDatabaseAsync s_redisDb = s_redisConnection.GetDatabase();
         private static readonly ISubscriber s_redisPublisher = s_redisConnection.GetSubscriber();
 
 
-        //Write-Around caching: triggers when there is a direct write to Cosmos DB, then writes asynchronously to Redis
+        /// <summary>
+        /// Triggers when key/value pairs are written directly to Cosmos DB, then asynchronously writes the associated key/value pair to Redis.
+        /// </summary>
+        /// <param name="cosmosData"> A readonly list containing all the new/updated documents in the specified Cosmos DB container.</param>
+        /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"> Thrown when they key/value pair is already stored in the Redis cache.</exception>
         [FunctionName(nameof(WriteAroundAsync))]
         public static async Task WriteAroundAsync(
             [CosmosDBTrigger(
-                databaseName: cosmosDBDatabaseName,
-                containerName: cosmosDBContainerName,
+                databaseName: databaseSetting,
+                containerName: containerSetting,
                 Connection = cosmosDbConnectionSetting,
                 LeaseContainerName = "leases", LeaseContainerPrefix = "Write-Around-")]IReadOnlyList<RedisData> cosmosData, 
             ILogger logger)
         {
-            //if the list is empty, return
+            //if the list is null or empty, return
             if (cosmosData == null || cosmosData.Count <= 0) return;
 
             //for each item upladed to cosmos, write it to Redis
@@ -48,17 +58,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 logger.LogInformation($"Key: \"{document.key}\", Value: \"{document.value}\" added to Redis.");
             }
         }
-        //Write-Around caching: triggers when there is a direct write to Cosmos DB's pubsub container, then writes the message to the Redis channel that was specified
+
+        /// <summary>
+        /// Triggers when pubsub messages are written directly to Cosmos DB, then asynchronously publishes the associated message to the Redis channel that was specified.
+        /// </summary>
+        /// <param name="cosmosData"> A readonly list containing all the new/updated documents in the specified Cosmos DB container.</param>
+        /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
+        /// <returns></returns>
         [FunctionName(nameof(WriteAroundMessageAsync))]
         public static async Task WriteAroundMessageAsync(
             [CosmosDBTrigger(
-                databaseName: cosmosDBDatabaseName,
-                containerName: cosmosDBPubSubContainerName,
+                databaseName: databaseSetting,
+                containerName: containerSetting,
                 Connection = cosmosDbConnectionSetting,
                 LeaseContainerName = "leases", LeaseContainerPrefix = "Write-Around-")]IReadOnlyList<PubSubData> cosmosData,
             ILogger logger)
         {
-            //if the list is empty, return
+            //if the list is null or empty, return
             if (cosmosData == null || cosmosData.Count <= 0) return;
 
             //for each new item upladed to cosmos, publish to Redis
