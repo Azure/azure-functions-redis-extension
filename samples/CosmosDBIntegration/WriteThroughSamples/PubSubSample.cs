@@ -7,24 +7,27 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
     public static class PubSubSample
     {
-        public const string localhostSetting = "redisLocalhost";
-        public const string cosmosDbConnectionSetting = "CosmosDBConnection";
-        public const string cosmosDBDatabaseName = "DatabaseId";
-        public const string cosmosDBContainerName = "ContainerId";
-        public const string cosmosDBPubSubContainerName = "PSContainerId";
-        public const string pubSubChannel = "PubSubChannel";
+        //Connection string settings that will be resolved from local.settings.json file
+        public const string redisConnectionSetting = "RedisConnectionString";
+        public const string cosmosDbConnectionSetting = "CosmosDbConnectionString";
+
+        //Cosmos DB settings that will be resolved from local.settings.json file
+        public const string databaseSetting = "%CosmosDbDatabaseId%";
+        public const string containerSetting = "%CosmosDbContainerId%";
+        public const string pubSubContainerSetting = "%PubSubContainerId%";
+        public const string pubSubChannelSetting = "%PubSubChannel%";
 
         private static readonly IDatabase s_redisDb =
-            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(localhostSetting)).GetDatabase();
+            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable($"ConnectionStrings:{redisConnectionSetting}")).GetDatabase();
 
 
         //write-through caching: Write to Redis then synchronously write to Cosmos DB
         [FunctionName(nameof(WriteThrough))]
         public static void WriteThrough(
-           [RedisPubSubTrigger(localhostSetting, "__keyevent@0__:set")] string newKey,
+           [RedisPubSubTrigger(redisConnectionSetting, "__keyevent@0__:set")] string newKey,
            [CosmosDB(
-                databaseName: cosmosDBDatabaseName,
-                containerName: cosmosDBContainerName,
+                databaseName: databaseSetting,
+                containerName: containerSetting,
                 Connection = cosmosDbConnectionSetting)]out dynamic cosmosDBOut,
            ILogger logger)
         {
@@ -42,10 +45,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         //Pub/sub Write-Behind: writes pubsub messages from Redis to Cosmos DB
         [FunctionName(nameof(WriteThroughMessage))]
         public static void WriteThroughMessage(
-            [RedisPubSubTrigger(localhostSetting, pubSubChannel)] ChannelMessage pubSubMessage,
+            [RedisPubSubTrigger(redisConnectionSetting, pubSubChannelSetting)] ChannelMessage pubSubMessage,
              [CosmosDB(
-                databaseName: cosmosDBDatabaseName,
-                containerName: cosmosDBPubSubContainerName,
+                databaseName: databaseSetting,
+                containerName: pubSubContainerSetting,
                 Connection = cosmosDbConnectionSetting)]out dynamic cosmosDBOut,
             ILogger logger)
         {
