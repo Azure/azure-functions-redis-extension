@@ -11,8 +11,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
     public static class PubSubSample
     {
-        public const string localhostSetting = "redisLocalhost";
-        public const string cosmosDBConnectionSetting = "CosmosDBConnection";
+        public const string localhostSetting = "redisConnectionString";
+        public const string cosmosDBConnectionSetting = "CosmosDBConnectionString";
         public const string cosmosDBDatabaseName = "DatabaseId";
         public const string cosmosDBContainerName = "ContainerId";
 
