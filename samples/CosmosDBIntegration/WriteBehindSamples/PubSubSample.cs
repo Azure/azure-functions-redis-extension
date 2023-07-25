@@ -48,11 +48,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
             //write the RedisData object to Cosmos DB using the IAsyncCollector
             await cosmosDBOut.AddAsync(redisData);
-            logger.LogInformation($"Key: \"{newKey}\", Value: \"{redisData.value}\" added to Cosmos DB container: \"{Environment.GetEnvironmentVariable("CosmosDbContainerId")}\" at id: \"{redisData.id}\"");
+            logger.LogInformation($"Key: \"{newKey}\", Value: \"{redisData.value}\" added to Cosmos DB container: \"{Environment.GetEnvironmentVariable(containerSetting.Replace("%", ""))}\" at id: \"{redisData.id}\"");
         }
 
         /// <summary>
-        /// Listens for messages sent on a Redis pub/sub channel and asynchronously writes that message to Cosmos DB.
+        /// Listens for messages sent on a Redis pub/sub channel and asynchronously writes the message and channel to Cosmos DB.
         /// </summary>
         /// <param name="pubSubMessage"> The message that was published to Redis.</param>
         /// <param name="cosmosDBOut"> An IAsyncCollector that is used to write the PubSubData to Cosmos DB.</param>
@@ -77,7 +77,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
             //write the PubSubData object to Cosmos DB using the IAsyncCollector
             await cosmosDBOut.AddAsync(redisData);
-            logger.LogInformation($"Message: \"{redisData.message}\" from Channel: \"{redisData.channel}\" stored in Cosmos DB container: \"{Environment.GetEnvironmentVariable("PubSubContainerId")}\" with id: \"{redisData.id}\"");
+            logger.LogInformation($"Message: \"{redisData.message}\" from Channel: \"{redisData.channel}\" stored in Cosmos DB container: \"{Environment.GetEnvironmentVariable(pubSubContainerSetting.Replace("%", ""))}\" with id: \"{redisData.id}\"");
         }
     }
 }

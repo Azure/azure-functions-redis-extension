@@ -25,8 +25,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable($"ConnectionStrings:{redisConnectionSetting}")).GetDatabase());
 
 
-        //keyspace notifications must be set to KEAm for this to trigger
-        //read-through caching: Read from Redis, if not found, read from Cosmos DB, then write to Redis
+
+        /// <summary>
+        /// Attempts to read from Redis, if the key is not found, it will then search Cosmos DB and write the associated key/value pair to Redis.
+        /// Note: This function will only trigger if the Redis keyspace notifications are set to KEAm.
+        /// </summary>
+        /// <param name="missedKey"> The key that caused a cache miss.</param>
+        /// <param name="cosmosDB"> A CosmosClient used to query the database for the missed key.</param>
+        /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"> Thrown when the requested key is not found in Redis or Cosmos DB</exception>
         [FunctionName(nameof(ReadThroughAsync))]
         public static async Task ReadThroughAsync(
             [RedisPubSubTrigger(redisConnectionSetting, "__keyevent@0__:keymiss")] string missedKey,
@@ -37,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             ILogger logger)
         {
             //get the Cosmos DB database and the container to read from
-            Container cosmosDBContainer = cosmosDB.GetContainer(Environment.GetEnvironmentVariable("CosmosDbDatabaseId"), Environment.GetEnvironmentVariable("CosmosDbContainerId"));
+            Container cosmosDBContainer = cosmosDB.GetContainer(Environment.GetEnvironmentVariable(databaseSetting.Replace("%", "")), Environment.GetEnvironmentVariable(containerSetting.Replace("%", "")));
             IOrderedQueryable<RedisData> queryable = cosmosDBContainer.GetItemLinqQueryable<RedisData>();
 
             //get all entries in the container that contain the missed key
