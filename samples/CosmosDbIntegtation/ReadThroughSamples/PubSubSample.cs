@@ -13,7 +13,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     public static class PubSubSample
     {
         //Connection string settings that will be resolved from local.settings.json file
-        public const string redisConnectionSetting = "RedisConnectionString";
+        public const string redisConnectionSetting = "redisConnectionString";
         public const string cosmosDbConnectionSetting = "CosmosDbConnectionString";
 
         //Cosmos DB settings that will be resolved from local.settings.json file
