@@ -11,7 +11,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         string id,
         List<string> value
     );
-    public static class WriteAroundSamples
+    public static class ListsSample
     {
         //Redis Cache primary connection string from local.settings.json
         public const string redisConnectionString = "redisConnectionString";

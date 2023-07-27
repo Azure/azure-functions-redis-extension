@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
-    public static class ReadThroughSamples
+    public static class ListsSample
     {
         public record ListData
         (
