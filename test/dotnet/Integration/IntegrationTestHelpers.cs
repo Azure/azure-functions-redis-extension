@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -104,18 +103,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         internal static string GetLogValue(object value)
         {
             return value.GetType().FullName + ":" + JsonConvert.SerializeObject(value);
-        }
-
-        internal static void ClearDataFromCosmosDb(string databaseName, string containerName)
-        {
-            using CosmosClient client = new(RedisUtilities.ResolveConnectionString(localsettings, PubSubCosmosIntegrationTestFunctions.cosmosDbConnectionSetting));
-            var container = client.GetContainer(databaseName, containerName);
-            var items = container.GetItemLinqQueryable<RedisData>(allowSynchronousQueryExecution: true);
-
-            foreach (var item in items)
-            {
-                container.DeleteItemAsync<RedisData>(item.id, PartitionKey.None).Wait();
-            }
         }
     }
 }

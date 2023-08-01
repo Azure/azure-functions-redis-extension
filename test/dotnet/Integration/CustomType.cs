@@ -9,17 +9,4 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         public string Random { get; set; }
     }
 
-    public record RedisData(
-        string id,
-        string key,
-        string value,
-        DateTime timestamp
-    );
-
-    public record PubSubData(
-        string id,
-        string channel,
-        string message,
-        DateTime timestamp
-    );
 }
