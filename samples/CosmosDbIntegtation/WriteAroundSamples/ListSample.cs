@@ -12,7 +12,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string redisConnectionString = "redisConnectionString";
         private static readonly IDatabase s_redisDb = ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionString)).GetDatabase();
 
-
         //CosmosDB Endpoint from local.settings.json
         public const string CosmosDBConnectionString = "CosmosDBConnectionString";
 
@@ -26,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="readOnlyList">An IReadOnlyList of ListData objects representing the items that have been modified or added to the CosmosDB container.</param>
         /// <param name="log">An ILogger object used for logging purposes.</param>
         [FunctionName("WriteAroundListTrigger")]
-        public static void Run([CosmosDBTrigger(
+        public static void WriteAroundListTrigger([CosmosDBTrigger(
         databaseName: "%CosmosDbDatabaseId%",
         containerName: "%CosmosDbContainerId%",
         Connection = "CosmosDBConnectionString",

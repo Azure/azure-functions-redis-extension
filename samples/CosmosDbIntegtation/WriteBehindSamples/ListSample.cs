@@ -19,7 +19,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         //Redis Cache primary connection string from local.settings.json
         public const string redisConnectionString = "redisConnectionString";
 
-        //CosmosDB Endpoint from local.settings.json
+        //CosmosDB endpoint from local.settings.json
         public const string CosmosDBConnectionString = "CosmosDBConnectionString";
 
         //CosmosDB database name and container name from local.settings.json

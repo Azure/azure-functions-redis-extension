@@ -86,7 +86,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 logger.LogInformation("This key does not exist in CosmosDB");
                 return;
             }
-            // If there exists an entry with this key in cosmos, 
+            //If there exists an entry with this key in cosmos, 
             else
             {
                 //Optional logger to display the name of the list trying to be retrieved
