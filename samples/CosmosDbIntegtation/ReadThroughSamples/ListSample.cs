@@ -12,14 +12,8 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
-    public static class ListsSample
+    public static class ListSample
     {
-        public record ListData
-        (
-            string id,
-            List<string> value
-        );
-
         //Redis Cache primary connection string from local.settings.json
         public const string redisConnectionString = "redisConnectionString";
         private static readonly IDatabase s_redisDb = ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionString)).GetDatabase();
@@ -35,7 +29,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="item"> The item to be added to the Redis cache. </param>
         /// <param name="listEntry">The key for the Redis list to which the item will be added. </param>
         /// <returns> None </returns>
-        public static async Task ToCacheAsync(FeedResponse<ListData> response, ListData item, string listEntry)
+        public static async Task ToCacheAsync(FeedResponse<CosmosDBListData> response, CosmosDBListData item, string listEntry)
         {
             //Retrieve the values in cosmos associated with the list name, so you can access each item
             var fullEntry = response.Take(response.Count);
@@ -43,7 +37,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             if (fullEntry == null) return;
 
             //Accessing each value from the entry 
-            foreach (ListData inputValues in fullEntry)
+            foreach (CosmosDBListData inputValues in fullEntry)
             {
                 RedisValue[] redisValues = Array.ConvertAll(inputValues.value.ToArray(), item => (RedisValue)item);
                 await s_redisDb.ListRightPushAsync(listEntry, redisValues);
@@ -76,14 +70,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
             //Creates query for item inthe container and
             //uses feed iterator to keep track of token when receiving results from query
-            IOrderedQueryable<ListData> query = db.GetItemLinqQueryable<ListData>();
-            using FeedIterator<ListData> results = query
+            IOrderedQueryable<CosmosDBListData> query = db.GetItemLinqQueryable<CosmosDBListData>();
+            using FeedIterator<CosmosDBListData> results = query
                 .Where(p => p.id == listEntry)
                 .ToFeedIterator();
 
             //Retrieve collection of items from results and then the first element of the sequence
-            FeedResponse<ListData> response = await results.ReadNextAsync();
-            ListData item = response.FirstOrDefault(defaultValue: null);
+            FeedResponse<CosmosDBListData> response = await results.ReadNextAsync();
+            CosmosDBListData item = response.FirstOrDefault(defaultValue: null);
 
             //If there doesnt exist an entry with this key in cosmos, no data will be retrieved
             if (item == null)

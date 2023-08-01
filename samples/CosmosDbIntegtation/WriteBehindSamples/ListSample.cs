@@ -14,12 +14,7 @@ using Container = Microsoft.Azure.Cosmos.Container;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
-    public record ListData
-    (
-        string id,
-        List<string> value
-    );
-    public static class ListsSample
+    public static class ListSample
     {
         //Redis Cache primary connection string from local.settings.json
         public const string redisConnectionString = "redisConnectionString";
@@ -52,14 +47,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
             //Creates query for item inthe container and
             //uses feed iterator to keep track of token when receiving results from query
-            IOrderedQueryable<ListData> query = db.GetItemLinqQueryable<ListData>();
-            using FeedIterator<ListData> results = query
+            IOrderedQueryable<CosmosDBListData> query = db.GetItemLinqQueryable<CosmosDBListData>();
+            using FeedIterator<CosmosDBListData> results = query
                 .Where(p => p.id == key)
                 .ToFeedIterator();
 
             //Retrieve collection of items from results and then the first element of the sequence
-            FeedResponse<ListData> response = await results.ReadNextAsync();
-            ListData item = response.FirstOrDefault(defaultValue: null);
+            FeedResponse<CosmosDBListData> response = await results.ReadNextAsync();
+            CosmosDBListData item = response.FirstOrDefault(defaultValue: null);
 
             //Optional logger to display what is being pushed to CosmosDB
             logger.LogInformation("The value added to " + key + " is " + listEntry + ". The value will be added to CosmosDB database: " + CosmosDbDatabaseId + " and container: " + CosmosDbContainerId + ".");
@@ -68,8 +63,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             List<string> resultsHolder = item?.value ?? new List<string>();
 
             resultsHolder.Add(listEntry);
-            ListData newEntry = new ListData(id: key, value: resultsHolder);
-            await db.UpsertItemAsync<ListData>(newEntry);
+            CosmosDBListData newEntry = new CosmosDBListData(id: key, value: resultsHolder);
+            await db.UpsertItemAsync<CosmosDBListData>(newEntry);
         }
 
     }

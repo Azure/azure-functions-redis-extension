@@ -6,12 +6,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
-    public record ListData
-    (
-        string id,
-        List<string> value
-    );
-    public static class ListsSample
+    public static class ListSample
     {
         //Redis Cache primary connection string from local.settings.json
         public const string redisConnectionString = "redisConnectionString";
@@ -35,12 +30,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         databaseName: "%CosmosDbDatabaseId%",
         containerName: "%CosmosDbContainerId%",
         Connection = "CosmosDBConnectionString",
-        LeaseContainerName = "leases")]IReadOnlyList<ListData> readOnlyList, ILogger log)
+        LeaseContainerName = "leases")]IReadOnlyList<CosmosDBListData> readOnlyList, ILogger log)
         {
             if (readOnlyList == null || readOnlyList.Count <= 0) return;
 
             //Accessing each entry from readOnlyList
-            foreach (ListData inputValues in readOnlyList)
+            foreach (CosmosDBListData inputValues in readOnlyList)
             {
                 if (inputValues.id == key)
                 {
