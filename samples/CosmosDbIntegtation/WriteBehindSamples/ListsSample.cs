@@ -41,8 +41,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="client">>A Cosmos DB client object used to connect to the database.</param>
         /// <param name="logger">An ILogger object used for logging purposes.</param>
         /// <returns></returns>
-        [FunctionName(nameof(ListTriggerAsync))]
-        public static async Task ListTriggerAsync(
+        [FunctionName(nameof(ListTriggerWriteBehind))]
+        public static async Task ListTriggerWriteBehind(
             [RedisListTrigger(redisConnectionString, key)] string listEntry, [CosmosDB(
             Connection = "CosmosDBConnectionString")]CosmosClient client,
             ILogger logger)
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
             //Retrieve collection of items from results and then the first element of the sequence
             FeedResponse<ListData> response = await results.ReadNextAsync();
-                        ListData item = response.FirstOrDefault(defaultValue: null);
+            ListData item = response.FirstOrDefault(defaultValue: null);
 
             //Optional logger to display what is being pushed to CosmosDB
             logger.LogInformation("The value added to " + key + " is " + listEntry + ". The value will be added to CosmosDB database: " + CosmosDbDatabaseId + " and container: " + CosmosDbContainerId + ".");

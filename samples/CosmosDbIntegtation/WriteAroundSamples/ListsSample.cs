@@ -30,7 +30,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// </summary>
         /// <param name="readOnlyList">An IReadOnlyList of ListData objects representing the items that have been modified or added to the CosmosDB container.</param>
         /// <param name="log">An ILogger object used for logging purposes.</param>
-        [FunctionName("CosmosToRedis")]
+        [FunctionName("WriteAroundListTrigger")]
         public static void Run([CosmosDBTrigger(
         databaseName: "%CosmosDbDatabaseId%",
         containerName: "%CosmosDbContainerId%",
