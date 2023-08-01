@@ -19,11 +19,6 @@ using System.Collections.Generic;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
-    public record ListData
-    (
-        string id,
-        List<string> value
-    );
     [Collection("RedisTriggerTests")]
     public class ListsCosmosIntegrationTests
     {
@@ -38,9 +33,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         int iterations = 2;
 
         [Fact]
-        public async void ListsTrigger_WriteBack()
+        public async void ListsTrigger_WriteBehind()
         {
-            string functionName = nameof(ListsCosmosIntegrationTestFunctions.ListTriggerAsync);
+            string functionName = nameof(ListsCosmosIntegrationTestFunctions.ListTriggerWriteBehind);
             RedisValue[] valuesArray = new RedisValue[] { "a", "b" };
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
@@ -56,7 +51,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
                     await multiplexer.GetDatabase().ListLeftPushAsync(key, valuesArray);
 
-                    await Task.Delay(TimeSpan.FromSeconds(3));
+                    await Task.Delay(TimeSpan.FromSeconds(5));
 
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();
@@ -67,9 +62,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Fact]
-        public async void ListsTrigger_WriteBackHeavyLoading()
+        public async void ListsTrigger_WriteBehindHeavyLoading()
         {
-            string functionName = nameof(ListsCosmosIntegrationTestFunctions.ListTriggerAsync);
+            string functionName = nameof(ListsCosmosIntegrationTestFunctions.ListTriggerWriteBehind);
             RedisValue[] valuesArray = new RedisValue[2000];
             for (int i = 0; i < valuesArray.Length; i++)
             {
@@ -102,12 +97,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void ListsTrigger_InCosmos()
         {
-            CosmosClientBuilder clientBuilder = new CosmosClientBuilder(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, ListsCosmosIntegrationTestFunctions.cosmosDBConnectionString));
+            CosmosClientBuilder clientBuilder = new CosmosClientBuilder(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, ListsCosmosIntegrationTestFunctions.CosmosDBConnectionString));
             CosmosClient cosmosClient = clientBuilder.Build();
 
             Container db = cosmosClient.GetDatabase(CosmosDbDatabaseID).GetContainer(CosmosDbContainerID);
-            var query = db.GetItemLinqQueryable<ListData>();
-            using FeedIterator<ListData> results = query
+            var query = db.GetItemLinqQueryable<CosmosDBListData>();
+            using FeedIterator<CosmosDBListData> results = query
                 .Where(p => p.id == key)
                 .ToFeedIterator();
 
@@ -125,24 +120,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, ListsCosmosIntegrationTestFunctions.redisConnectionString));
             bool exists = true;
 
-            CosmosClientBuilder clientBuilder = new CosmosClientBuilder(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, ListsCosmosIntegrationTestFunctions.cosmosDBConnectionString));
+            CosmosClientBuilder clientBuilder = new CosmosClientBuilder(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, ListsCosmosIntegrationTestFunctions.CosmosDBConnectionString));
             CosmosClient cosmosClient = clientBuilder.Build();
 
             Container db = cosmosClient.GetDatabase(CosmosDbDatabaseID).GetContainer(CosmosDbContainerID);
 
-            var query = db.GetItemLinqQueryable<ListData>();
-            using FeedIterator<ListData> results = query
+            var query = db.GetItemLinqQueryable<CosmosDBListData>();
+            using FeedIterator<CosmosDBListData> results = query
                 .Where(p => p.id == key)
                 .ToFeedIterator();
 
-            FeedResponse<ListData> response = await results.ReadNextAsync();
-            ListData item = response.FirstOrDefault(defaultValue: null);
+            FeedResponse<CosmosDBListData> response = await results.ReadNextAsync();
+            CosmosDBListData item = response.FirstOrDefault(defaultValue: null);
 
             var fullEntry = response.Take(response.Count);
 
             if (fullEntry == null) return;
 
-            foreach (ListData inputValues in fullEntry)
+            foreach (CosmosDBListData inputValues in fullEntry)
             {
                 RedisValue[] redisValues = Array.ConvertAll(inputValues.value.ToArray(), item => (RedisValue)item);
                 await multiplexer.GetDatabase().ListRightPushAsync(key, redisValues);
