@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WriteAroundSamples
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
     internal class StreamSample
     {
@@ -25,14 +25,14 @@ namespace WriteAroundSamples
         /// </summary>
         /// <param name="input"> List of changed documents in CosmosDB </param>
         /// <param name="logger"> ILogger used to write key information </param>
-        [FunctionName("CosmosToRedis")]
-        public static void Run(
+        [FunctionName(nameof(WriteAroundForStream))]
+        public static void WriteAroundForStream(
             [CosmosDBTrigger(
                 databaseName: cosmosDatabase,
                 containerName: cosmosContainer,
                 Connection = cosmosConnectionString,
                 LeaseContainerName = "leases",
-                CreateLeaseContainerIfNotExists = true)]IReadOnlyList<Data> input, ILogger logger)
+                CreateLeaseContainerIfNotExists = true)]IReadOnlyList<CosmosDBData> input, ILogger logger)
         {
             foreach (var document in input)
             {
@@ -47,10 +47,4 @@ namespace WriteAroundSamples
             }
         }
     }
-}
-
-public class Data
-{
-    public string id { get; set; }
-    public Dictionary<string, string> values { get; set; }
 }

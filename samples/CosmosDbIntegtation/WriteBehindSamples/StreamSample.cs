@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WriteBehindSamples
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
     internal class StreamSample
     {
@@ -27,36 +27,18 @@ namespace WriteBehindSamples
         /// <param name="entry"> The message which has gone through the stream. Includes message id alongside the key/value pairs </param>
         /// <param name="items"> Container for where the CosmosDB items are stored </param>
         /// <param name="logger"> ILogger used to write key information </param>
-        [FunctionName(nameof(WriteBehindAsync))]
-        public static async Task WriteBehindAsync(
+        [FunctionName(nameof(WriteBehindForStream))]
+        public static async Task WriteBehindForStream(
                 [RedisStreamTrigger(redisLocalHost, streamName)] StreamEntry entry,
                 [CosmosDB(
                 databaseName: cosmosDatabase,
                 containerName: cosmosContainer,
                 Connection = cosmosConnectionString)]
-                IAsyncCollector<Data> items,
+                IAsyncCollector<CosmosDBData> items,
                 ILogger logger)
         {
             // Insert data into CosmosDB asynchronously
-            await items.AddAsync(FormatData(entry, logger));
-        }
-
-        // Helper method to format stream message
-        private static Data FormatData(StreamEntry entry, ILogger logger)
-        {
-            logger.LogInformation("ID: {val}", entry.Id.ToString());
-
-            // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
-
-            Data sampleItem = new Data { id = entry.Id, values = dict };
-            return sampleItem;
+            await items.AddAsync(CosmosDBData.Format(entry, logger));
         }
     }
-}
-
-public class Data
-{
-    public string id { get; set; }
-    public Dictionary<string, string> values { get; set; }
 }
