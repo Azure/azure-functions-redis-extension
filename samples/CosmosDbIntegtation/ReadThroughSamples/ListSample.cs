@@ -16,7 +16,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     {
         //Redis Cache primary connection string from local.settings.json
         public const string redisConnectionString = "redisConnectionString";
-        private static readonly IDatabase s_redisDb = ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionString)).GetDatabase();
+        private static readonly Lazy<IDatabaseAsync> s_redisDb = new Lazy<IDatabaseAsync>(() => ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionString)).GetDatabase());
 
         //CosmosDB database name and container name from local.settings.json
         public const string CosmosDbDatabaseId = "CosmosDbDatabaseId";
@@ -40,14 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             foreach (CosmosDBListData inputValues in fullEntry)
             {
                 RedisValue[] redisValues = Array.ConvertAll(inputValues.value.ToArray(), item => (RedisValue)item);
-                await s_redisDb.ListRightPushAsync(listEntry, redisValues);
-
-                //Optional foreach loop + console write line to confirm each value is sent to the cache
-                foreach (RedisValue entryValue in redisValues)
-                {
-                    Console.WriteLine("Saved item " + entryValue + " in Azure Redis cache");
-
-                }
+                await s_redisDb.Value.ListRightPushAsync(listEntry, redisValues);
             }
         }
 
