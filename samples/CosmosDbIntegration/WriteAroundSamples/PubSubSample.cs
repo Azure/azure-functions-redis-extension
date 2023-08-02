@@ -19,8 +19,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string containerSetting = "%CosmosDbContainerId%";
         public const string pubSubContainerSetting = "%PubSubContainerId%";
 
-        private static readonly IConnectionMultiplexer s_redisConnection =
-            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionSetting));
+        private static readonly Lazy<IConnectionMultiplexer> s_redisConnection = new Lazy<IConnectionMultiplexer>(() =>
+            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionSetting)));
 
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             //if the list is null or empty, return
             if (cosmosData == null || cosmosData.Count <= 0) return;
 
-            IDatabaseAsync s_redisDb = s_redisConnection.GetDatabase();
+            IDatabaseAsync s_redisDb = s_redisConnection.Value.GetDatabase();
             //for each item upladed to cosmos, write it to Redis
             foreach (var document in cosmosData)
             {
@@ -75,7 +75,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             //if the list is null or empty, return
             if (cosmosData == null || cosmosData.Count <= 0) return;
 
-            ISubscriber s_redisPublisher = s_redisConnection.GetSubscriber();
+            ISubscriber s_redisPublisher = s_redisConnection.Value.GetSubscriber();
             //for each new item upladed to cosmos, publish to Redis
             foreach (var document in cosmosData)
             {
