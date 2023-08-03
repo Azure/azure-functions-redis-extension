@@ -5,7 +5,11 @@ using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using System.Net.Http;
 using Xunit;
+using System.Collections.Generic;
+using System.Text;
+using static Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration.IntegrationTestHelpers;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
@@ -103,6 +107,35 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
             var incorrect = counts.Where(pair => pair.Value != 0);
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
+        }
+
+        [Fact]
+        public async void ListTrigger_TargetBasedScaling_WorksCorrectly()
+        {
+            string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue_LongPollingInterval);
+            int port = 7071;
+            int elements = 10000;
+            RedisValue[] valuesArray = Enumerable.Range(0, elements).Select(x => new RedisValue(x.ToString())).ToArray();
+
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
+            {
+                await multiplexer.GetDatabase().ListLeftPushAsync(functionName, valuesArray);
+                await multiplexer.CloseAsync();
+            };
+
+            ScaleStatus status;
+            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, port))
+            using (HttpClient client = new HttpClient())
+            using (StringContent jsonContent = new StringContent("{}", Encoding.UTF8, "application/json"))
+            {
+                StringContent content = new StringContent(JsonConvert.SerializeObject(new { name = functionName, arguments = new string[] { "1" } }));
+                HttpResponseMessage response = await client.PostAsync($"http://127.0.0.1:{port}/admin/host/scale/status", jsonContent);
+                status = JsonConvert.DeserializeObject<ScaleStatus>(await response.Content.ReadAsStringAsync());
+                functionsProcess.Kill();
+            };
+
+            Assert.Equal(1, status.vote);
+            Assert.Equal(elements, status.targetWorkerCount - 1);
         }
     }
 }
