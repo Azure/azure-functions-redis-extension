@@ -42,17 +42,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             //if the list is null or empty, return
             if (cosmosData == null || cosmosData.Count <= 0) return;
 
-            IDatabaseAsync s_redisDb = s_redisConnection.Value.GetDatabase();
+            IDatabaseAsync redisDb = s_redisConnection.Value.GetDatabase();
             //for each item upladed to cosmos, write it to Redis
             foreach (var document in cosmosData)
             {
                 //if the key/value pair is already in Redis, throw an exception
-                if (await s_redisDb.StringGetAsync(document.key) == document.value)
+                if (await redisDb.StringGetAsync(document.key) == document.value)
                 {
                     throw new Exception($"ERROR: Key: \"{document.key}\", Value: \"{document.value}\" pair is already in Azure Redis Cache.");
                 }
                 //Write the key/value pair to Redis
-                await s_redisDb.StringSetAsync(document.key, document.value);
+                await redisDb.StringSetAsync(document.key, document.value);
                 logger.LogInformation($"Key: \"{document.key}\", Value: \"{document.value}\" added to Redis.");
             }
         }
@@ -75,12 +75,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             //if the list is null or empty, return
             if (cosmosData == null || cosmosData.Count <= 0) return;
 
-            ISubscriber s_redisPublisher = s_redisConnection.Value.GetSubscriber();
+            ISubscriber redisPublisher = s_redisConnection.Value.GetSubscriber();
             //for each new item upladed to cosmos, publish to Redis
             foreach (var document in cosmosData)
             {
                 //publish the message to the correct Redis channel
-                await s_redisPublisher.PublishAsync(document.channel, document.message);
+                await redisPublisher.PublishAsync(document.channel, document.message);
                 logger.LogInformation($"Message: \"{document.message}\" has been published on channel: \"{document.channel}\".");
             }
         }
