@@ -13,3 +13,4 @@
       "CosmosDbConnectionString": "AccountEndpoint=https://<cosmosdb-account>.documents.azure.com:443/;AccountKey=<access-key>;"
     }
   }
+}
