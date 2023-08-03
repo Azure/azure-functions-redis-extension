@@ -11,14 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis", "src\Microsoft.Azure.WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj", "{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadThroughSamples", "samples\CosmosDbIntegration\ReadThroughSamples\ReadThroughSamples.csproj", "{3AD71A49-E059-49D1-8D1A-DD5BC2391F86}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteAroundSamples", "samples\CosmosDbIntegration\WriteAroundSamples\WriteAroundSamples.csproj", "{79F00D03-5062-4038-ABE6-17A8CD24AAF8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteBehindSamples", "samples\CosmosDbIntegration\WriteBehindSamples\WriteBehindSamples.csproj", "{EB1B3C37-1D04-4C73-B197-0A4E7803036E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteThroughSamples", "samples\CosmosDbIntegration\WriteThroughSamples\WriteThroughSamples.csproj", "{61C31C94-4087-46CD-B6A6-4F9CB274C9CD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,22 +33,6 @@ Global
 		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1A50657-EB50-4B7C-9BDD-AB2A357F8235}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3AD71A49-E059-49D1-8D1A-DD5BC2391F86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3AD71A49-E059-49D1-8D1A-DD5BC2391F86}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3AD71A49-E059-49D1-8D1A-DD5BC2391F86}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3AD71A49-E059-49D1-8D1A-DD5BC2391F86}.Release|Any CPU.Build.0 = Release|Any CPU
-		{79F00D03-5062-4038-ABE6-17A8CD24AAF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79F00D03-5062-4038-ABE6-17A8CD24AAF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79F00D03-5062-4038-ABE6-17A8CD24AAF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79F00D03-5062-4038-ABE6-17A8CD24AAF8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB1B3C37-1D04-4C73-B197-0A4E7803036E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB1B3C37-1D04-4C73-B197-0A4E7803036E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB1B3C37-1D04-4C73-B197-0A4E7803036E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB1B3C37-1D04-4C73-B197-0A4E7803036E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61C31C94-4087-46CD-B6A6-4F9CB274C9CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61C31C94-4087-46CD-B6A6-4F9CB274C9CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61C31C94-4087-46CD-B6A6-4F9CB274C9CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61C31C94-4087-46CD-B6A6-4F9CB274C9CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
