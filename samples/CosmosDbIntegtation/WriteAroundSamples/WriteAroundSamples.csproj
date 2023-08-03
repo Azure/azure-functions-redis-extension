@@ -13,6 +13,9 @@
     <PackageReference Include="StackExchange.Redis" Version="2.6.122" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\dotnet\Microsoft.Azure.WebJobs.Extensions.Redis.Samples.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

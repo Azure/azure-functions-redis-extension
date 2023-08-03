@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Microsoft.Azure.Functions.Worker.Extensions.Redis\Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj" />
+    <ProjectReference Include="..\..\dotnet\Microsoft.Azure.WebJobs.Extensions.Redis.Samples.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
