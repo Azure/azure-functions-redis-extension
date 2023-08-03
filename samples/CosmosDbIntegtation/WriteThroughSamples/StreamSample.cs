@@ -13,13 +13,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     internal class StreamSample
     {
         // Redis connection string and stream names stored in local.settings.json
-        public const string redisLocalHost = "redisConnectionString";
+        public const string redisConnectionSetting = "redisConnectionString";
         public const string streamName = "streamTest";
 
         // CosmosDB connection string, database name and container name stored in local.settings.json
-        public const string cosmosConnectionString = "cosmosConnectionString";
-        public const string cosmosDatabase = "%database-id%";
-        public const string cosmosContainer = "%container-id%";
+        public const string cosmosDbConnectionSetting = "CosmosDbConnectionString";
+        public const string databaseSetting = "%CosmosDbDatabaseId%";
+        public const string containerSetting = "%CosmosDbContainerId%";
 
         /// <summary>
         /// Write through: Write to CosmosDB synchronously whenever a new value is added to the Redis Stream
@@ -29,11 +29,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="logger"> ILogger used to write key information </param>
         [FunctionName(nameof(WriteThroughForStream))]
         public static void WriteThroughForStream(
-                [RedisStreamTrigger(redisLocalHost, streamName)] StreamEntry entry,
+                [RedisStreamTrigger(redisConnectionSetting, streamName)] StreamEntry entry,
                  [CosmosDB(
-                databaseName: "database-id",
-                containerName: "container-id",
-                Connection = "cosmosConnectionString")]
+                databaseName: databaseSetting,
+                containerName: containerSetting,
+                Connection = cosmosDbConnectionSetting)]
                 ICollector<CosmosDBData> items,
                 ILogger logger)
         {

@@ -13,13 +13,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     internal class StreamSample
     {
         // Redis connection string and stream names stored in local.settings.json
-        public const string redisLocalHost = "redisConnectionString";
+        public const string redisConnectionSetting = "redisConnectionString";
         public const string streamName = "streamTest";
 
-        // CosmosDB connection string, database name and container name stored in local.settings.json
-        public const string cosmosConnectionString = "cosmosConnectionString";
-        public const string cosmosDatabase = "%database-id%";
-        public const string cosmosContainer = "%container-id%";
+        // CosmosDB connection string, client, database name and container name stored in local.settings.json
+        public const string cosmosDbConnectionSetting = "cosmosDbConnectionString";
+        public const string databaseSetting = "%cosmosDbDatabaseId%";
+        public const string containerSetting = "%cosmosDbContainerId%";
 
         /// <summary>
         /// Write behind: Write to CosmosDB asynchronously whenever a new value is added to the Redis Stream
@@ -29,11 +29,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="logger"> ILogger used to write key information </param>
         [FunctionName(nameof(WriteBehindForStream))]
         public static async Task WriteBehindForStream(
-                [RedisStreamTrigger(redisLocalHost, streamName)] StreamEntry entry,
+                [RedisStreamTrigger(redisConnectionSetting, streamName)] StreamEntry entry,
                 [CosmosDB(
-                databaseName: cosmosDatabase,
-                containerName: cosmosContainer,
-                Connection = cosmosConnectionString)]
+                databaseName: databaseSetting,
+                containerName: containerSetting,
+                Connection = cosmosDbConnectionSetting)]
                 IAsyncCollector<CosmosDBData> items,
                 ILogger logger)
         {
