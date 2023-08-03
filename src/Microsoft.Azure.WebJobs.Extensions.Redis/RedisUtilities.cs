@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    internal static class RedisUtilities
+    public static class RedisUtilities
     {
         public static Version Version62 = new Version("6.2");
         public static Version Version70 = new Version("7.0");
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        internal static Dictionary<string, string> StreamEntryToDictionary(StreamEntry entry)
+        public static Dictionary<string, string> StreamEntryToDictionary(StreamEntry entry)
         {
             return entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
         }
