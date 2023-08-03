@@ -23,7 +23,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string CosmosDbContainerId = "CosmosDbContainerId";
 
         /// <summary>
-        /// Adds a value to a Redis cache.
+        /// Adds a CosmosDBListData item to a Redis list with a specific key.
         /// </summary>
         /// <param name="response"> The response object returned by a Cosmos DB query. </param>
         /// <param name="item"> The item to be added to the Redis cache. </param>
