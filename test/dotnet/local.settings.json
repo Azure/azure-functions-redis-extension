@@ -2,13 +2,9 @@
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "CosmosDbDatabaseId": "DatabaseId",
-    "CosmosDbContainerId": "ContainerId",
-    "PubSubContainerId": "PSContainerId",
-    "PubSubChannel": "PubSubTest"
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet"
   },
   "ConnectionStrings": {
-    "redisConnectionString": "<cache-name>.redis.cache.windows.net:6380,password=<access-key>,ssl=True,abortConnect=False,tiebreaker=",
+    "redisLocalhost": "127.0.0.1:6379"
   }
 }
