@@ -349,6 +349,3 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-/StreamTriggerSamples/CosmosDB to Redis/local.settings.json
-/StreamTriggerSamples/Redis to CosmosDB/local.settings.json
-/StreamTriggerSamples/StreamTriggerUnitTests/local.settings.json
