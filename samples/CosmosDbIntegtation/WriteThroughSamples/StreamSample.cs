@@ -17,9 +17,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string streamName = "streamTest";
 
         // CosmosDB connection string, database name and container name stored in local.settings.json
-        public const string cosmosDbConnectionSetting = "CosmosDbConnectionString";
-        public const string databaseSetting = "%CosmosDbDatabaseId%";
-        public const string containerSetting = "%CosmosDbContainerId%";
+        public const string cosmosDbConnectionSetting = "cosmosDbConnectionString";
+        public const string databaseSetting = "%cosmosDbDatabaseId%";
+        public const string containerSetting = "%cosmosDbContainerId%";
 
         /// <summary>
         /// Write through: Write to CosmosDB synchronously whenever a new value is added to the Redis Stream

@@ -11,7 +11,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
     internal class StreamSample
     {
-        /*
         // Redis database and stream stored in local.settings.json
         public const string redisConnectionSetting = "redisConnectionString";
         private static readonly Lazy<IDatabaseAsync> redisDB = new Lazy<IDatabaseAsync>(() =>
@@ -53,6 +52,5 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 }
             }
         }
-        */
      }
 }
