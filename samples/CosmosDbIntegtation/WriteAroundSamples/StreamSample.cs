@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string redisConnectionSetting = "redisConnectionString";
         private static readonly Lazy<IDatabaseAsync> redisDB = new Lazy<IDatabaseAsync>(() =>
            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionSetting)).GetDatabase());
-        public const string stream = "streamTest";
+        private const string streamName = "streamTest_WriteAround";
 
         // CosmosDB connection string, database name and container name stored in local.settings.json
         public const string cosmosDbConnectionSetting = "cosmosDbConnectionString";
@@ -34,7 +34,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 containerName: containerSetting,
                 Connection = cosmosDbConnectionSetting,
                 LeaseContainerName = "leases",
-                CreateLeaseContainerIfNotExists = true)]IReadOnlyList<CosmosDBData> input, ILogger logger)
+                CreateLeaseContainerIfNotExists = true)]IReadOnlyList<StreamData> input, ILogger logger)
         {
             if (input != null)
             {
@@ -48,9 +48,49 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                         values[i++] = new NameValueEntry(entry.Key, entry.Value);
                     }
 
-                    await redisDB.Value.StreamAddAsync(stream, values);
+                    await redisDB.Value.StreamAddAsync(streamName, values);
                 }
             }
         }
-     }
+
+       
+        public const string containerSettingSingleDocument = "%cosmosDbContainerIdSingleDocument%";
+        private const string streamNameSingleDocument = "streamTest_CosmosToRedis";
+        /// <summary>
+        /// Write Around: Write from Cosmos DB to Redis whenever a change occurs in one of the CosmosDB documents
+        /// </summary>
+        /// <param name="input"> List of changed documents in CosmosDB </param>
+        /// <param name="logger"> ILogger used to write key information </param>
+        [FunctionName(nameof(CosmosToRedisForStreamSingleDocumentAsync))]
+        public static async Task CosmosToRedisForStreamSingleDocumentAsync(
+            [CosmosDBTrigger(
+                databaseName: databaseSetting,
+                containerName: containerSettingSingleDocument,
+                Connection = cosmosDbConnectionSetting,
+                LeaseContainerName = "leases",
+                CreateLeaseContainerIfNotExists = true)]IReadOnlyList<StreamData2> input, ILogger logger)
+        {
+            if (input != null)
+            {
+                foreach (var document in input)
+                {
+                    logger.LogInformation(document.id + " changed");
+
+                    foreach (var message in document.messages)
+                    {
+                        var values = new NameValueEntry[message.Value.Count];
+                        int i = 0;
+                        foreach (var entry in message.Value)
+                        {
+                            values[i++] = new NameValueEntry(entry.Key, entry.Value);
+                        }
+
+                        await redisDB.Value.StreamAddAsync(streamNameSingleDocument, values, messageId: message.Key, maxLength: document.maxlen);
+
+                    }
+                }
+            }
+        }
+        
+    }
 }
