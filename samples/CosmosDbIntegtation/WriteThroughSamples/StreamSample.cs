@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         public const string containerSettingSingleDocument = "%cosmosDbContainerIdSingleDocument%";
         /// <summary>
-        /// Write through: Write messages to a single document in CosmosDB synchronously whenever a new value is added to the Redis Stream
+        /// Write through (Single Document): Write messages to a single document in CosmosDB synchronously whenever a new value is added to the Redis Stream
         /// </summary>
         /// <param name="entry"> The message which has gone through the stream. Includes message id alongside the key/value pairs </param>
         /// <param name="items"> Container for where the CosmosDB items are stored </param>
@@ -56,7 +56,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 [CosmosDB(
                     databaseName: databaseSetting,
                     containerName: containerSettingSingleDocument,
-                    Connection = cosmosDbConnectionSetting)] ICollector<StreamData2> items,
+                    Connection = cosmosDbConnectionSetting)] ICollector<StreamDataSingleDocument> items,
                  ILogger logger)
         {
             // Connect CosmosDB container
@@ -64,7 +64,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 .GetContainer(Environment.GetEnvironmentVariable(containerSettingSingleDocument.Substring(1, containerSettingSingleDocument.Length - 2)));
 
             // Query Database by the stream name
-            StreamData2 results = cosmosDbContainer.GetItemLinqQueryable<StreamData2>(true)
+            StreamDataSingleDocument results = cosmosDbContainer.GetItemLinqQueryable<StreamDataSingleDocument>(true)
                                  .Where(b => b.id == streamName)
                                  .AsEnumerable()
                                  .FirstOrDefault();
@@ -72,7 +72,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             if (results == null)
             {
                 // If the stream does not exist in CosmosDB, create a new entry
-                StreamData2 data = StreamData2.CreateNewEntry(entry, streamName, logger);
+                StreamDataSingleDocument data = StreamDataSingleDocument.CreateNewEntry(entry, streamName, logger);
 
                 // Insert data into CosmosDB synchronously
                 items.Add(data);
@@ -80,7 +80,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             else
             {
                 // If the stream exists in CosmosDB, add to the existing entry
-                StreamData2 data = StreamData2.UpdateExistingEntry(results, entry, logger);
+                StreamDataSingleDocument data = StreamDataSingleDocument.UpdateExistingEntry(results, entry, logger);
 
                 // Insert data into CosmosDB synchronously
                 items.Add(data);

@@ -23,13 +23,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         }
     }
 
-    public class StreamData2
+    public class StreamDataSingleDocument
     {
         public string id { get; set; }
         public int maxlen { get; set; }
         public Dictionary<string, Dictionary<string, string>> messages { get; set; }
 
-        public static StreamData2 CreateNewEntry(StreamEntry entry, string streamName, ILogger logger)
+        public static StreamDataSingleDocument CreateNewEntry(StreamEntry entry, string streamName, ILogger logger)
         {
             logger.LogInformation("Creating a new document for {val}. Inserting ID: {val} as the first entry", streamName, entry.Id.ToString());
 
@@ -40,12 +40,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             var list = new Dictionary<string, Dictionary<string, string>>();
             list.Add(entry.Id.ToString(), dict);
 
-            StreamData2 data = new StreamData2 { id = streamName, maxlen = 1000, messages = list };
+            StreamDataSingleDocument data = new StreamDataSingleDocument { id = streamName, maxlen = 1000, messages = list };
             return data;
         }
 
-
-        public static StreamData2 UpdateExistingEntry(StreamData2 results, StreamEntry entry, ILogger logger)
+        public static StreamDataSingleDocument UpdateExistingEntry(StreamDataSingleDocument results, StreamEntry entry, ILogger logger)
         {
             logger.LogInformation("Adding to {val} document. Inserting ID: {val} ", results.id, entry.Id.ToString());
 
@@ -62,7 +61,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 list.Remove(minKey);
             }
 
-            StreamData2 data = new StreamData2 { id = results.id, maxlen = results.maxlen, messages = list };
+            StreamDataSingleDocument data = new StreamDataSingleDocument { id = results.id, maxlen = results.maxlen, messages = list };
             return data;
         }
     }

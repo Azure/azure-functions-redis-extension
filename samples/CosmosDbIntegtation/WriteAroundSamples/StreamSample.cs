@@ -57,7 +57,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string containerSettingSingleDocument = "%cosmosDbContainerIdSingleDocument%";
         private const string streamNameSingleDocument = "streamTest_CosmosToRedis";
         /// <summary>
-        /// Write Around: Write from Cosmos DB to Redis whenever a change occurs in one of the CosmosDB documents
+        /// Write Around (Single Document): Write from Cosmos DB to Redis whenever a change occurs in one of the CosmosDB documents
         /// </summary>
         /// <param name="input"> List of changed documents in CosmosDB </param>
         /// <param name="logger"> ILogger used to write key information </param>
@@ -68,7 +68,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 containerName: containerSettingSingleDocument,
                 Connection = cosmosDbConnectionSetting,
                 LeaseContainerName = "leases",
-                CreateLeaseContainerIfNotExists = true)]IReadOnlyList<StreamData2> input, ILogger logger)
+                CreateLeaseContainerIfNotExists = true)]IReadOnlyList<StreamDataSingleDocument> input, ILogger logger)
         {
             if (input != null)
             {
