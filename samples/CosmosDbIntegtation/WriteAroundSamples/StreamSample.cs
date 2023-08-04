@@ -38,13 +38,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 foreach (var document in input)
                 {
                     logger.LogInformation(document.id + " changed");
+
                     var values = new NameValueEntry[document.values.Count];
                     int i = 0;
+
+                    // Format the key/value pairs
                     foreach (KeyValuePair<string, string> entry in document.values)
                     {
                         values[i++] = new NameValueEntry(entry.Key, entry.Value);
                     }
 
+                    // Upload value to Redis Stream
                     await redisDB.Value.StreamAddAsync(streamName, values);
                 }
             }
@@ -73,6 +77,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 {
                     logger.LogInformation(document.id + " changed");
 
+                    // Go through each message and format the key/value pairs
                     foreach (var message in document.messages)
                     {
                         var values = new NameValueEntry[message.Value.Count];
@@ -82,6 +87,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                             values[i++] = new NameValueEntry(entry.Key, entry.Value);
                         }
 
+                        // Upload value to Redis Stream
                         await redisDB.Value.StreamAddAsync(streamNameSingleDocument, values, messageId: message.Key, maxLength: document.maxlen);
 
                     }
