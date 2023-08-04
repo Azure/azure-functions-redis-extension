@@ -1,20 +1,13 @@
-using System;
+﻿using System;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
 {
-    public class CustomType
-    {
-        public string Name { get; set; }
-        public string Field { get; set; }
-        public string Random { get; set; }
-    }
-
     public record RedisData(
         string id,
         string key,
         string value,
         DateTime timestamp
-    );
+        );
 
     public record PubSubData(
         string id,
@@ -22,4 +15,5 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         string message,
         DateTime timestamp
         );
+
 }
