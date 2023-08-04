@@ -1,6 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -58,6 +57,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             logger.LogInformation($"Message: \"{redisData.message}\" from Channel: \"{redisData.channel}\" stored in Cosmos DB container: \"{"PSContainerId"}\" with id: \"{redisData.id}\"");
         }
 
+        
         [FunctionName(nameof(MultipleChannelWriteBehind))]
         public static async Task MultipleChannelWriteBehind(
             [RedisPubSubTrigger(localhostSetting, pubsubMultiple)] ChannelMessage pubSubMessage,
