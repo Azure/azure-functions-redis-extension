@@ -13,6 +13,7 @@ trigger:
       - main
 
 variables:
+  FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED: 1
   # It is a release build if it is triggered by the main branch.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
   majorVersion: 0
@@ -40,12 +41,6 @@ jobs:
         inputs:
           targetType: 'inline'
           script: 'wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb; sudo dpkg -i packages-microsoft-prod.deb; sudo apt-get update; sudo apt-get install -qq -y azure-functions-core-tools-4'
-
-      - task: Bash@3
-        displayName: Set Environment Variables
-        inputs:
-          targetType: 'inline'
-          script: 'echo '##vso[task.setvariable variable=FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED]1'
 
       - task: Bash@3
         displayName: Download and start redis server, enable all keyspace/keyevent notifications
