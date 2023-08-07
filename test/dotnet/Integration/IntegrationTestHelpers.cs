@@ -27,6 +27,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     UseShellExecute = false
                 }
             };
+            functionsProcess.StartInfo.EnvironmentVariables["FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED"] = "1";
 
             TaskCompletionSource<bool> hostStarted = new TaskCompletionSource<bool>();
             void hostStartupHandler(object sender, DataReceivedEventArgs e)

@@ -127,15 +127,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (StringContent jsonContent = new StringContent("{}", Encoding.UTF8, "application/json"))
             {
                 StringContent content = new StringContent(JsonConvert.SerializeObject(new { name = functionName, arguments = new string[] { "1" } }));
-                try
-                {
-                    HttpResponseMessage response = await client.PostAsync($"http://127.0.0.1:{port}/admin/host/scale/status", jsonContent);
-                    status = JsonConvert.DeserializeObject<IntegrationTestHelpers.ScaleStatus>(await response.Content.ReadAsStringAsync());
-                }
-                catch (HttpRequestException ex)
-                {
-                    //Environment variable FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED not set to 1, so test will not work.
-                }
+                HttpResponseMessage response = await client.PostAsync($"http://127.0.0.1:{port}/admin/host/scale/status", jsonContent);
+                status = JsonConvert.DeserializeObject<IntegrationTestHelpers.ScaleStatus>(await response.Content.ReadAsStringAsync());
                 functionsProcess.Kill();
             };
 
