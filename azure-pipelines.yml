@@ -49,9 +49,9 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
+        env:
+          FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED: '1'
         inputs:
-          env:
-            FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED: '1'
           command: test
           arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
 
