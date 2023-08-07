@@ -13,7 +13,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         private static readonly IDatabase s_redisDb = ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionString)).GetDatabase();
 
         //CosmosDB Endpoint from local.settings.json
-        public const string CosmosDBConnectionString = "CosmosDBConnectionString";
+        public const string CosmosDbDatabaseId = "%CosmosDbDatabaseId%";
+        public const string ListContainerId = "%ListContainerId%";
 
         //Uses the key of the user's choice and should be changed accordingly
         public const string key = "userListName";
@@ -27,7 +28,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         [FunctionName("WriteAroundListTrigger")]
         public static void WriteAroundListTrigger([CosmosDBTrigger(
         databaseName: "%CosmosDbDatabaseId%",
-        containerName: "%CosmosDbContainerId%",
+        containerName: "%ListContainerId%",
         Connection = "CosmosDBConnectionString",
         LeaseContainerName = "leases")]IReadOnlyList<CosmosDBListData> readOnlyList, ILogger log)
         {

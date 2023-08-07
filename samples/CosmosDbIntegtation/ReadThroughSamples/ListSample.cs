@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         //CosmosDB database name and container name from local.settings.json
         public const string CosmosDbDatabaseId = "CosmosDbDatabaseId";
-        public const string CosmosDbContainerId = "CosmosDbContainerId";
+        public const string ListContainerId = "ListContainerId";
 
         /// <summary>
         /// Adds a CosmosDBListData item to a Redis list with a specific key.
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             ILogger logger)
         {
             //Retrieve the database and container from the given client, which accesses the CosmosDB Endpoint
-            Container db = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(CosmosDbContainerId));
+            Container db = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(ListContainerId));
 
             //Creates query for item inthe container and
             //uses feed iterator to keep track of token when receiving results from query

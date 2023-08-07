@@ -24,7 +24,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         //CosmosDB database name and container name from local.settings.json
         public const string CosmosDbDatabaseId = "CosmosDbDatabaseId";
-        public const string CosmosDbContainerId = "CosmosDbContainerId";
+        public const string ListContainerId = "ListContainerId";
 
         //Uses the key of the user's choice and should be changed accordingly
         public const string key = "userListName";
@@ -43,7 +43,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             ILogger logger)
         {
             //Retrieve the database and container from the given client, which accesses the CosmosDB Endpoint
-            Container db = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(CosmosDbContainerId));
+            Container db = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(ListContainerId));
 
             //Creates query for item inthe container and
             //uses feed iterator to keep track of token when receiving results from query
@@ -57,7 +57,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             CosmosDBListData item = response.FirstOrDefault(defaultValue: null);
 
             //Optional logger to display what is being pushed to CosmosDB
-            logger.LogInformation("The value added to " + key + " is " + listEntry + ". The value will be added to CosmosDB database: " + CosmosDbDatabaseId + " and container: " + CosmosDbContainerId + ".");
+            logger.LogInformation("The value added to " + key + " is " + listEntry + ". The value will be added to CosmosDB database: " + CosmosDbDatabaseId + " and container: " + ListContainerId + ".");
 
             //Create an entry if the key doesn't exist in CosmosDB or add to it if there is an existing entry
             List<string> resultsHolder = item?.value ?? new List<string>();
