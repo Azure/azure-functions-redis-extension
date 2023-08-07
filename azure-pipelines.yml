@@ -13,7 +13,6 @@ trigger:
       - main
 
 variables:
-  FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED: 1
   # It is a release build if it is triggered by the main branch.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
   majorVersion: 0
@@ -51,6 +50,8 @@ jobs:
       - task: DotNetCoreCLI@2
         displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
         inputs:
+          env:
+            FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED: '1'
           command: test
           arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
 
