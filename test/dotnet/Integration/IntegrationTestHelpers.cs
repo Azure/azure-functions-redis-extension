@@ -14,9 +14,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         internal static Process StartFunction(string functionName, int port)
         {
-            Environment.SetEnvironmentVariable("FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED", "1");
-            Environment.SetEnvironmentVariable("TARGET_BASED_SCALING_ENABLED", "1");
-
             Process functionsProcess = new Process
             {
                 StartInfo = new ProcessStartInfo
