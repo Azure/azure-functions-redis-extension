@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;

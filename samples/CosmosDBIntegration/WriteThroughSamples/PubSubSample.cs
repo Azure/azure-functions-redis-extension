@@ -1,6 +1,4 @@
-﻿using Microsoft.Azure.Functions.Worker.Extensions.Redis;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
+﻿using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -29,8 +27,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="newKey"> The key that has been added or changed in Redis.</param>
         /// <param name="cosmosDBOut"> A dynamic object that is used to synchronously write new data to CosmosDB.</param>
         /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
-        [FunctionName(nameof(WriteThrough))]
-        public static void WriteThrough(
+        [FunctionName(nameof(PubsubWriteThrough))]
+        public static void PubsubWriteThrough(
            [RedisPubSubTrigger(redisConnectionSetting, "__keyevent@0__:set")] string newKey,
            [CosmosDB(
                 databaseName: databaseSetting,
@@ -55,8 +53,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="pubSubMessage"> The message that was published in Redis</param>
         /// <param name="cosmosDBOut"> A dynamic object that is used to synchronously write new data to CosmosDB.</param>
         /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
-        [FunctionName(nameof(WriteThroughMessage))]
-        public static void WriteThroughMessage(
+        [FunctionName(nameof(PubsubWriteThroughMessage))]
+        public static void PubsubWriteThroughMessage(
             [RedisPubSubTrigger(redisConnectionSetting, pubSubChannelSetting)] ChannelMessage pubSubMessage,
              [CosmosDB(
                 databaseName: databaseSetting,

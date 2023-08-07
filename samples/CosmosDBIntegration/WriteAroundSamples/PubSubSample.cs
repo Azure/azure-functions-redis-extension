@@ -4,7 +4,6 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
@@ -30,8 +29,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
         /// <returns></returns>
         /// <exception cref="Exception"> Thrown when they key/value pair is already stored in the Redis cache.</exception>
-        [FunctionName(nameof(WriteAroundAsync))]
-        public static async Task WriteAroundAsync(
+        [FunctionName(nameof(PubsubWriteAroundAsync))]
+        public static async Task PubsubWriteAroundAsync(
             [CosmosDBTrigger(
                 databaseName: databaseSetting,
                 containerName: containerSetting,
@@ -63,8 +62,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="cosmosData"> A readonly list containing all the new/updated documents in the specified Cosmos DB container.</param>
         /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
         /// <returns></returns>
-        [FunctionName(nameof(WriteAroundMessageAsync))]
-        public static async Task WriteAroundMessageAsync(
+        [FunctionName(nameof(PubsubWriteAroundMessageAsync))]
+        public static async Task PubsubWriteAroundMessageAsync(
             [CosmosDBTrigger(
                 databaseName: databaseSetting,
                 containerName: pubSubContainerSetting,
