@@ -110,6 +110,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void ListTrigger_TargetBasedScaling_WorksCorrectly()
         {
+            string monitoringEnabled = Environment.GetEnvironmentVariable("FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED");
+            if (monitoringEnabled.IsNullOrEmpty() || monitoringEnabled != "1")
+            {
+                throw new Exception("FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED not set to 1, cannot attempt to check status");
+            }
+
             string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue_LongPollingInterval);
             int port = 7071;
             int elements = 10000;
