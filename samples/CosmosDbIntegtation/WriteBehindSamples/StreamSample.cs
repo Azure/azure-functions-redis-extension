@@ -81,7 +81,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 // If the stream exists in CosmosDB, add to the existing entry
                 StreamDataSingleDocument data = StreamDataSingleDocument.UpdateExistingEntry(results, entry, logger);
 
-                // Insert data into CosmosDB synchronously
+                // Insert data into CosmosDB asynchronously
                 await items.AddAsync(data);
             }
         }
