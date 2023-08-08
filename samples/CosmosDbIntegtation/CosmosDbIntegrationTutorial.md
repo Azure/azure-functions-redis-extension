@@ -1,7 +1,3 @@
-ms.topic: tutorial #Required; leave this attribute/value as-is
-ms.date: #Required; mm/dd/yyyy format
-
-
 # Tutorial: Setup Redis Triggers for Azure Function in Visual Studio
 Article 08/08/2023 Nadia Bugarin, Riley MacDonald, Phoebe Owusu
 
@@ -92,12 +88,12 @@ Lists
 2.	WriteAround 
     - Change the value of key to the desired key before the function 
 
-    :::image type="content" source="CosmosDbIntegration/Models/ListKey.png" alt-text="Screenshot of List Key variable in sample code":::
+    ![Image](Models/ListKey.png)
  
 Streams 
 1.	Set streamName variable equal to the name of your stream to connect stream triggers to it. 
 
-:::image type="content" source="CosmosDbIntegration/Models/StreamName.png" alt-text="Screenshot of Stream Name variable in sample code.":::
+    ![Image](Models/StreamName.png)
 
 ### Security
 * This design introduces new secrets. Theses secrets are the CosmosDB keys and connection strings, and the Azure Cache for Redis Connection strings. These will be stored in the customers’ storage account associated with their function app.
