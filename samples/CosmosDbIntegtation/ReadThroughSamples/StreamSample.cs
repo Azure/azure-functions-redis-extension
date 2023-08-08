@@ -11,18 +11,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     internal class StreamSample
     {
         // Redis connection string and stream names stored in local.settings.json
-        public const string redisConnectionSetting = "redisConnectionString";
-        private static readonly Lazy<IDatabaseAsync> redisDB = new Lazy<IDatabaseAsync>(() =>
-           ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionSetting)).GetDatabase());
-        private const string streamNameSingleDocument = "streamTest_WriteBehind";
+        public const string RedisConnectionSetting = "RedisConnectionString";
+        private static readonly Lazy<IDatabaseAsync> _redisDB = new Lazy<IDatabaseAsync>(() =>
+           ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(RedisConnectionSetting)).GetDatabase());
+        public static string StreamNameSingleDocument = Environment.GetEnvironmentVariable("StreamTest");
 
-        // CosmosDB connection string, client, database name and container name stored in local.settings.json
-        public const string cosmosDbConnectionSetting = "cosmosDbConnectionString";
-        public const string databaseSetting = "%cosmosDbDatabaseId%";
-        public const string containerSettingSingleDocument = "%cosmosDbContainerIdSingleDocument%";
+        // CosmosDB connection string, database name and container name stored in local.settings.json
+        public const string CosmosDbConnectionSetting = "CosmosDbConnectionString";
+        public const string DatabaseSetting = "%CosmosDbDatabaseId%";
+        public const string ContainerSettingSingleDocument = "%CosmosDbContainerIdSingleDocument%";
 
         /// <summary>
-        /// Read Through: If the stream does not exits, refresh it with the values saved in CosmosDB (only available if entries were written in a single document)
+        /// Read Through: If the stream does not exist in Redis, refresh it with the values saved in CosmosDB 
         /// </summary>
         /// <param name="entry"> The message which has gone through the stream. Includes message id alongside the key/value pairs </param>
         /// <param name="items"> Container for where the CosmosDB items are stored </param>
@@ -30,50 +30,49 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <returns></returns>
         [FunctionName(nameof(ReadThroughForStreamSingleDocumentAsync))]
         public static async Task ReadThroughForStreamSingleDocumentAsync(
-               [RedisPubSubTrigger(redisConnectionSetting, "__keyevent@0__:keymiss")] string entry,
+               [RedisPubSubTrigger(RedisConnectionSetting, "__keyevent@0__:keymiss")] string entry,
                [CosmosDB(
-                    databaseName: databaseSetting,
-                    containerName: containerSettingSingleDocument,
-                    Connection = cosmosDbConnectionSetting)] CosmosClient cosmosDbClient,
+                    databaseName: DatabaseSetting,
+                    containerName: ContainerSettingSingleDocument,
+                    Connection = CosmosDbConnectionSetting)] CosmosClient cosmosDbClient,
                ILogger logger)
         {
-            if (entry == streamNameSingleDocument)
+
+            if (entry != StreamNameSingleDocument) return;
+            
+            // Connect CosmosDB container
+            Container cosmosDbContainer = cosmosDbClient.GetContainer(Environment.GetEnvironmentVariable(DatabaseSetting.Replace("%", "")), Environment.GetEnvironmentVariable(ContainerSettingSingleDocument.Replace("%", "")));
+
+            // Query Database by the stream name
+            FeedIterator<StreamDataSingleDocument> query = cosmosDbContainer.GetItemLinqQueryable<StreamDataSingleDocument>(true)
+                .Where(b => b.id == StreamNameSingleDocument)
+                .ToFeedIterator();
+            FeedResponse<StreamDataSingleDocument> response = await query.ReadNextAsync();
+            StreamDataSingleDocument results = response.FirstOrDefault(defaultValue: null);
+
+            // If stream not found
+            if (results == null)
             {
-                // Connect CosmosDB container
-                Cosmos.Container cosmosDbContainer = cosmosDbClient.GetDatabase(Environment.GetEnvironmentVariable(databaseSetting.Substring(1, databaseSetting.Length - 2)))
-                    .GetContainer(Environment.GetEnvironmentVariable(containerSettingSingleDocument.Substring(1, containerSettingSingleDocument.Length - 2)));
-
-                // Query Database by the stream name
-                FeedIterator<StreamDataSingleDocument> query = cosmosDbContainer.GetItemLinqQueryable<StreamDataSingleDocument>(true)
-                                     .Where(b => b.id == streamNameSingleDocument)
-                                     .ToFeedIterator();
-
-                FeedResponse<StreamDataSingleDocument> response = await query.ReadNextAsync();
-                StreamDataSingleDocument results = response.FirstOrDefault(defaultValue: null);
-
-                //If stream note found
-                if (results == null)
-                {
-                    logger.LogInformation("stream not found");
-                }
-                else
-                {
-                    // Go through each message and format the key/value pairs
-                    foreach (var message in results.messages)
-                    {
-                        var values = new NameValueEntry[message.Value.Count];
-                        int i = 0;
-                        foreach (var pair in message.Value)
-                        {
-                            values[i++] = new NameValueEntry(pair.Key, pair.Value);
-                        }
-
-                        // Upload value to Redis Stream
-                        await redisDB.Value.StreamAddAsync(streamNameSingleDocument, values, messageId: message.Key, maxLength: results.maxlen);
-
-                    }
-                }
+                logger.LogWarning("{streamNameSingleDocument} was not found in the database, failed to read stream", StreamNameSingleDocument);
             }
+            else
+            {
+                logger.LogInformation("{streamNameSingleDocument} was  found in the database", StreamNameSingleDocument);
+
+                // Go through each message and format the key/value pairs
+                foreach (var message in results.messages)
+                {
+                    var values = new NameValueEntry[message.Value.Count];
+                    int i = 0;
+                    foreach (var pair in message.Value)
+                    {
+                        values[i++] = new NameValueEntry(pair.Key, pair.Value);
+                    }
+
+                    // Upload value to Redis Stream
+                    await _redisDB.Value.StreamAddAsync(StreamNameSingleDocument, values, messageId: message.Key, maxLength: results.maxlen);
+                }
+            }         
         }
     }
 }
