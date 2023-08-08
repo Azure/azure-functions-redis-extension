@@ -92,12 +92,12 @@ Lists
 2.	WriteAround 
     - Change the value of key to the desired key before the function 
 
-    :::image type="content" source="Models/ListKey.png" alt-text="Screenshot of List Key variable in sample code":::
+    :::image type="content" source="CosmosDbIntegration/Models/ListKey.png" alt-text="Screenshot of List Key variable in sample code":::
  
 Streams 
 1.	Set streamName variable equal to the name of your stream to connect stream triggers to it. 
 
-:::image type="content" source="Models/StreamName.png" alt-text="Screenshot of Stream Name variable in sample code.":::
+:::image type="content" source="CosmosDbIntegration/Models/StreamName.png" alt-text="Screenshot of Stream Name variable in sample code.":::
 
 ### Security
 * This design introduces new secrets. Theses secrets are the CosmosDB keys and connection strings, and the Azure Cache for Redis Connection strings. These will be stored in the customers’ storage account associated with their function app.
@@ -111,20 +111,9 @@ If you're not going to continue to use this application, delete
 1. On overview, select Delete account or “Delete."
 1. Confirm anything else to delete the resource
 
-<!-- 9. Next step/Related content ------------------------------------------------------------------------ 
-
-Optional: You have two options for manually curated links in this pattern: Next step and Related content. You don't have to use either, but don't use both.
-  - For Next step, provide one link to the next step in a sequence. Use the blue box format
-  - For Related content provide 1-3 links. Include some context so the customer can determine why they would click the link. Add a context sentence for the following links.
-
--->
-
-## Next step
-
-> [Blog Post](article-concept.md)
-
-<!-- OR -->
 
 ## Related content
 
-- [README](article-concept.md)
+> [README](article-concept.md)
+
+> [Blog Post](article-concept.md)
