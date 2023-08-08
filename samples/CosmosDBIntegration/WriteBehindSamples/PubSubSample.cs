@@ -1,6 +1,4 @@
-﻿using Microsoft.Azure.Functions.Worker.Extensions.Redis;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
+﻿using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -31,8 +29,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
          /// <param name="cosmosDBOut"> An IAsyncCollector that is used to write RedisData to Cosmos DB.</param>
          /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
          /// <returns></returns>
-        [FunctionName(nameof(WriteBehindAsync))]
-        public static async Task WriteBehindAsync(
+        [FunctionName(nameof(PubsubWriteBehindAsync))]
+        public static async Task PubsubWriteBehindAsync(
             [RedisPubSubTrigger(redisConnectionSetting, "__keyevent@0__:set")] string newKey,
             [CosmosDB(
                 databaseName: databaseSetting,
@@ -60,8 +58,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="cosmosDBOut"> An IAsyncCollector that is used to write the PubSubData to Cosmos DB.</param>
         /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
         /// <returns></returns>
-        [FunctionName(nameof(WriteBehindMessageAsync))]
-        public static async Task WriteBehindMessageAsync(
+        [FunctionName(nameof(PubsubWriteBehindMessageAsync))]
+        public static async Task PubsubWriteBehindMessageAsync(
             [RedisPubSubTrigger(redisConnectionSetting, pubSubChannelSetting)] ChannelMessage pubSubMessage,
             [CosmosDB(
                 databaseName: databaseSetting,
