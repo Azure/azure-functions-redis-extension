@@ -8,17 +8,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     public static class PubSubSample
     {
         //Connection string settings that will be resolved from local.settings.json file
-        public const string redisConnectionSetting = "redisConnectionString";
-        public const string cosmosDbConnectionSetting = "CosmosDbConnectionString";
+        public const string RedisConnectionSetting = "RedisConnectionString";
+        public const string CosmosDbConnectionSetting = "CosmosDbConnectionString";
 
         //Cosmos DB settings that will be resolved from local.settings.json file
-        public const string databaseSetting = "%CosmosDbDatabaseId%";
-        public const string containerSetting = "%CosmosDbContainerId%";
-        public const string pubSubContainerSetting = "%PubSubContainerId%";
-        public const string pubSubChannelSetting = "%PubSubChannel%";
+        public const string DatabaseSetting = "%CosmosDbDatabaseId%";
+        public const string ContainerSetting = "%PubSubCosmosDbContainerId%";
+        public const string PubSubContainerSetting = "%PubSubContainerId%";
+        public const string PubSubChannelSetting = "%PubSubChannel%";
 
         private static readonly IDatabase s_redisDb =
-            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionSetting)).GetDatabase();
+            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(RedisConnectionSetting)).GetDatabase();
 
 
         /// <summary>
@@ -29,11 +29,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
         [FunctionName(nameof(PubsubWriteThrough))]
         public static void PubsubWriteThrough(
-           [RedisPubSubTrigger(redisConnectionSetting, "__keyevent@0__:set")] string newKey,
+           [RedisPubSubTrigger(RedisConnectionSetting, "__keyevent@0__:set")] string newKey,
            [CosmosDB(
-                databaseName: databaseSetting,
-                containerName: containerSetting,
-                Connection = cosmosDbConnectionSetting)]out dynamic cosmosDBOut,
+                databaseName: DatabaseSetting,
+                containerName: ContainerSetting,
+                Connection = CosmosDbConnectionSetting)]out dynamic cosmosDBOut,
            ILogger logger)
         {
             //assign the data from Redis to a dynamic object that will be written to Cosmos DB
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 timestamp: DateTime.UtcNow
             );
             
-            logger.LogInformation($"Key: \"{newKey}\", Value: \"{cosmosDBOut.value}\" addedd to Cosmos DB container: \"{Environment.GetEnvironmentVariable(containerSetting.Replace("%",""))}\" at id: \"{cosmosDBOut.id}\"");
+            logger.LogInformation($"Key: \"{newKey}\", Value: \"{cosmosDBOut.value}\" addedd to Cosmos DB container: \"{Environment.GetEnvironmentVariable(ContainerSetting.Replace("%",""))}\" at id: \"{cosmosDBOut.id}\"");
         }
 
         /// <summary>
@@ -55,11 +55,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
         [FunctionName(nameof(PubsubWriteThroughMessage))]
         public static void PubsubWriteThroughMessage(
-            [RedisPubSubTrigger(redisConnectionSetting, pubSubChannelSetting)] ChannelMessage pubSubMessage,
+            [RedisPubSubTrigger(RedisConnectionSetting, PubSubChannelSetting)] ChannelMessage pubSubMessage,
              [CosmosDB(
-                databaseName: databaseSetting,
-                containerName: pubSubContainerSetting,
-                Connection = cosmosDbConnectionSetting)]out dynamic cosmosDBOut,
+                databaseName: DatabaseSetting,
+                containerName: PubSubContainerSetting,
+                Connection = CosmosDbConnectionSetting)]out dynamic cosmosDBOut,
             ILogger logger)
         {
             //assign the message from Redis to a dynamic object that will be written to Cosmos DB
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 timestamp: DateTime.UtcNow
                 );
 
-            logger.LogInformation($"Message: \"{cosmosDBOut.message}\" from Channel: \"{cosmosDBOut.channel}\" stored in Cosmos DB container: \"{Environment.GetEnvironmentVariable(pubSubContainerSetting.Replace("%", ""))}\" with id: \"{cosmosDBOut.id}\"");
+            logger.LogInformation($"Message: \"{cosmosDBOut.message}\" from Channel: \"{cosmosDBOut.channel}\" stored in Cosmos DB container: \"{Environment.GetEnvironmentVariable(PubSubContainerSetting.Replace("%", ""))}\" with id: \"{cosmosDBOut.id}\"");
         }
     }
 }

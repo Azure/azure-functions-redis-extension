@@ -10,16 +10,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     public static class PubSubSample
     {
         //Connection string settings that will be resolved from local.settings.json file
-        public const string redisConnectionSetting = "redisConnectionString";
-        public const string cosmosDbConnectionSetting = "CosmosDbConnectionString";
+        public const string RedisConnectionSetting = "RedisConnectionString";
+        public const string CosmosDbConnectionSetting = "CosmosDbConnectionString";
 
         //Cosmos DB settings that will be resolved from local.settings.json file
-        public const string databaseSetting = "%CosmosDbDatabaseId%";
-        public const string containerSetting = "%CosmosDbContainerId%";
-        public const string pubSubContainerSetting = "%PubSubContainerId%";
+        public const string DatabaseSetting = "%CosmosDbDatabaseId%";
+        public const string ContainerSetting = "%PubSubCosmosDbContainerId%";
+        public const string PubSubContainerSetting = "%PubSubContainerId%";
 
         private static readonly Lazy<IConnectionMultiplexer> s_redisConnection = new Lazy<IConnectionMultiplexer>(() =>
-            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionSetting)));
+            ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(RedisConnectionSetting)));
 
 
         /// <summary>
@@ -32,9 +32,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         [FunctionName(nameof(PubsubWriteAroundAsync))]
         public static async Task PubsubWriteAroundAsync(
             [CosmosDBTrigger(
-                databaseName: databaseSetting,
-                containerName: containerSetting,
-                Connection = cosmosDbConnectionSetting,
+                databaseName: DatabaseSetting,
+                containerName: ContainerSetting,
+                Connection = CosmosDbConnectionSetting,
                 LeaseContainerName = "leases", LeaseContainerPrefix = "Write-Around-")]IReadOnlyList<RedisData> cosmosData, 
             ILogger logger)
         {
@@ -65,9 +65,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         [FunctionName(nameof(PubsubWriteAroundMessageAsync))]
         public static async Task PubsubWriteAroundMessageAsync(
             [CosmosDBTrigger(
-                databaseName: databaseSetting,
-                containerName: pubSubContainerSetting,
-                Connection = cosmosDbConnectionSetting,
+                databaseName: DatabaseSetting,
+                containerName: PubSubContainerSetting,
+                Connection = CosmosDbConnectionSetting,
                 LeaseContainerName = "leases", LeaseContainerPrefix = "Write-Around-")]IReadOnlyList<PubSubData> cosmosData,
             ILogger logger)
         {

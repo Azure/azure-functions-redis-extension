@@ -18,7 +18,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         // CosmosDB connection string, database name and container name stored in local.settings.json
         public const string CosmosDbConnectionSetting = "CosmosDbConnectionString";
         public const string DatabaseSetting = "%CosmosDbDatabaseId%";
-        public const string ContainerSetting = "%CosmosDbContainerId%";
+        public const string ContainerSetting = "%StreamCosmosDbContainerId%";
 
         /// <summary>
         /// Write Around: Write from Cosmos DB to Redis whenever a change occurs in one of the CosmosDB documents
@@ -55,7 +55,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             }     
         }
        
-        public const string ContainerSettingSingleDocument = "%CosmosDbContainerIdSingleDocument%";
+        public const string ContainerSettingSingleDocument = "%StreamCosmosDbContainerIdSingleDocument%";
         public static string StreamNameSingleDocument = Environment.GetEnvironmentVariable("StreamTestSingleDocument");
 
         /// <summary>

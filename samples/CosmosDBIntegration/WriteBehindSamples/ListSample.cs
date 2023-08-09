@@ -12,17 +12,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     public static class ListSample
     {
         //Redis Cache primary connection string from local.settings.json
-        public const string redisConnectionString = "redisConnectionString";
+        public const string RedisConnectionString = "RedisConnectionString";
 
         //CosmosDB endpoint from local.settings.json
         public const string CosmosDBConnectionString = "CosmosDBConnectionString";
 
         //CosmosDB database name and container name from local.settings.json
         public const string CosmosDbDatabaseId = "CosmosDbDatabaseId";
-        public const string CosmosDbContainerId = "CosmosDbContainerId";
+        public const string CosmosDbContainerId = "ListCosmosDbContainerId";
 
         //Uses the key of the user's choice and should be changed accordingly
-        public const string key = "userListName";
+        public const string ListKey = "userListName";
 
         /// <summary>
         /// This function retrieves a specified item from a CosmosDB container and adds a new entry to it. The entry is retrieved from a Redis list trigger and added to the specified item's collection of values.
@@ -33,18 +33,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <returns></returns>
         [FunctionName(nameof(ListTriggerWriteBehind))]
         public static async Task ListTriggerWriteBehind(
-            [RedisListTrigger(redisConnectionString, key)] string listEntry, [CosmosDB(
+            [RedisListTrigger(RedisConnectionString, ListKey)] string listEntry, [CosmosDB(
             Connection = "CosmosDBConnectionString")]CosmosClient client,
             ILogger logger)
         {
-            //Retrieve the database and container from the given client, which accesses the CosmosDB Endpoint
-            Container db = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(CosmosDbContainerId));
+            // Retrieve the database and container from the given client, which accesses the CosmosDB Endpoint
+            Container cosmosDbContainer = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(CosmosDbContainerId));
 
-            //Creates query for item inthe container and
+            //Creates query for item in the container and
             //uses feed iterator to keep track of token when receiving results from query
-            IOrderedQueryable<CosmosDBListData> query = db.GetItemLinqQueryable<CosmosDBListData>();
+            IOrderedQueryable<CosmosDBListData> query = cosmosDbContainer.GetItemLinqQueryable<CosmosDBListData>();
             using FeedIterator<CosmosDBListData> results = query
-                .Where(p => p.id == key)
+                .Where(p => p.id == ListKey)
                 .ToFeedIterator();
 
             //Retrieve collection of items from results and then the first element of the sequence
@@ -52,14 +52,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             CosmosDBListData item = response.FirstOrDefault(defaultValue: null);
 
             //Optional logger to display what is being pushed to CosmosDB
-            logger.LogInformation("The value added to " + key + " is " + listEntry + ". The value will be added to CosmosDB database: " + CosmosDbDatabaseId + " and container: " + CosmosDbContainerId + ".");
+            logger.LogInformation("The value added to " + ListKey + " is " + listEntry + ". The value will be added to CosmosDB database: " + CosmosDbDatabaseId + " and container: " + CosmosDbContainerId + ".");
 
             //Create an entry if the key doesn't exist in CosmosDB or add to it if there is an existing entry
             List<string> resultsHolder = item?.value ?? new List<string>();
 
             resultsHolder.Add(listEntry);
-            CosmosDBListData newEntry = new CosmosDBListData(id: key, value: resultsHolder);
-            await db.UpsertItemAsync<CosmosDBListData>(newEntry);
+            CosmosDBListData newEntry = new CosmosDBListData(id: ListKey, value: resultsHolder);
+            await cosmosDbContainer.UpsertItemAsync<CosmosDBListData>(newEntry);
         }
 
     }

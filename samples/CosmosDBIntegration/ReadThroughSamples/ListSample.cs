@@ -12,12 +12,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     public static class ListSample
     {
         //Redis Cache primary connection string from local.settings.json
-        public const string redisConnectionString = "redisConnectionString";
-        private static readonly Lazy<IDatabaseAsync> s_redisDb = new Lazy<IDatabaseAsync>(() => ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionString)).GetDatabase());
+        public const string RedisConnectionString = "RedisConnectionString";
+        private static readonly Lazy<IDatabaseAsync> s_redisDb = new Lazy<IDatabaseAsync>(() => ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(RedisConnectionString)).GetDatabase());
 
         //CosmosDB database name and container name from local.settings.json
         public const string CosmosDbDatabaseId = "CosmosDbDatabaseId";
-        public const string CosmosDbContainerId = "CosmosDbContainerId";
+        public const string CosmosDbContainerId = "ListCosmosDbContainerId";
 
         /// <summary>
         /// Adds a CosmosDBListData item to a Redis list with a specific key.
@@ -51,16 +51,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <returns></returns>
         [FunctionName(nameof(ListTriggerReadThroughFunc))]
         public static async Task ListTriggerReadThroughFunc(
-            [RedisPubSubTrigger(redisConnectionString, "__keyevent@0__:keymiss")] string listEntry, [CosmosDB(
+            [RedisPubSubTrigger(RedisConnectionString, "__keyevent@0__:keymiss")] string listEntry, [CosmosDB(
             Connection = "CosmosDBConnectionString" )]CosmosClient client,
             ILogger logger)
         {
             //Retrieve the database and container from the given client, which accesses the CosmosDB Endpoint
-            Container db = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(CosmosDbContainerId));
+            Container cosmosDbContainer = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(CosmosDbContainerId));
 
             //Creates query for item inthe container and
             //uses feed iterator to keep track of token when receiving results from query
-            IOrderedQueryable<CosmosDBListData> query = db.GetItemLinqQueryable<CosmosDBListData>();
+            IOrderedQueryable<CosmosDBListData> query = cosmosDbContainer.GetItemLinqQueryable<CosmosDBListData>();
             using FeedIterator<CosmosDBListData> results = query
                 .Where(p => p.id == listEntry)
                 .ToFeedIterator();

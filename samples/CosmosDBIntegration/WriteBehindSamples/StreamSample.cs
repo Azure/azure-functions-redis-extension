@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         private static CosmosClient _cosmosDbClient = new(
             connectionString: Environment.GetEnvironmentVariable(CosmosDbConnectionSetting)!);
         public const string DatabaseSetting = "%CosmosDbDatabaseId%";
-        public const string ContainerSetting = "%CosmosDbContainerId%";
+        public const string ContainerSetting = "%StreamCosmosDbContainerId%";
 
         /// <summary>
         /// Write behind: Write messages to CosmosDB asynchronously whenever a new value is added to the Redis Stream. Each message will get it's own document.
@@ -41,7 +41,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             await items.AddAsync(StreamData.Format(entry, logger));
         }
 
-        public const string ContainerSettingSingleDocument = "%CosmosDbContainerIdSingleDocument%";
+        public const string ContainerSettingSingleDocument = "%StreamCosmosDbContainerIdSingleDocument%";
 
         /// <summary>
         /// Write behind (Single Document): Write messages to a single document in CosmosDB asynchronously whenever a new value is added to the Redis Stream.
