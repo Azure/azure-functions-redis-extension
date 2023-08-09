@@ -3,14 +3,9 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using System.Collections.Generic;
-using StackExchange.Redis;
 using System.Linq;
 using Microsoft.Azure.Cosmos.Linq;
-using Microsoft.VisualBasic;
-using System.ComponentModel;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.Functions.Worker.Extensions.Redis;
-using Container = Microsoft.Azure.Cosmos.Container;
+using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {

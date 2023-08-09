@@ -32,8 +32,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
         /// <returns></returns>
         /// <exception cref="Exception"> Thrown when the requested key is not found in Redis or Cosmos DB</exception>
-        [FunctionName(nameof(ReadThroughAsync))]
-        public static async Task ReadThroughAsync(
+        [FunctionName(nameof(PubsubReadThroughAsync))]
+        public static async Task PubsubReadThroughAsync(
             [RedisPubSubTrigger(redisConnectionSetting, "__keyevent@0__:keymiss")] string missedKey,
             [CosmosDB(
                 databaseName: databaseSetting,
