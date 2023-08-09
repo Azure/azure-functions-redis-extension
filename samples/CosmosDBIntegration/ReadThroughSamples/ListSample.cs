@@ -19,6 +19,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         public const string CosmosDbDatabaseId = "CosmosDbDatabaseId";
         public const string CosmosDbContainerId = "ListCosmosDbContainerId";
 
+        //Uses the key of the user's choice and should be changed accordingly
+        public const string ListKey = "userListName";
+
         /// <summary>
         /// Adds a CosmosDBListData item to a Redis list with a specific key.
         /// </summary>
@@ -55,6 +58,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             Connection = "CosmosDBConnectionString" )]CosmosClient client,
             ILogger logger)
         {
+            if (listEntry != ListKey) return;
             //Retrieve the database and container from the given client, which accesses the CosmosDB Endpoint
             Container cosmosDbContainer = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(CosmosDbContainerId));
 

@@ -16,7 +16,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         //Cosmos DB settings that will be resolved from local.settings.json file
         public const string DatabaseSetting = "%CosmosDbDatabaseId%";
         public const string ContainerSetting = "%PubSubCosmosDbContainerId%";
-        public const string PubSubContainerSetting = "%PubSubContainerId%";
+        public const string PubSubContainerSetting = "%MessagesCosmosDbContainerId%";
 
         private static readonly Lazy<IConnectionMultiplexer> s_redisConnection = new Lazy<IConnectionMultiplexer>(() =>
             ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(RedisConnectionSetting)));

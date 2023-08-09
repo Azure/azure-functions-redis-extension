@@ -41,6 +41,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 Connection = CosmosDbConnectionSetting)]CosmosClient cosmosDB,
             ILogger logger)
         {
+            if (missedKey == StreamSample.StreamNameSingleDocument || missedKey == ListSample.ListKey) return;
+
             //get the Cosmos DB database and the container to read from
             Container cosmosDBContainer = cosmosDB.GetContainer(Environment.GetEnvironmentVariable(DatabaseSetting.Replace("%", "")), Environment.GetEnvironmentVariable(ContainerSetting.Replace("%", "")));
             IOrderedQueryable<RedisData> queryable = cosmosDBContainer.GetItemLinqQueryable<RedisData>();
