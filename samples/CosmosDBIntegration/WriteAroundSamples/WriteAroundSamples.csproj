@@ -13,6 +13,7 @@
     <PackageReference Include="StackExchange.Redis" Version="2.6.122" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Microsoft.Azure.WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj" />
     <ProjectReference Include="..\..\dotnet\Microsoft.Azure.WebJobs.Extensions.Redis.Samples.csproj" />
   </ItemGroup>
   <ItemGroup>
