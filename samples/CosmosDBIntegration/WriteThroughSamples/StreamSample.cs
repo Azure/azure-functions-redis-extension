@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 using Microsoft.Extensions.Logging;
@@ -82,3 +83,43 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         }
     }
 }
+=======
+﻿using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
+using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
+
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
+{
+    internal class StreamSample
+    {
+        // Redis connection string and stream names stored in local.settings.json
+        public const string redisConnectionSetting = "redisConnectionString";
+        public const string streamName = "streamTest";
+
+        // CosmosDB connection string, database name and container name stored in local.settings.json
+        public const string cosmosDbConnectionSetting = "cosmosDbConnectionString";
+        public const string databaseSetting = "%cosmosDbDatabaseId%";
+        public const string containerSetting = "%cosmosDbContainerId%";
+
+        /// <summary>
+        /// Write through: Write to CosmosDB synchronously whenever a new value is added to the Redis Stream
+        /// </summary>
+        /// <param name="entry"> The message which has gone through the stream. Includes message id alongside the key/value pairs </param>
+        /// <param name="items"> Container for where the CosmosDB items are stored </param>
+        /// <param name="logger"> ILogger used to write key information </param>
+        [FunctionName(nameof(WriteThroughForStream))]
+        public static void WriteThroughForStream(
+                [RedisStreamTrigger(redisConnectionSetting, streamName)] StreamEntry entry,
+                 [CosmosDB(
+                databaseName: databaseSetting,
+                containerName: containerSetting,
+                Connection = cosmosDbConnectionSetting)]
+                ICollector<CosmosDBData> items,
+                ILogger logger)
+        {
+            // Insert data into CosmosDB synchronously
+            items.Add(CosmosDBData.Format(entry, logger));
+        }
+    }
+}
+>>>>>>> bad07ae (Fixed spelling error for naming of parent directory and reduced duplicate files for custom data (#101))
