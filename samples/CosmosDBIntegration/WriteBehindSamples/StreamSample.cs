@@ -127,4 +127,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         }
     }
 }
+<<<<<<< HEAD
 >>>>>>> bad07ae (Fixed spelling error for naming of parent directory and reduced duplicate files for custom data (#101))
+=======
+>>>>>>> 58a8a06 (continued rebase, added readme.md and tutorial.md)
+>>>>>>> 61a4462 (continued rebase)
