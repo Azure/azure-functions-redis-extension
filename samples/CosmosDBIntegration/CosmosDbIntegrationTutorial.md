@@ -3,8 +3,8 @@ Article 08/08/2023 Nadia Bugarin, Riley MacDonald, Phoebe Owusu
 
 In this tutorial, you learn how to:
 1. Install packages on an existing Azure function
-1. Use a Redis trigger with your Azure Function
-1. Deploy an Azure Function
+2. Use a Redis trigger with your Azure Function
+3. Deploy an Azure Function
 
 
 ## Prerequisites
@@ -39,11 +39,11 @@ In this tutorial, you learn how to:
 ### Install packages and adding code
 1. In the terminal, add the following packages
     1. dotnet add package Microsoft.Azure.Cosmos
-    1. dotnet add package Microsoft.Azure.WebJobs.Extensions.CosmosDB
-    1. dotnet add package Microsoft.Azure.WebJobs.Extensions.Redis --prerelease
-    1. dotnet add package Microsoft.NET.Sdk.Functions
-1. Choose a sample from the Prerequisites to use with your Azure Function according to each trigger and caching pattern.
-1. Copy and paste the sample code into your azure function, using a cs file.
+    2. dotnet add package Microsoft.Azure.WebJobs.Extensions.CosmosDB
+    3. dotnet add package Microsoft.Azure.WebJobs.Extensions.Redis --prerelease
+    4. dotnet add package Microsoft.NET.Sdk.Functions
+2. Choose a sample from the Prerequisites to use with your Azure Function according to each trigger and caching pattern.
+3. Copy and paste the sample code into your azure function, using a cs file.
 
 ### Adding connection string and variables
 1. Direct to your local.settings.json file in Visual Studio.
@@ -55,33 +55,34 @@ In this tutorial, you learn how to:
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    // Database all of the functions can share
     "CosmosDbDatabaseId": "<database-id>",
-    // Container for lists
     "ListCosmosDbContainerId": "<container-id-for-list>",
-    // Container for key/value pairs set with PubSub triggers
     "PubSubCosmosDbContainerId": "<container-id-for-pubsub>",
-    // Container for messages sent with PubSub triggers
     "MessagesCosmosDbContainerId": "<container-id-for-pubsub-messages>",
-    // The name of the channel the PubSub trigger is listening to
     "PubSubChannel": "<pubsub-channel-name>",
-    // Container IDs of the CosmosDB containers that store the stream messages
     "StreamCosmosDbContainerId": "<container-id-for-stream>",
-    // Container IDs of the CosmosDB containers that store the stream messages when writing to a single document
     "StreamCosmosDbContainerIdSingleDocument": "<container-id-for-stream-singular-document>",
-    // Name of the streams the trigger is listening to
     "StreamTest": "<stream-name>",
-    // Name of the stream the trigger is listening when writing to a single document in CosmosDB
     "StreamTestSingleDocument": "<stream-name-singular-document>",
-    // Primary connection string to Redis Cache
     "RedisConnectionString": "<cache-name>.redis.cache.windows.net:6380,password=<access-key>,ssl=True,abortConnect=False,tiebreaker=",
-    // Account endpoint to CosmosDB
     "CosmosDbConnectionString": "AccountEndpoint=https://<cosmosdb-account>.documents.azure.com:443/;AccountKey=<access-key>;"
   }
 }
  ```
+ NOTE: each trigger should be using a separate container, which is dependent on the variable names.
 
-* NOTE: each trigger should be using a separate container, which is dependent on the variable names.
+ #### Description of each variable
+ * CosmosDbDatabaseId: Database all of the functions can share
+ * ListCosmosDbContainerId: Container for Lists
+ * PubSubCosmosDbContainerId: Container for key/value pairs set with PubSub triggers
+ * MessagesCosmosDbContainerId: Container for messages sent with PubSub triggers
+ * PubSubChannel: The name of the channel the PubSub trigger is listening to
+ * StreamCosmosDbContainerId: Container IDs of the CosmosDB containers that store the stream messages
+ * StreamCosmosDbContainerIdSingleDocument: Container IDs of the CosmosDB containers that store the stream messages when writing to a single document
+ * StreamTest: Name of the streams the trigger is listening to
+ * StreamTestSingleDocument: Name of the stream the trigger is listening when writing to a single document in CosmosDB
+ * RedisConnectionString: Primary connection string to Redis Cache
+ * CosmosDbConnectionString: Account endpoint to CosmosDB
 
 ### Adjusting List and Stream variables
 Lists 
@@ -110,4 +111,5 @@ If you're not going to continue to use this application, delete
 ## Related content
 
 > [README](README.md)
+
 

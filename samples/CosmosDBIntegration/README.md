@@ -40,29 +40,29 @@ When data is modified in the system, the changes are first stored in the cache, 
 
 ## Description of each Redis Trigger
 1. PubSub: PubSub is a way for different programs to communicate with each other using messages. A publisher can send a message to a channel, and any number of subscribers listening to that channel can receive it. Pub/Sub uses a fire and forget message delivery system meaning that a message will be delivered once if at all. So, if a subscriber misses a message due to network error or some other issue, it will never receive it. You can read more about pubsub on the Redis docs
-    a.	Write Through, Write Behind: Every time a key is set or changed, the information is stored in CosmosDB. The same is true for messages sent on a specified Pubsub channel.
-    b.  Write Around: Data written to CosmosDB will then be stored in the cache for future read operations. This works for key-value pairs and pubsub channel-message data.
-    c.	Read Through: When reading, first check if the data is in the cache. If the data is not found in the cache (a cache miss), the caching system automatically retrieves the data from the database and caches it for future use. This is only applicable for key-value pairs.
+    1.	Write Through, Write Behind: Every time a key is set or changed, the information is stored in CosmosDB. The same is true for messages sent on a specified Pubsub channel.
+    2.  Write Around: Data written to CosmosDB will then be stored in the cache for future read operations. This works for key-value pairs and pubsub channel-message data.
+    3.	Read Through: When reading, first check if the data is in the cache. If the data is not found in the cache (a cache miss), the caching system automatically retrieves the data from the database and caches it for future use. This is only applicable for key-value pairs.
 2. Lists: Redis Lists are linked lists that contain string values. They are typically used to implement stacks and queues, and to build queue management for background worker systems.
-    a.	Every time an item is added to the cache, it is popped and sent to CosmosDB
+    1.	Every time an item is added to the cache, it is popped and sent to CosmosDB
 3. Streams: A Redis Stream is a datatype that acts as an append only log. Streams are used for real time data consumption where a consumer is actively listening for messages published to a stream. Unlike pub/sub, when a consumer stops running, it can continue to read messages where it left off once it turns on again. The RedisStreamTrigger uses consumer groups to read new entries from a stream.
-    a.	Every time a message is written to the stream, the RedisStreamTrigger will consume the message in real-time using write through or write behind caching patterns.
-    b.	Write around can be used to write from CosmosDB to Redis
+    1.	Every time a message is written to the stream, the RedisStreamTrigger will consume the message in real-time using write through or write behind caching patterns.
+    2.	Write around can be used to write from CosmosDB to Redis
 
 
 ## Unsupported Functionality
 1. PubSub:
-    a. These triggers are only available on the Premium plan and Dedicated plan because Redis pub/sub requires clients to always be actively listening to receive all messages. There is a chance your function may miss messages on a consumption plan.
-    b. Functions using these triggers should not be scaled out to multiple instances. Each instance will trigger on each message from the channel, resulting in duplicate processing.
+    1. These triggers are only available on the Premium plan and Dedicated plan because Redis pub/sub requires clients to always be actively listening to receive all messages. There is a chance your function may miss messages on a consumption plan.
+    2. Functions using these triggers should not be scaled out to multiple instances. Each instance will trigger on each message from the channel, resulting in duplicate processing.
 
 2. Lists:
-    a. Write Through was not implemented because of the popping nature of the trigger, which prevents any synchronous nature
+    1. Write Through was not implemented because of the popping nature of the trigger, which prevents any synchronous nature
 
 3. Streams:
-    a. Reading from a stream outside of reading in real-time is not supported with the RedisStreamTrigger. You can use the PubSubTrigger to detect if your stream has been deleted and refresh the the cache but that is the limit. 
-    b. You cannot modify entries in a stream. For the Write Around function, a new message will have to be written with a new ID.
-    c. If you follow the route where all messages are written in one CosmosDB document, anytime a change happens in the document, it’s not possible to detect where the change happened from in and you will need to re-write all entries again to the stream.
-    d. If you follow the route where messages have their own document, it becomes difficult to monitor the size of storage
+    1. Reading from a stream outside of reading in real-time is not supported with the RedisStreamTrigger. You can use the PubSubTrigger to detect if your stream has been deleted and refresh the the cache but that is the limit. 
+    2. You cannot modify entries in a stream. For the Write Around function, a new message will have to be written with a new ID.
+    3. If you follow the route where all messages are written in one CosmosDB document, anytime a change happens in the document, it’s not possible to detect where the change happened from in and you will need to re-write all entries again to the stream.
+    4. If you follow the route where messages have their own document, it becomes difficult to monitor the size of storage
 
 
 ### Security
