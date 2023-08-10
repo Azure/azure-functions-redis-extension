@@ -92,8 +92,10 @@ Lists
     - Change the value of ListKey to the desired key before the function 
 3. ReadThrough
     - Change the value of ListKey to the desired key before the function
-
-    ![Image](Models/ListKey.png)
+    ```csharp
+    public const string ListKey = "userListName";
+    ```
+    
 
 ### Security
 * This design introduces new secrets. Theses secrets are the CosmosDB keys and connection strings, and the Azure Cache for Redis Connection strings. These will be stored in the customers’ storage account associated with their function app.
