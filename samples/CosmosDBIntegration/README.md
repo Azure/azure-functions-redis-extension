@@ -1,5 +1,4 @@
 # Redis Triggers for Azure Functions
-08/08/2023 Nadia Bugarin, Riley MacDonald, Phoebe Owusu
 
 ## Introduction
 This project is an integration between Redis Cache and CosmosDB that includes function triggers using caching patterns that include Write Behind, Write Through, Write Around, and Read Through. Each function trigger, PubSub, Lists, and Streams.
