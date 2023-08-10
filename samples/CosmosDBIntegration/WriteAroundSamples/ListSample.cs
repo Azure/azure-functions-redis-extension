@@ -9,14 +9,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     public static class ListSample
     {
         //Redis Cache primary connection string from local.settings.json
-        public const string redisConnectionString = "redisConnectionString";
-        private static readonly IDatabase s_redisDb = ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(redisConnectionString)).GetDatabase();
+        public const string RedisConnectionString = "RedisConnectionString";
+        private static readonly IDatabase s_redisDb = ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable(RedisConnectionString)).GetDatabase();
 
         //CosmosDB Endpoint from local.settings.json
         public const string CosmosDBConnectionString = "CosmosDBConnectionString";
 
         //Uses the key of the user's choice and should be changed accordingly
-        public const string key = "userListName";
+        public const string ListKey = "userListName";
 
         /// <summary>
         /// This function is triggered by changes to a specified CosmosDB container. It retrieves a list of items that have been modified or added 
@@ -26,9 +26,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <param name="log">An ILogger object used for logging purposes.</param>
         [FunctionName("WriteAroundListTrigger")]
         public static void WriteAroundListTrigger([CosmosDBTrigger(
-        databaseName: "%CosmosDbDatabaseId%",
-        containerName: "%CosmosDbContainerId%",
-        Connection = "CosmosDBConnectionString",
+            databaseName: "%CosmosDbDatabaseId%",
+            containerName: "%ListCosmosDbContainerId%",
+            Connection = "CosmosDBConnectionString",
         LeaseContainerName = "leases")]IReadOnlyList<CosmosDBListData> readOnlyList, ILogger log)
         {
             if (readOnlyList == null || readOnlyList.Count <= 0) return;
@@ -36,11 +36,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             //Accessing each entry from readOnlyList
             foreach (CosmosDBListData inputValues in readOnlyList)
             {
-                if (inputValues.id == key)
+                if (inputValues.id == ListKey)
                 {
                     //Converting one entry into an array format
                     RedisValue[] redisValues = Array.ConvertAll(inputValues.value.ToArray(), item => (RedisValue)item);
-                    s_redisDb.ListRightPush(key, redisValues);
+                    s_redisDb.ListRightPush(ListKey, redisValues);
 
                     //Optional foreach loop + log to confirm each value is sent to the cache
                     foreach (RedisValue entryValue in redisValues)

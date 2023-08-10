@@ -12,14 +12,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
     public static class ListSample
     {
         //Redis Cache primary connection string from local.settings.json
-        public const string redisConnectionString = "redisConnectionString";
+        public const string RedisConnectionString = "RedisConnectionString";
 
         //CosmosDB endpoint from local.settings.json
         public const string CosmosDBConnectionString = "CosmosDBConnectionString";
 
         //CosmosDB database name and container name from local.settings.json
         public const string CosmosDbDatabaseId = "CosmosDbDatabaseId";
-        public const string CosmosDbContainerId = "CosmosDbContainerId";
+        public const string CosmosDbContainerId = "ListCosmosDbContainerId";
 
         //Uses the key of the user's choice and should be changed accordingly
         public const string key = "userListName";
@@ -33,14 +33,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         /// <returns></returns>
         [FunctionName(nameof(ListTriggerWriteBehind))]
         public static async Task ListTriggerWriteBehind(
-            [RedisListTrigger(redisConnectionString, key)] string listEntry, [CosmosDB(
+            [RedisListTrigger(RedisConnectionString, key)] string listEntry, [CosmosDB(
             Connection = "CosmosDBConnectionString")]CosmosClient client,
             ILogger logger)
         {
-            //Retrieve the database and container from the given client, which accesses the CosmosDB Endpoint
+            // Retrieve the database and container from the given client, which accesses the CosmosDB Endpoint
             Container db = client.GetDatabase(Environment.GetEnvironmentVariable(CosmosDbDatabaseId)).GetContainer(Environment.GetEnvironmentVariable(CosmosDbContainerId));
 
-            //Creates query for item inthe container and
+            //Creates query for item in the container and
             //uses feed iterator to keep track of token when receiving results from query
             IOrderedQueryable<CosmosDBListData> query = db.GetItemLinqQueryable<CosmosDBListData>();
             using FeedIterator<CosmosDBListData> results = query
