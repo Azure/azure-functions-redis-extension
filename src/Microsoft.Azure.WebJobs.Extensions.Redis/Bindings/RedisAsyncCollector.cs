@@ -28,7 +28,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             logger?.LogDebug($"Adding {command} command to transaction with input string[] arguments.");
-            _ = transaction.ExecuteAsync(command, arguments);
+            _ = transaction.ExecuteAsync(command, arguments, CommandFlags.FireAndForget);
             return Task.CompletedTask;
         }
 

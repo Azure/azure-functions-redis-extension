@@ -76,5 +76,45 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 Assert.Equal(0, length);
             }
         }
+
+        [Fact]
+        public async void MultipleAddAsyncCalls_SuccessfullyUsesOneTransaction()
+        {
+            string functionName = nameof(RedisOutputBindingTestFunctions.MultipleAddAsyncCalls);
+            ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
+
+            int numKeys = 100;
+            string[] keys = Enumerable.Range(0, numKeys).Select(i => i.ToString()).ToArray();
+            RedisKey[] rKeys = keys.Select(key => new RedisKey(key)).ToArray();
+            string message = string.Join(',', keys);
+
+            long actualKeys = 0;
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
+            {
+                await multiplexer.GetDatabase().KeyDeleteAsync(rKeys);
+                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+                {
+                    functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
+
+                    await multiplexer.GetSubscriber().PublishAsync(functionName, message);
+
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+
+                    foreach(string key in keys)
+                    {
+                        if (await multiplexer.GetDatabase().KeyExistsAsync(key))
+                        {
+                            actualKeys++;
+                        }
+                    }
+                    await multiplexer.CloseAsync();
+                    functionsProcess.Kill();
+                };
+                var incorrect = counts.Where(pair => pair.Value != 0);
+                Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
+                Assert.Equal(numKeys, actualKeys);
+            }
+        }
     }
 }
