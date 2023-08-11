@@ -1,0 +1,18 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "CosmosDbDatabaseId": "<database-id>",
+    "ListCosmosDbContainerId": "<container-id-for-list>",
+    "PubSubCosmosDbContainerId": "<container-id-for-pubsub>",
+    "MessagesCosmosDbContainerId": "<container-id-for-pubsub-messages>",
+    "PubSubChannel": "<pubsub-channel-name>",
+    "StreamCosmosDbContainerId": "<container-id-for-stream>",
+    "StreamCosmosDbContainerIdSingleDocument": "<container-id-for-stream-singular-document>",
+    "StreamTest": "<stream-name>",
+    "StreamTestSingleDocument": "<stream-name-singular-document>",
+    "RedisConnectionString": "<cache-name>.redis.cache.windows.net:6380,password=<access-key>,ssl=True,abortConnect=False,tiebreaker=",
+    "CosmosDbConnectionString": "AccountEndpoint=https://<cosmosdb-account>.documents.azure.com:443/;AccountKey=<access-key>;"
+  }
+}
