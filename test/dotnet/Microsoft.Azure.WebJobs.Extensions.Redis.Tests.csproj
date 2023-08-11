@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="7.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.35.3" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
@@ -27,6 +28,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\samples\CosmosDBIntegration\ReadThroughSamples\ReadThroughSamples.csproj" />
+    <ProjectReference Include="..\..\samples\CosmosDBIntegration\WriteAroundSamples\WriteAroundSamples.csproj" />
+    <ProjectReference Include="..\..\samples\CosmosDBIntegration\WriteBehindSamples\WriteBehindSamples.csproj" />
+    <ProjectReference Include="..\..\samples\CosmosDBIntegration\WriteThroughSamples\WriteThroughSamples.csproj" />
+    <ProjectReference Include="..\..\samples\CosmosDbIntegtation\ReadThroughSamples\ReadThroughSamples.csproj" />
+    <ProjectReference Include="..\..\samples\CosmosDbIntegtation\WriteAroundSamples\WriteAroundSamples.csproj" />
+    <ProjectReference Include="..\..\samples\CosmosDbIntegtation\WriteBehindSamples\WriteBehindSamples.csproj" />
+    <ProjectReference Include="..\..\samples\CosmosDbIntegtation\WriteThroughSamples\WriteThroughSamples.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.Azure.WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj" />
   </ItemGroup>
 </Project>
