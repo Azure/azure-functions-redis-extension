@@ -1,7 +1,7 @@
 # Tutorial: Setup Redis Triggers for Azure Function in Visual Studio Code
 
 ## Summary
-The following tutorial shows how to implement database caching samples using Azure Cache for Redis and Azure CosmosDB. You will incorporate basic triggers using Azure Functions. The goal is to synchorize data between Azure Cache for Redis and Azure CosmosDB. You will install necessary packages and incorporate samples using different caching patterns.
+The following tutorial shows how to implement database caching samples using Azure Cache for Redis and Azure CosmosDB. You will incorporate basic triggers using Azure Functions. The goal is to synchronize data between Azure Cache for Redis and Azure CosmosDB. You will install necessary packages and incorporate samples using different caching patterns.
 
 In this tutorial, you learn how to:
 1. [Install packages in Azure Function and adding sample code according to each Redis trigger and caching pattern](#install-packages-in-azure-function-and-adding-sample-code-according-to-each-redis-trigger-and-caching-pattern)

@@ -7,7 +7,7 @@ This project is an integration between Redis Cache and CosmosDB that includes fu
 - Accounts
    - Azure Redis Cache 
    - CosmosDB Account
-- Visual Studo Code
+- Visual Studio Code
     - Custom NuGet Package (available in this repo)
         * dotnet add package Microsoft.Azure.WebJobs.Extensions.Redis --prerelease
 
