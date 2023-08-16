@@ -18,23 +18,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
         }
 
         [FunctionName(nameof(OutputBindingArgumentsOnly))]
-        [return: Redis(localhostSetting, "set")]
+        [return: Redis(localhostSetting, "SET")]
         public static string[] OutputBindingArgumentsOnly(
             [RedisPubSubTrigger(localhostSetting, "pubsubTest")] string message,
             ILogger logger)
         {
             logger.LogInformation(message);
             return new string[] { "keyspaceTest", message };
-        }
-
-        [FunctionName(nameof(OutputBindingCommandAndArguments))]
-        [return: Redis(localhostSetting)]
-        public static string[] OutputBindingCommandAndArguments(
-            [RedisPubSubTrigger(localhostSetting, "pubsubTest")] string message,
-            ILogger logger)
-        {
-            logger.LogInformation(message);
-            return new string[] { "set", "keyspaceTest", message };
         }
 
         [FunctionName(nameof(PubSubTriggerResolvedChannel))]
@@ -83,7 +73,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             [Redis(localhostSetting, "XDEL")] out string[] result,
             ILogger logger)
         {
-            logger.LogInformation($"Stream entry from key 'streamTest2' with Id '{entry.Id}' and values '{JsonConvert.SerializeObject(entry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString()))}");
+            logger.LogInformation($"Stream entry from key 'streamTest2' with Id '{entry.Id}' and values '" +
+                JsonConvert.SerializeObject(entry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString())));
             result = new string[] { "streamTest2", entry.Id.ToString() };
         }
     }
