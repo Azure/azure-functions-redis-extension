@@ -24,6 +24,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (transaction is null)
             {
+                logger?.LogDebug("Creating transaction.");
                 transaction = multiplexer.GetDatabase().CreateTransaction();
             }
 
