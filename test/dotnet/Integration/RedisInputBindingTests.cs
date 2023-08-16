@@ -6,7 +6,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Xunit;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {

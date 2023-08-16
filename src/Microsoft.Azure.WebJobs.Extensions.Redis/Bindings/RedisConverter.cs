@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -22,37 +24,78 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public async Task<T> ConvertAsync(RedisAttribute input, CancellationToken cancellationToken)
         {
-            string command = RedisUtilities.ResolveString(nameResolver, input.Command, nameof(input.Command));
+            string fullCommand = RedisUtilities.ResolveString(nameResolver, input.Command, nameof(input.Command));
             IDatabase db = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, input.ConnectionStringSetting).GetDatabase();
 
-            string[] arguments = command.Split(' ');
-            switch (arguments[0])
+            string[] splitCommand = fullCommand.Split(' ');
+            string command = splitCommand[0];
+            if (!SingleOutputReadCommands.Contains(command))
             {
-                case "GET": return await GET(db, arguments);
-                case "HGET": return await HGET(db, arguments);
-                default:
-                    throw new ArgumentException($"Command '{arguments[0]}' not supported for Redis Input Binding.");
+                throw new ArgumentException($"Command '{command}' not supported for Redis Input Binding.");
+            }
+
+            string[] arguments = splitCommand.Skip(1).ToArray();
+            RedisResult result = await db.ExecuteAsync(command, arguments);
+            return (T)RedisResultTypeConverter(result, typeof(T));
+        }
+
+        public static object RedisResultTypeConverter(RedisResult value, Type destinationType)
+        {
+            if (value.Type.Equals(ResultType.None))
+            {
+                return null;
+            }
+            if (value.Type.Equals(ResultType.Error))
+            {
+                throw new RedisException((string)value);
+            }
+            if (value.Type.Equals(ResultType.SimpleString) || value.Type.Equals(ResultType.Integer) || value.Type.Equals(ResultType.BulkString))
+            {
+                return RedisUtilities.RedisValueTypeConverter((RedisValue)value, destinationType);
+            }
+            else
+            {
+                throw new InvalidOperationException($"Redis Output BindingResultTypeConverter does not support RedisResult type '{value.Type}'.");
             }
         }
 
-        private async Task<T> GET(IDatabase db, string[] arguments)
+        public static readonly HashSet<string> SingleOutputReadCommands = new HashSet<string>()
         {
-            if (arguments.Length != 2)
-            {
-                throw new ArgumentException($"Command '{arguments[0]}' requires 1 argument.");
-            }
-            RedisValue value = await db.StringGetAsync(arguments[1]);
-            return (T)RedisUtilities.RedisValueTypeConverter(value, typeof(T));
-        }
-
-        private async Task<T> HGET(IDatabase db, string[] arguments)
-        {
-            if (arguments.Length != 3)
-            {
-                throw new ArgumentException($"Command '{arguments[0]}' requires 2 arguments.");
-            }
-            RedisValue value = await db.HashGetAsync(arguments[1], arguments[2]);
-            return (T)RedisUtilities.RedisValueTypeConverter(value, typeof(T));
-        }
+            "BITCOUNT",
+            "BITPOS",
+            "DBSIZE",
+            "DUMP",
+            "EXISTS",
+            "EXPIRETIME",
+            "GEODIST",
+            "GET",
+            "GETBIT",
+            "GETRANGE",
+            "HEXISTS",
+            "HGET",
+            "HLEN",
+            "HSTRLEN",
+            "LINDEX",
+            "LLEN",
+            "PEXPIRETIME",
+            "PFCOUNT",
+            "PTTL",
+            "RANDOMKEY",
+            "SCARD",
+            "SINTERCARD",
+            "SISMEMBER",
+            "STRLEN",
+            "SUBSTR",
+            "TOUCH",
+            "TTL",
+            "TYPE",
+            "XLEN",
+            "ZCARD",
+            "ZCOUNT",
+            "ZDIFF",
+            "ZINTERCARD",
+            "ZLEXCOUNT",
+            "ZSCORE",
+        };
     }
 }
