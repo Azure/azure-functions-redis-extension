@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
@@ -131,6 +132,25 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, messagesPerWorker, defaultCount, false, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = increasingMetrics };
             Assert.Equal(expected, listener.GetScaleStatus(context).Vote);
+        }
+
+        [Theory]
+        [InlineData(10, 10, 1)]
+        [InlineData(50, 10, 5)]
+        [InlineData(100, 10, 10)]
+        [InlineData(500, 10, 50)]
+        [InlineData(1000, 50, 20)]
+        [InlineData(5000, 100, 50)]
+        [InlineData(10000, 10, 1000)]
+        public async Task TargetScaler_IncreasingMetricsAsync(long remaining, int messagesPerWorker, int expected)
+        {
+            RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, messagesPerWorker, defaultCount, false, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
+            IDatabase fakeDatabase = A.Fake<IDatabase>();
+            A.CallTo(() => fakeDatabase.ListLength(A<RedisKey>._, A<CommandFlags>._)).Returns(remaining);
+            IConnectionMultiplexer fakeMultiplexer = A.Fake<IConnectionMultiplexer>();
+            A.CallTo(() => fakeMultiplexer.GetDatabase(A<int>._, A<object>._)).Returns(fakeDatabase);
+            listener.multiplexer = fakeMultiplexer;
+            Assert.Equal(expected, (await listener.GetScaleResultAsync(null)).TargetWorkerCount);
         }
     }
 }
