@@ -107,36 +107,42 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
-        //Target Scaler Integration Tests not required.
-        // Keeping this as a manual test for local development.
-        //[Fact]
-        //public async void ListTrigger_TargetBasedScaling_WorksCorrectly()
-        //{
-        //    string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue_LongPollingInterval);
-        //    int port = 7071;
-        //    int elements = 10000;
-        //    RedisValue[] valuesArray = Enumerable.Range(0, elements).Select(x => new RedisValue(x.ToString())).ToArray();
+        [Fact]
+        public async void ListTrigger_TargetBasedScaling_WorksCorrectly()
+        {
+            string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue_LongPollingInterval);
+            int port = 7071;
+            int elements = 10000;
+            RedisValue[] valuesArray = Enumerable.Range(0, elements).Select(x => new RedisValue(x.ToString())).ToArray();
 
-        //    using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
-        //    {
-        //        await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
-        //        await multiplexer.GetDatabase().ListLeftPushAsync(functionName, valuesArray);
-        //        await multiplexer.CloseAsync();
-        //    };
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
+            {
+                await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
+                await multiplexer.GetDatabase().ListLeftPushAsync(functionName, valuesArray);
+                await multiplexer.CloseAsync();
+            };
 
-        //    IntegrationTestHelpers.ScaleStatus status = new IntegrationTestHelpers.ScaleStatus { vote = 0, targetWorkerCount = 0 };
-        //    using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, port))
-        //    using (HttpClient client = new HttpClient())
-        //    using (StringContent jsonContent = new StringContent("{}", Encoding.UTF8, "application/json"))
-        //    {
-        //        StringContent content = new StringContent(JsonConvert.SerializeObject(new { name = functionName, arguments = new string[] { "1" } }));
-        //        HttpResponseMessage response = await client.PostAsync($"http://127.0.0.1:{port}/admin/host/scale/status", jsonContent);
-        //        status = JsonConvert.DeserializeObject<IntegrationTestHelpers.ScaleStatus>(await response.Content.ReadAsStringAsync());
-        //        functionsProcess.Kill();
-        //    };
+            IntegrationTestHelpers.ScaleStatus status = new IntegrationTestHelpers.ScaleStatus { vote = 0, targetWorkerCount = 0 };
+            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, port))
+            using (HttpClient client = new HttpClient())
+            using (StringContent jsonContent = new StringContent("{}", Encoding.UTF8, "application/json"))
+            {
+                StringContent content = new StringContent(JsonConvert.SerializeObject(new { name = functionName, arguments = new string[] { "1" } }));
+                try
+                {
+                    HttpResponseMessage response = await client.PostAsync($"http://127.0.0.1:{port}/admin/host/scale/status", jsonContent);
+                    status = JsonConvert.DeserializeObject<IntegrationTestHelpers.ScaleStatus>(await response.Content.ReadAsStringAsync());
+                }
+                catch (HttpRequestException ex)
+                {
+                    // In the case where the admin endpoint for the functions process does not respond
+                    // Catch exception to ensure that functions process is killed and other tests complete successfully
+                }
+                functionsProcess.Kill();
+            };
 
-        //    Assert.Equal(1, status.vote);
-        //    Assert.True(status.targetWorkerCount / (float) elements > 0.999);
-        //}
+            Assert.Equal(1, status.vote);
+            Assert.True(status.targetWorkerCount / (float)elements > 0.999);
+        }
     }
 }
