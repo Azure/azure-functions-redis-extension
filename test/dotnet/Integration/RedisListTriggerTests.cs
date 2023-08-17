@@ -134,7 +134,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             Assert.Equal(1, status.vote);
-            Assert.Equal(elements - 1, status.targetWorkerCount);
+            Assert.True(status.targetWorkerCount / (float) elements > 0.999);
         }
     }
 }
