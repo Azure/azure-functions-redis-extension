@@ -14,14 +14,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in ms.</param>
-        /// <param name="messagesPerWorker">The number of messages each functions instance is expected to handle.</param>
-        /// <param name="count">Number of entries to pull from Redis at one time.</param>
-        public RedisPollingTriggerBaseAttribute(string connectionStringSetting, string key, int pollingIntervalInMs, int messagesPerWorker, int count)
+        /// <param name="count">Number of entries to pull from Redis at one time. Used to determine scaling.</param>
+        public RedisPollingTriggerBaseAttribute(string connectionStringSetting, string key, int pollingIntervalInMs, int count)
         {
             this.ConnectionStringSetting = connectionStringSetting;
             this.Key = key;
             this.PollingIntervalInMs = pollingIntervalInMs;
-            this.MessagesPerWorker = messagesPerWorker;
             this.Count = count;
         }
 
@@ -42,15 +40,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// How often to poll Redis in milliseconds.
         /// </summary>
         public int PollingIntervalInMs { get; }
-
-        /// <summary>
-        /// The number of messages each functions instance is expected to handle.
-        /// Used to determine how many workers the function should scale to.
-        /// For example, if the number of <see cref="MessagesPerWorker">MessagesPerWorker</see> is 10,
-        /// and there are 1500 entries remaining in the list,
-        /// the functions host will attempt to scale up to 150 instances.
-        /// </summary>
-        public int MessagesPerWorker { get; }
 
         /// <summary>
         /// Number of entries to pull from Redis at one time.

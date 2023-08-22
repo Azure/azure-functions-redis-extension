@@ -21,7 +21,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string connectionString;
         internal string key;
         internal TimeSpan pollingInterval;
-        internal int messagesPerWorker;
         internal int count;
         internal ITriggeredFunctionExecutor executor;
         internal ILogger logger;
@@ -33,13 +32,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
 
-        public RedisPollingTriggerBaseListener(string name, string connectionString, string key, TimeSpan pollingInterval, int messagesPerWorker, int count, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPollingTriggerBaseListener(string name, string connectionString, string key, TimeSpan pollingInterval, int count, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.name = name;
             this.connectionString = connectionString;
             this.key = key;
             this.pollingInterval = pollingInterval;
-            this.messagesPerWorker = messagesPerWorker;
             this.count = count;
             this.executor = executor;
             this.logger = logger;
@@ -143,12 +141,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             double average = metrics.OrderByDescending(metric => metric.Timestamp).Take(MINIMUM_SAMPLES).Select(metric => metric.Remaining).Average();
 
-            if (workerCount * messagesPerWorker < average)
+            if (workerCount * count < average)
             {
                 return new ScaleStatus { Vote = ScaleVote.ScaleOut };
             }
 
-            if ((workerCount - 1) * messagesPerWorker > average)
+            if ((workerCount - 1) * count > average)
             {
                 return new ScaleStatus { Vote = ScaleVote.ScaleIn };
             }
@@ -159,7 +157,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public async Task<TargetScalerResult> GetScaleResultAsync(TargetScalerContext context)
         {
             RedisPollingTriggerBaseMetrics metric = await GetMetricsAsync();
-            return new TargetScalerResult() { TargetWorkerCount = (int)Math.Ceiling(metric.Remaining / (decimal)messagesPerWorker) };
+            return new TargetScalerResult() { TargetWorkerCount = (int)Math.Ceiling(metric.Remaining / (decimal)count) };
         }
     }
 }

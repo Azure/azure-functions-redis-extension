@@ -56,7 +56,6 @@ public class RedisSamples {
                 connectionStringSetting = "redisLocalhost",
                 key = "listTest",
                 pollingIntervalInMs = 100,
-                messagesPerWorker = 10,
                 count = 1,
                 listPopFromBeginning = false)
                 String entry,
@@ -71,7 +70,6 @@ public class RedisSamples {
                 connectionStringSetting = "redisLocalhost",
                 key = "streamTest",
                 pollingIntervalInMs = 100,
-                messagesPerWorker = 10,
                 count = 1,
                 deleteAfterProcess = true)
                 String entry,
