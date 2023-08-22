@@ -42,7 +42,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(key, count) : await db.ListRightPopAsync(key, count);
                 if (result is null)
                 {
-                    logger?.LogWarning($"Key '{key}' does not exist.");
+                    logger?.LogDebug($"Key '{key}' does not exist.");
                 }
                 else
                 {
@@ -55,7 +55,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 RedisValue value = listPopFromBeginning ? await db.ListLeftPopAsync(key) : await db.ListRightPopAsync(key);
                 if (value.IsNullOrEmpty)
                 {
-                    logger?.LogWarning($"Key '{key}' does not exist.");
+                    logger?.LogDebug($"Key '{key}' does not exist.");
                 }
                 else
                 {
