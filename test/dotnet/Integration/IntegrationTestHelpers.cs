@@ -14,19 +14,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         internal static Process StartFunction(string functionName, int port)
         {
-            Process functionsProcess = new Process
+            ProcessStartInfo info = new ProcessStartInfo
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = GetFunctionsFileName(),
-                    Arguments = $"start --verbose --functions {functionName} --port {port} --no-build --prefix {GetPrefix()}",
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    WorkingDirectory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false
-                }
+                FileName = GetFunctionsFileName(),
+                Arguments = $"start --verbose --functions {functionName} --port {port} --no-build --prefix {GetPrefix()}",
+                WindowStyle = ProcessWindowStyle.Hidden,
+                WorkingDirectory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
             };
+            info.EnvironmentVariables["FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED"] = "1";
+            Process functionsProcess = new Process() { StartInfo = info };
 
             TaskCompletionSource<bool> hostStarted = new TaskCompletionSource<bool>();
             void hostStartupHandler(object sender, DataReceivedEventArgs e)
@@ -103,6 +102,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         internal static string GetLogValue(object value)
         {
             return value.GetType().FullName + ":" + JsonConvert.SerializeObject(value);
+        }
+
+        public class ScaleStatus
+        {
+            public int vote;
+            public int targetWorkerCount;
         }
     }
 }
