@@ -40,15 +40,26 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (serverVersion >= RedisUtilities.Version62)
             {
                 RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(key, count) : await db.ListRightPopAsync(key, count);
-                logger?.LogDebug($"{logPrefix} Received {result.Length} entries from the list at key '{key}'.");
-                await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
+                if (result is null)
+                {
+                    logger?.LogDebug($"Key '{key}' does not exist.");
+                }
+                else
+                {
+                    logger?.LogDebug($"{logPrefix} Received {result.Length} entries from the list at key '{key}'.");
+                    await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
+                }
             }
             else
             {
                 RedisValue value = listPopFromBeginning ? await db.ListLeftPopAsync(key) : await db.ListRightPopAsync(key);
-                logger?.LogDebug($"{logPrefix} Received 1 entry from the list at key '{key}'.");
-                if (!value.IsNullOrEmpty)
+                if (value.IsNullOrEmpty)
                 {
+                    logger?.LogDebug($"Key '{key}' does not exist.");
+                }
+                else
+                {
+                    logger?.LogDebug($"{logPrefix} Received 1 entry from the list at key '{key}'.");
                     await ExecuteAsync(value, cancellationToken);
                 }
             }
