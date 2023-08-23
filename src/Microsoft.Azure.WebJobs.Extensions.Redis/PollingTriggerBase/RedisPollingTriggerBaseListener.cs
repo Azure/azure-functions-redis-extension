@@ -22,6 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string key;
         internal TimeSpan pollingInterval;
         internal int maxBatchSize;
+        internal bool singleDispatch;
         internal ITriggeredFunctionExecutor executor;
         internal ILogger logger;
 
@@ -32,13 +33,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
 
-        public RedisPollingTriggerBaseListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPollingTriggerBaseListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool singleDispatch, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.name = name;
             this.connectionString = connectionString;
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
+            this.singleDispatch = singleDispatch;
             this.executor = executor;
             this.logger = logger;
         }

@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -34,15 +35,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.logger = logger;
         }
 
-        public Type TriggerValueType => typeof(RedisValue);
+        public Type TriggerValueType => parameterType.IsArray ? typeof(RedisValue[]) : typeof(RedisValue);
 
         public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            RedisValue redisValue = (RedisValue)value;
-            IReadOnlyDictionary<string, object> bindingData = CreateBindingData(redisValue);
-            return Task.FromResult<ITriggerData>(new TriggerData(new RedisValueValueProvider(redisValue, parameterType), bindingData));
+            if (parameterType.IsArray)
+            {
+                RedisValue[] redisValues = (RedisValue[])value;
+                IReadOnlyDictionary<string, object> bindingData = CreateBindingData(redisValues);
+                return Task.FromResult<ITriggerData>(new TriggerData(new RedisValueArrayValueProvider(redisValues, parameterType), bindingData));
+            }
+            else
+            {
+                RedisValue redisValue = (RedisValue)value;
+                IReadOnlyDictionary<string, object> bindingData = CreateBindingData(redisValue);
+                return Task.FromResult<ITriggerData>(new TriggerData(new RedisValueValueProvider(redisValue, parameterType), bindingData));
+            }
         }
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
@@ -53,7 +63,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
+<<<<<<< HEAD
             return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.LogName, connectionString, key, pollingInterval, maxBatchSize, listPopFromBeginning, context.Executor, logger));
+=======
+            return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.LogName, connectionString, key, pollingInterval, count, listPopFromBeginning, parameterType.IsArray, context.Executor, logger));
+>>>>>>> 93d410d (initial batch commit)
         }
 
         public ParameterDescriptor ToParameterDescriptor()
@@ -77,6 +91,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return new Dictionary<string, object>()
             {
                 { "Value", value.ToString() }
+            };
+        }
+
+        internal static IReadOnlyDictionary<string, object> CreateBindingData(RedisValue[] values)
+        {
+            return new Dictionary<string, object>()
+            {
+                { "Value", JsonConvert.SerializeObject(values.ToStringArray()) }
             };
         }
     }

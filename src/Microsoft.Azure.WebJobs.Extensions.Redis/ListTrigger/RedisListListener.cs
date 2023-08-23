@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Internal;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
@@ -17,8 +18,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool listPopFromBeginning;
 
-        public RedisListListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, connectionString, key, pollingInterval, maxBatchSize, executor, logger)
+        public RedisListListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, bool singleDispatch, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, key, pollingInterval, maxBatchSize, singleDispatch, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
             this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Key:{key}]";
@@ -47,7 +48,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 else
                 {
                     logger?.LogDebug($"{logPrefix} Received {result.Length} entries from the list at key '{key}'.");
-                    await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
+                    if (singleDispatch)
+                    {
+                        await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
+                    }
+                    else
+                    {
+                        await ExecuteAsync(result, cancellationToken);
+                    }
                 }
             }
             else
@@ -65,9 +73,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        private Task ExecuteAsync(RedisValue value, CancellationToken cancellationToken)
+        private async Task ExecuteAsync(object value, CancellationToken cancellationToken)
         {
-            return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
+            FunctionResult result = await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
+            if (!result.Succeeded)
+            {
+                logger?.LogCritical(result.Exception, "Function execution failed with exception.");
+            }
         }
 
         public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
