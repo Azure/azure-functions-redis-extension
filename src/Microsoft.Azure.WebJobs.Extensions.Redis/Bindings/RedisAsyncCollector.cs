@@ -11,7 +11,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly string command;
         private readonly ILogger logger;
 
-        private ITransaction transaction;
+        private IBatch batch;
 
         public RedisAsyncCollector(IConnectionMultiplexer multiplexer, string command, ILogger logger)
         {
@@ -22,23 +22,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task AddAsync(string[] arguments, CancellationToken cancellationToken = default)
         {
-            if (transaction is null)
+            if (batch is null)
             {
-                logger?.LogDebug("Creating transaction.");
-                transaction = multiplexer.GetDatabase().CreateTransaction();
+                logger?.LogDebug("Creating batch.");
+                batch = multiplexer.GetDatabase().CreateBatch();
             }
 
-            logger?.LogDebug($"Adding {command} command to transaction with input string[] arguments.");
-            _ = transaction.ExecuteAsync(command, arguments, CommandFlags.FireAndForget);
+            logger?.LogDebug($"Adding {command} command to batch with input string[] arguments.");
+            _ = batch.ExecuteAsync(command, arguments, CommandFlags.FireAndForget);
             return Task.CompletedTask;
         }
 
-        public async Task FlushAsync(CancellationToken cancellationToken = default)
+        public Task FlushAsync(CancellationToken cancellationToken = default)
         {
-            logger?.LogDebug("Executing transaction.");
-            await transaction.ExecuteAsync(CommandFlags.FireAndForget);
-            transaction = null;
-            return;
+            logger?.LogDebug("Executing batch.");
+            batch.Execute();
+            batch = null;
+            return Task.CompletedTask;
         }
     }
 }
