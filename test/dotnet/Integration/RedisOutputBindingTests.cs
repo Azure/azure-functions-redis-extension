@@ -78,7 +78,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Fact]
-        public async void MultipleAddAsyncCalls_SuccessfullyUsesOneTransaction()
+        public async void MultipleAddAsyncCalls_SuccessfullyFlushes()
         {
             string functionName = nameof(RedisOutputBindingTestFunctions.MultipleAddAsyncCalls);
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();

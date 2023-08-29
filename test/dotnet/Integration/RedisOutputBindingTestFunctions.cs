@@ -41,7 +41,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             string[] keys = entry.Split(',');
             foreach (string key in keys)
             {
-                collector.AddAsync(new string[] { key, nameof(MultipleAddAsyncCalls) });
+                collector.AddAsync(new string[] { key, nameof(MultipleAddAsyncCalls) }).Wait();
             }
         }
     }

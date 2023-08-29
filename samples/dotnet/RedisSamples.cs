@@ -24,7 +24,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             ILogger logger)
         {
             logger.LogInformation(message);
-            return new string[] { "keyspaceTest", message };
+            return new string[] { nameof(OutputBindingArgumentsOnly), message };
         }
 
         [FunctionName(nameof(PubSubTriggerResolvedChannel))]
