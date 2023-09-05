@@ -63,11 +63,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-<<<<<<< HEAD
-            return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.LogName, connectionString, key, pollingInterval, maxBatchSize, listPopFromBeginning, context.Executor, logger));
-=======
-            return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.LogName, connectionString, key, pollingInterval, count, listPopFromBeginning, parameterType.IsArray, context.Executor, logger));
->>>>>>> 93d410d (initial batch commit)
+            return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.LogName, connectionString, key, pollingInterval, maxBatchSize, listPopFromBeginning, !parameterType.IsArray, context.Executor, logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()
