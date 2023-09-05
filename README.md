@@ -63,8 +63,6 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
   - This field can be resolved using `INameResolver`.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
-- `MessagesPerWorker`: How many messages each functions instance "should" process. Used to determine how many instances the function should scale to.
-  - Default: `100`
 - `Count`: Number of entries to pop from Redis at one time. These are processed in parallel.
   - Default: `10`
   - Only supported on Redis 6.2+ using the `COUNT` argument in [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/).
@@ -100,8 +98,6 @@ Each functions instance creates a new random GUID to use as its consumer name wi
   - This field can be resolved using `INameResolver`.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
-- `MessagesPerWorker`: How many messages each functions instance "should" process. Used to determine how many instances the function should scale to.
-  - Default: `100`
 - `Count`: Number of entries to read from Redis at one time. These are processed in parallel.
   - Default: `10`
 - `DeleteAfterProcess`: Whether to delete the stream entries after the function has run.
