@@ -18,14 +18,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
         }
 
-        [FunctionName(nameof(StreamTrigger_NameValueEntryArray))]
-        public static void StreamTrigger_NameValueEntryArray(
-            [RedisStreamTrigger(localhostSetting, nameof(StreamTrigger_NameValueEntryArray), pollingIntervalInMs: pollingInterval)] NameValueEntry[] values,
-            ILogger logger)
-        {
-            logger.LogInformation(IntegrationTestHelpers.GetLogValue(values));
-        }
-
         [FunctionName(nameof(StreamTrigger_Dictionary))]
         public static void StreamTrigger_Dictionary(
             [RedisStreamTrigger(localhostSetting, nameof(StreamTrigger_Dictionary), pollingIntervalInMs: pollingInterval)] Dictionary<string, string> values,

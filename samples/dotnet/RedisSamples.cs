@@ -80,7 +80,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 
         [FunctionName(nameof(StreamTriggerArray))]
         public static void StreamTriggerArray(
-            [RedisStreamTrigger(localhostSetting, "streamArrayTest", pollingIntervalInMs: 1, deleteAfterProcess: true, count: 16)] StreamEntry[] entries,
+            [RedisStreamTrigger(localhostSetting, "streamArrayTest")] StreamEntry[] entries,
             ILogger logger)
         {
             logger.LogInformation(string.Join(',', entries.ToString()));

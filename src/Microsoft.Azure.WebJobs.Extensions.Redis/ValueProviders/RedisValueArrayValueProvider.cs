@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -23,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public RedisValueArrayValueProvider(RedisValue[] values, Type destinationType)
         {
             this.values = values;
-            this.Type = destinationType;
+            Type = destinationType;
         }
 
         /// <summary>
@@ -40,15 +39,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             if (Type.Equals(typeof(RedisValue[])))
             {
-                return Task.FromResult((object)values);
+                return Task.FromResult<object>(values);
             }
             else if (Type.Equals(typeof(string[])))
             {
-                return Task.FromResult((object)values.ToStringArray());
+                return Task.FromResult<object>(values.ToStringArray());
             }
             else
             {
-                return Task.FromResult((object)values.Select(value => RedisUtilities.RedisValueTypeConverter(value, Type.GetElementType())).ToArray());
+                return Task.FromResult<object>(values.Select(value => RedisUtilities.RedisValueTypeConverter(value, Type.GetElementType())).ToArray());
             }
         }
 

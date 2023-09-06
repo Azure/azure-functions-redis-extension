@@ -1,10 +1,10 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -24,7 +24,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public StreamEntryArrayValueProvider(StreamEntry[] entries, Type parameterType)
         {
             this.entries = entries;
-            this.Type = parameterType;
+            Type = parameterType;
         }
 
         /// <summary>
@@ -43,13 +43,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return Task.FromResult<object>(entries);
             }
-            if (Type.Equals(typeof(NameValueEntry[][])))
-            {
-                return Task.FromResult<object>(entries.Select(e => e.Values).ToArray());
-            }
             if (Type.Equals(typeof(Dictionary<string, string>[])))
             {
                 return Task.FromResult<object>(entries.Select(e => RedisUtilities.StreamEntryToDictionary(e)).ToArray());
+            }
+            if (Type.Equals(typeof(ReadOnlyMemory<byte>[])))
+            {
+                return Task.FromResult<object>(entries.Select(e => new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(RedisUtilities.StreamEntryToString(e)))).ToArray());
+            }
+            if (Type.Equals(typeof(byte[][])))
+            {
+                return Task.FromResult<object>(entries.Select(e => Encoding.UTF8.GetBytes(RedisUtilities.StreamEntryToString(e))).ToArray());
             }
             if (Type.Equals(typeof(string[])))
             {
@@ -57,11 +61,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             try
             {
-                return Task.FromResult((object) entries.Select(e => JsonConvert.DeserializeObject(JsonConvert.SerializeObject(RedisUtilities.StreamEntryToDictionary(e)), Type)).ToArray());
+                return Task.FromResult<object>(entries.Select(e => JsonConvert.DeserializeObject(JsonConvert.SerializeObject(RedisUtilities.StreamEntryToDictionary(e)), Type.GetElementType())).ToArray());
             }
             catch (JsonException e)
             {
-                string msg = $@"Binding parameters to complex objects (such as '{Type.Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
+                string msg = $@"Binding parameters to complex objects (such as '{Type.GetElementType().Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
                 throw new InvalidOperationException(msg, e);
             }
         }

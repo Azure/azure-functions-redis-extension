@@ -1,11 +1,8 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
-using Microsoft.Azure.WebJobs.Host.Bindings;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,7 +23,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public StreamEntryValueProvider(StreamEntry entry, Type parameterType)
         {
             this.entry = entry;
-            this.Type = parameterType;
+            Type = parameterType;
         }
 
         /// <summary>
@@ -44,10 +41,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (Type.Equals(typeof(StreamEntry)))
             {
                 return Task.FromResult<object>(entry);
-            }
-            if (Type.Equals(typeof(NameValueEntry[])))
-            {
-                return Task.FromResult<object>(entry.Values);
             }
             if (Type.Equals(typeof(Dictionary<string, string>)))
             {

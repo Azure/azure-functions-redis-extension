@@ -91,7 +91,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [Theory]
         [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_StreamEntry), typeof(StreamEntry))]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_NameValueEntryArray), typeof(NameValueEntry[]))]
         [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_ByteArray), typeof(byte[]))]
         [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_String), typeof(string))]
         [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_CustomType), typeof(CustomType))]

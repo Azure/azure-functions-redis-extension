@@ -1,8 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
-using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -22,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public RedisValueValueProvider(RedisValue value, Type destinationType)
         {
             this.value = value;
-            this.Type = destinationType;
+            Type = destinationType;
         }
 
         /// <summary>

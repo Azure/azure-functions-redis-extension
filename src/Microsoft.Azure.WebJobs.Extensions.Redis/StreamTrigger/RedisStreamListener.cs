@@ -70,37 +70,27 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             if (arrayReturn)
             {
-                await ExecuteAsync(entries, cancellationToken);
+                await ExecuteAsync(entries, entries.Select(entry => entry.Id).ToArray(), cancellationToken);
             }
             else
             {
-                await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, cancellationToken)));
+                await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, new RedisValue[] { entry.Id }, cancellationToken)));
             }
         }
 
-        private async Task ExecuteAsync(StreamEntry entry, CancellationToken cancellationToken)
+        private async Task ExecuteAsync(object value, RedisValue[] entryIds, CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = entry }, cancellationToken);
+            FunctionResult result = await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
 
-            RedisValue[] entryIds = new RedisValue[] { entry.Id };
-            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
-            logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
-        }
-
-        private async Task ExecuteAsync(StreamEntry[] entries, CancellationToken cancellationToken)
-        {
-            IDatabase db = multiplexer.GetDatabase();
-            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = entries }, cancellationToken);
-
-            RedisValue[] entryIds = entries.Select(entry => entry.Id).ToArray();
-            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
-            logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
-
-            if (deleteAfterProcess)
+            if (result.Succeeded)
             {
-                long deleted = await db.StreamDeleteAsync(key, entryIds);
-                logger?.LogDebug($"{logPrefix} Deleted {deleted} entries from the stream at key '{key}'.");
+                long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
+                logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
+            }
+            else
+            {
+                logger?.LogCritical(result.Exception, "Function execution failed with exception.");
             }
         }
 
