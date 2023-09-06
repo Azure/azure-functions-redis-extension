@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
+using Microsoft.Azure.WebJobs.Host.Bindings;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
@@ -82,12 +83,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <returns></returns>
         public string ToInvokeString()
         {
-            JObject obj = new JObject()
-            {
-                [nameof(StreamEntry.Id)] = entry.Id.ToString(),
-                [nameof(StreamEntry.Values)] = JObject.FromObject(RedisUtilities.StreamEntryToDictionary(entry))
-            };
-            return obj.ToString(Formatting.None);
+            return RedisUtilities.StreamEntryToString(entry);
         }
     }
 }

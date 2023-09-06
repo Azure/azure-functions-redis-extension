@@ -77,5 +77,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
                 JsonConvert.SerializeObject(entry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString())));
             result = new string[] { "streamTest2", entry.Id.ToString() };
         }
+
+        [FunctionName(nameof(StreamTriggerArray))]
+        public static void StreamTriggerArray(
+            [RedisStreamTrigger(localhostSetting, "streamArrayTest", pollingIntervalInMs: 1, deleteAfterProcess: true, count: 16)] StreamEntry[] entries,
+            ILogger logger)
+        {
+            logger.LogInformation(string.Join(',', entries.ToString()));
+        }
     }
 }

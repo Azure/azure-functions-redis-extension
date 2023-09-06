@@ -1,8 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
-using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
 using System.Linq;
@@ -18,8 +16,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool listPopFromBeginning;
 
-        public RedisListListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, bool singleDispatch, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, connectionString, key, pollingInterval, maxBatchSize, singleDispatch, executor, logger)
+        public RedisListListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, bool arrayReturn, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, key, pollingInterval, maxBatchSize, arrayReturn, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
             this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Key:{key}]";
@@ -48,13 +46,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 else
                 {
                     logger?.LogDebug($"{logPrefix} Received {result.Length} entries from the list at key '{key}'.");
-                    if (singleDispatch)
+                    if (arrayReturn)
                     {
-                        await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
+                        await ExecuteAsync(result, cancellationToken);
                     }
                     else
                     {
-                        await ExecuteAsync(result, cancellationToken);
+                        await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
                     }
                 }
             }

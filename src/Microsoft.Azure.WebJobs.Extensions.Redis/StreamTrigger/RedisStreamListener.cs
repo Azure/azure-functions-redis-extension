@@ -3,7 +3,6 @@ using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,8 +17,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string consumerGroup;
         internal string consumerName;
 
-        public RedisStreamListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool singleDispatch, string consumerGroup, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, connectionString, key, pollingInterval, maxBatchSize, singleDispatch, executor, logger)
+        public RedisStreamListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool arrayReturn, string consumerGroup, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, key, pollingInterval, maxBatchSize, arrayReturn, executor, logger)
         {
             this.consumerGroup = consumerGroup;
             this.consumerName = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? Guid.NewGuid().ToString();
@@ -64,7 +63,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             IDatabase db = multiplexer.GetDatabase();
             StreamEntry[] entries = await db.StreamReadGroupAsync(key, consumerGroup, consumerName, count: maxBatchSize);
             logger?.LogDebug($"{logPrefix} Received {entries.Length} entries from the stream at key '{key}'.");
-            await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, cancellationToken)));
+            if (entries.Length == 0)
+            {
+                return;
+            }
+
+            if (arrayReturn)
+            {
+                await ExecuteAsync(entries, cancellationToken);
+            }
+            else
+            {
+                await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, cancellationToken)));
+            }
         }
 
         private async Task ExecuteAsync(StreamEntry entry, CancellationToken cancellationToken)
@@ -75,6 +86,22 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             RedisValue[] entryIds = new RedisValue[] { entry.Id };
             long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
             logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
+        }
+
+        private async Task ExecuteAsync(StreamEntry[] entries, CancellationToken cancellationToken)
+        {
+            IDatabase db = multiplexer.GetDatabase();
+            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = entries }, cancellationToken);
+
+            RedisValue[] entryIds = entries.Select(entry => entry.Id).ToArray();
+            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
+            logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
+
+            if (deleteAfterProcess)
+            {
+                long deleted = await db.StreamDeleteAsync(key, entryIds);
+                logger?.LogDebug($"{logPrefix} Deleted {deleted} entries from the stream at key '{key}'.");
+            }
         }
 
         public async override void BeforeClosing()

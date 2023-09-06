@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -87,6 +88,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public static Dictionary<string, string> StreamEntryToDictionary(StreamEntry entry)
         {
             return entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
+        }
+
+        public static string StreamEntryToString(StreamEntry entry)
+        {
+            JObject obj = new JObject()
+            {
+                [nameof(StreamEntry.Id)] = entry.Id.ToString(),
+                [nameof(StreamEntry.Values)] = JObject.FromObject(RedisUtilities.StreamEntryToDictionary(entry))
+            };
+            return obj.ToString(Formatting.None);
         }
     }
 }
