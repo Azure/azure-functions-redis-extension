@@ -117,6 +117,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         public void ScalingLogic_DecreasingMetrics(int workerCount, int batchSize, ScaleVote expected)
         {
             RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
+            ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = decreasingMetrics };
+            Assert.Equal(expected, listener.GetScaleStatus(context).Vote);
         }
         [Theory]
         [InlineData(1, 10, ScaleVote.ScaleOut)]
