@@ -3,7 +3,6 @@ using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -37,7 +36,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Type TriggerValueType => parameterType.IsArray ? typeof(RedisValue[]) : typeof(RedisValue);
 
-        public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
+        public IReadOnlyDictionary<string, Type> BindingDataContract => CreateBindingDataContract();
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
@@ -74,27 +73,41 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             };
         }
 
-        internal static IReadOnlyDictionary<string, Type> CreateBindingDataContract()
+        internal IReadOnlyDictionary<string, Type> CreateBindingDataContract()
         {
-            return new Dictionary<string, Type>()
+            if (parameterType.IsArray)
             {
-                { "Value", typeof(string) }
-            };
+                return new Dictionary<string, Type>()
+                {
+                    { "Key", typeof(string) },
+                    { "Count", typeof(int) }
+                };
+            }
+            else
+            {
+                return new Dictionary<string, Type>()
+                {
+                    { "Key", typeof(string) },
+                    { "Value", typeof(string) }
+                };
+            }
         }
 
-        internal static IReadOnlyDictionary<string, object> CreateBindingData(RedisValue value)
+        internal IReadOnlyDictionary<string, object> CreateBindingData(RedisValue value)
         {
             return new Dictionary<string, object>()
             {
+                { "Key", key },
                 { "Value", value.ToString() }
             };
         }
 
-        internal static IReadOnlyDictionary<string, object> CreateBindingData(RedisValue[] values)
+        internal IReadOnlyDictionary<string, object> CreateBindingData(RedisValue[] values)
         {
             return new Dictionary<string, object>()
             {
-                { "Value", JsonConvert.SerializeObject(values.ToStringArray()) }
+                { "Key", key },
+                { "Count", values.Length }
             };
         }
     }
