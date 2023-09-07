@@ -33,14 +33,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
 
-        public RedisPollingTriggerBaseListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool arrayReturn, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPollingTriggerBaseListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.name = name;
             this.connectionString = connectionString;
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
-            this.batch = arrayReturn;
+            this.batch = batch;
             this.executor = executor;
             this.logger = logger;
         }
