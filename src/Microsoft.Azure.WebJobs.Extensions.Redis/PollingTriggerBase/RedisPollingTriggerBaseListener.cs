@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string key;
         internal TimeSpan pollingInterval;
         internal int maxBatchSize;
-        internal bool arrayReturn;
+        internal bool batch;
         internal ITriggeredFunctionExecutor executor;
         internal ILogger logger;
 
@@ -40,7 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
-            this.arrayReturn = arrayReturn;
+            this.batch = arrayReturn;
             this.executor = executor;
             this.logger = logger;
         }

@@ -51,8 +51,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             logger.LogInformation(message);
         }
 
-        [FunctionName(nameof(ListTriggerSingle))]
-        public static void ListTriggerSingle(
+        [FunctionName(nameof(ListTrigger))]
+        public static void ListTrigger(
             [RedisListTrigger(localhostSetting, "listTest")] string entry,
             ILogger logger)
         {

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -33,12 +32,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.logger = logger;
         }
 
-        public Type TriggerValueType => parameterType.IsArray ? typeof(StreamEntry[]) : typeof(StreamEntry);
+        public Type TriggerValueType => IsBatchParameter() ? typeof(StreamEntry[]) : typeof(StreamEntry);
         public IReadOnlyDictionary<string, Type> BindingDataContract => CreateBindingDataContract();
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            if (parameterType.IsArray && parameterType != typeof(byte[]) && parameterType != typeof(NameValueEntry[]))
+            if (IsBatchParameter())
             {
                 StreamEntry[] entries = (StreamEntry[])value;
                 IReadOnlyDictionary<string, object> bindingData = CreateBindingData(entries);
@@ -66,7 +65,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 key,
                 pollingInterval,
                 maxBatchSize,
-                parameterType.IsArray && parameterType != typeof(byte[]) && parameterType != typeof(NameValueEntry[]),
+                IsBatchParameter(),
                 context.Descriptor.Id,
                 context.Executor,
                 logger));
@@ -83,7 +82,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         internal IReadOnlyDictionary<string, Type> CreateBindingDataContract()
         {
-            if (parameterType.IsArray)
+            if (IsBatchParameter())
             {
                 return new Dictionary<string, Type>()
                 {
@@ -120,5 +119,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 { "Count", entries.Length },
             };
         }
+
+        internal bool IsBatchParameter() => parameterType.IsArray && parameterType != typeof(byte[]) && parameterType != typeof(NameValueEntry[]);
     }
 }

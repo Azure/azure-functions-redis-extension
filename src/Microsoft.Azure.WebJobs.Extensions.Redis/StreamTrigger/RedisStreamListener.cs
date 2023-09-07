@@ -17,8 +17,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string consumerGroup;
         internal string consumerName;
 
-        public RedisStreamListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool arrayReturn, string consumerGroup, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, connectionString, key, pollingInterval, maxBatchSize, arrayReturn, executor, logger)
+        public RedisStreamListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, string consumerGroup, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, connectionString, key, pollingInterval, maxBatchSize, batch, executor, logger)
         {
             this.consumerGroup = consumerGroup;
             this.consumerName = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? Guid.NewGuid().ToString();
@@ -68,7 +68,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 return;
             }
 
-            if (arrayReturn)
+            if (batch)
             {
                 await ExecuteAsync(entries, entries.Select(entry => entry.Id).ToArray(), cancellationToken);
             }

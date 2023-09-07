@@ -34,13 +34,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.logger = logger;
         }
 
-        public Type TriggerValueType => parameterType.IsArray ? typeof(RedisValue[]) : typeof(RedisValue);
+        public Type TriggerValueType => IsBatchParameter() ? typeof(RedisValue[]) : typeof(RedisValue);
 
         public IReadOnlyDictionary<string, Type> BindingDataContract => CreateBindingDataContract();
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            if (parameterType.IsArray && parameterType != typeof(byte[]))
+            if (IsBatchParameter())
             {
                 RedisValue[] redisValues = (RedisValue[])value;
                 IReadOnlyDictionary<string, object> bindingData = CreateBindingData(redisValues);
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 pollingInterval,
                 maxBatchSize,
                 listPopFromBeginning,
-                parameterType.IsArray && parameterType != typeof(byte[]),
+                IsBatchParameter(),
                 context.Executor,
                 logger));
         }
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         internal IReadOnlyDictionary<string, Type> CreateBindingDataContract()
         {
-            if (parameterType.IsArray)
+            if (IsBatchParameter())
             {
                 return new Dictionary<string, Type>()
                 {
@@ -119,5 +119,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 { "Count", values.Length }
             };
         }
+
+        internal bool IsBatchParameter() => parameterType.IsArray && parameterType != typeof(byte[]);
     }
 }
