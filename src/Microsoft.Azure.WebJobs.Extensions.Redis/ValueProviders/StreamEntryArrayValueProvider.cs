@@ -45,33 +45,27 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             if (Type.Equals(typeof(NameValueEntry[][])))
             {
-                return Task.FromResult<object>(entries.Select(e => e.Values).ToArray());
+                return Task.FromResult<object>(Array.ConvertAll(entries, e => e.Values));
             }
             if (Type.Equals(typeof(Dictionary<string, string>[])))
             {
-                return Task.FromResult<object>(entries.Select(e => RedisUtilities.StreamEntryToDictionary(e)).ToArray());
+                return Task.FromResult<object>(Array.ConvertAll(entries, e => RedisUtilities.StreamEntryToDictionary(e)));
             }
             if (Type.Equals(typeof(ReadOnlyMemory<byte>[])))
             {
-                return Task.FromResult<object>(entries.Select(e => new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(RedisUtilities.StreamEntryToString(e)))).ToArray());
+                return Task.FromResult<object>(Array.ConvertAll(entries, e => new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(RedisUtilities.StreamEntryToString(e)))));
             }
             if (Type.Equals(typeof(byte[][])))
             {
-                return Task.FromResult<object>(entries.Select(e => Encoding.UTF8.GetBytes(RedisUtilities.StreamEntryToString(e))).ToArray());
+                return Task.FromResult<object>(Array.ConvertAll(entries, e => Encoding.UTF8.GetBytes(RedisUtilities.StreamEntryToString(e))));
             }
             if (Type.Equals(typeof(string[])))
             {
-                return Task.FromResult<object>(entries.Select(e => RedisUtilities.StreamEntryToString(e)).ToArray());
+                return Task.FromResult<object>(Array.ConvertAll(entries, e => RedisUtilities.StreamEntryToString(e)));
             }
-            try
-            {
-                return Task.FromResult<object>(entries.Select(e => JsonConvert.DeserializeObject(JsonConvert.SerializeObject(RedisUtilities.StreamEntryToDictionary(e)), Type.GetElementType())).ToArray());
-            }
-            catch (JsonException e)
-            {
-                string msg = $@"Binding parameters to complex objects (such as '{Type.GetElementType().Name}') uses Json.NET serialization. The JSON parser failed: {e.Message}";
-                throw new InvalidOperationException(msg, e);
-            }
+
+            string msg = $@"Binding parameters to complex objects (such as '{Type.GetElementType().Name}') is not supported for batches.";
+            throw new InvalidOperationException(msg);
         }
 
         /// <summary>

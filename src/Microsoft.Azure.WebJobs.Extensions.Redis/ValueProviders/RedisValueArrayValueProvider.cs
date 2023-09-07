@@ -1,8 +1,8 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -41,14 +41,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return Task.FromResult<object>(values);
             }
-            else if (Type.Equals(typeof(string[])))
+            if (Type.Equals(typeof(string[])))
             {
                 return Task.FromResult<object>(values.ToStringArray());
             }
-            else
+            if (Type.Equals(typeof(byte[][])))
             {
-                return Task.FromResult<object>(values.Select(value => RedisUtilities.RedisValueTypeConverter(value, Type.GetElementType())).ToArray());
+                return Task.FromResult<object>(Array.ConvertAll(values, value => (byte[])value));
             }
+            if (Type.Equals(typeof(ReadOnlyMemory<byte>[])))
+            {
+                return Task.FromResult<object>(Array.ConvertAll(values, value => (ReadOnlyMemory<byte>)value));
+            }
+
+            string msg = $@"Binding parameters to complex objects (such as '{Type.GetElementType().Name}') is not supported for batches.";
+            throw new InvalidOperationException(msg);
         }
 
         /// <summary>

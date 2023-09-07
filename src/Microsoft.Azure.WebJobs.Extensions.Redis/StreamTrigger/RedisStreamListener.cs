@@ -70,7 +70,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             if (batch)
             {
-                await ExecuteAsync(entries, entries.Select(entry => entry.Id).ToArray(), cancellationToken);
+                await ExecuteAsync(entries, Array.ConvertAll(entries, entry => entry.Id), cancellationToken);
             }
             else
             {

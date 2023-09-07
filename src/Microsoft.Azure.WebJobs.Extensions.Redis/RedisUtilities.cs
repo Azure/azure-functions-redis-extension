@@ -73,7 +73,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return (ReadOnlyMemory<byte>)value;
             }
-
             try
             {
                 return JsonConvert.DeserializeObject((string)value, destinationType);

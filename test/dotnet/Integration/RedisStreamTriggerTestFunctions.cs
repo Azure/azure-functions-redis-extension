@@ -49,5 +49,37 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
         }
+
+        [FunctionName(nameof(StreamTrigger_Batch_StreamEntry))]
+        public static void StreamTrigger_Batch_StreamEntry(
+            [RedisStreamTrigger(localhostSetting, nameof(StreamTrigger_Batch_StreamEntry), pollingIntervalInMs: pollingInterval)] StreamEntry[] entry,
+            ILogger logger)
+        {
+            logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
+        }
+
+        [FunctionName(nameof(StreamTrigger_Batch_Dictionary))]
+        public static void StreamTrigger_Batch_Dictionary(
+            [RedisStreamTrigger(localhostSetting, nameof(StreamTrigger_Batch_Dictionary), pollingIntervalInMs: pollingInterval)] Dictionary<string, string>[] values,
+            ILogger logger)
+        {
+            logger.LogInformation(IntegrationTestHelpers.GetLogValue(values));
+        }
+
+        [FunctionName(nameof(StreamTrigger_Batch_ByteArray))]
+        public static void StreamTrigger_Batch_ByteArray(
+            [RedisStreamTrigger(localhostSetting, nameof(StreamTrigger_Batch_ByteArray), pollingIntervalInMs: pollingInterval)] byte[][] values,
+            ILogger logger)
+        {
+            logger.LogInformation(IntegrationTestHelpers.GetLogValue(values));
+        }
+
+        [FunctionName(nameof(StreamTrigger_Batch_String))]
+        public static void StreamTrigger_Batch_String(
+            [RedisStreamTrigger(localhostSetting, nameof(StreamTrigger_Batch_String), pollingIntervalInMs: pollingInterval)] string[] values,
+            ILogger logger)
+        {
+            logger.LogInformation(IntegrationTestHelpers.GetLogValue(values));
+        }
     }
 }
