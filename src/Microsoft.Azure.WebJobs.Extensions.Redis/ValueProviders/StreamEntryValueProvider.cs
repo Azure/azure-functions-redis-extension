@@ -42,6 +42,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return Task.FromResult<object>(entry);
             }
+            if (Type.Equals(typeof(NameValueEntry[])))
+            {
+                return Task.FromResult<object>(entry.Values);
+            }
             if (Type.Equals(typeof(Dictionary<string, string>)))
             {
                 return Task.FromResult<object>(RedisUtilities.StreamEntryToDictionary(entry));

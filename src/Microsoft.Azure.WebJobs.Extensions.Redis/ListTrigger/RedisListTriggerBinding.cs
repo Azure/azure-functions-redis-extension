@@ -40,7 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            if (parameterType.IsArray)
+            if (parameterType.IsArray && parameterType != typeof(byte[]))
             {
                 RedisValue[] redisValues = (RedisValue[])value;
                 IReadOnlyDictionary<string, object> bindingData = CreateBindingData(redisValues);
@@ -62,7 +62,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.LogName, connectionString, key, pollingInterval, maxBatchSize, listPopFromBeginning, parameterType.IsArray, context.Executor, logger));
+            return Task.FromResult<IListener>(new RedisListListener(
+                context.Descriptor.LogName,
+                connectionString,
+                key,
+                pollingInterval,
+                maxBatchSize,
+                listPopFromBeginning,
+                parameterType.IsArray && parameterType != typeof(byte[]),
+                context.Executor,
+                logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()
