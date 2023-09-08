@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -14,9 +14,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     [Extension("Redis")]
     public class RedisExtensionConfigProvider : IExtensionConfigProvider
     {
-        private readonly IConfiguration configuration;
-        private readonly INameResolver nameResolver;
-        private readonly ILoggerFactory loggerFactory;
+        internal readonly IConfiguration configuration;
+        internal readonly INameResolver nameResolver;
+        internal readonly ILoggerFactory loggerFactory;
+
+        private static readonly ConcurrentDictionary<string, IConnectionMultiplexer> connectionMultiplexerCache = new ConcurrentDictionary<string, IConnectionMultiplexer>();
 
         /// <summary>
         /// Adds Redis triggers and bindings to the extension context.
@@ -50,7 +52,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             FluentBindingRule<RedisStreamTriggerAttribute> streamTriggerRule = context.AddBindingRule<RedisStreamTriggerAttribute>();
             streamTriggerRule.BindToTrigger(new RedisStreamTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger("RedisStreamTrigger")));
+
+            FluentBindingRule<RedisAttribute> outputBindingRule = context.AddBindingRule<RedisAttribute>();
+            outputBindingRule.BindToCollector((attr) => new RedisAsyncCollector(GetOrCreateConnectionMultiplexer(attr), attr.Command, loggerFactory.CreateLogger("RedisOutputBinding")));
 #pragma warning restore CS0618
+        }
+
+        internal IConnectionMultiplexer GetOrCreateConnectionMultiplexer(RedisAttribute attribute)
+        {
+            string connectionString = RedisUtilities.ResolveConnectionString(configuration, attribute.ConnectionStringSetting);
+            return connectionMultiplexerCache.GetOrAdd(connectionString, (string cs) => ConnectionMultiplexer.Connect(cs));
         }
     }
 }
