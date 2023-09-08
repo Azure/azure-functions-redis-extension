@@ -5,10 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
-using System.Net.Http;
 using Xunit;
-using System.Text;
-using System.Collections.Generic;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {

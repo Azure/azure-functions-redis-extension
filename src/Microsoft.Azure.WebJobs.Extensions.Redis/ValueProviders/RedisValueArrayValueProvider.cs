@@ -1,6 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
 using System.Threading.Tasks;
