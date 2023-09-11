@@ -1,8 +1,10 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public StreamEntryValueProvider(StreamEntry entry, Type parameterType)
         {
             this.entry = entry;
-            Type = parameterType;
+            this.Type = parameterType;
         }
 
         /// <summary>
