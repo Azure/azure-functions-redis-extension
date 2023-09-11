@@ -73,7 +73,7 @@ public @interface RedisListTrigger {
      * Number of entries to pull from Redis at one time.
      * @return Number of entries to pull from Redis at one time.
      */
-    int count() default 10;
+    int maxBatchSize() default 10;
 
     /**
      * Determines whether to pop entries from the beginning using LPOP or to pop entries from the end using RPOP.

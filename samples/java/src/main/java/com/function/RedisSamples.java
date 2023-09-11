@@ -56,7 +56,7 @@ public class RedisSamples {
                 connectionStringSetting = "redisLocalhost",
                 key = "listTest",
                 pollingIntervalInMs = 100,
-                count = 1,
+                maxBatchSize = 1,
                 listPopFromBeginning = false)
                 String entry,
             final ExecutionContext context) {
@@ -70,7 +70,7 @@ public class RedisSamples {
                 connectionStringSetting = "redisLocalhost",
                 key = "streamTest",
                 pollingIntervalInMs = 100,
-                count = 1,
+                maxBatchSize = 1,
                 deleteAfterProcess = true)
                 String entry,
             final ExecutionContext context) {
