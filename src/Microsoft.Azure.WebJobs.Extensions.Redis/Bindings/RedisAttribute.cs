@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="command">The command to be executed on the cache.</param>
-        public RedisAttribute(string connectionStringSetting, string command = "")
+        public RedisAttribute(string connectionStringSetting, string command)
         {
             ConnectionStringSetting = connectionStringSetting;
             Command = command;

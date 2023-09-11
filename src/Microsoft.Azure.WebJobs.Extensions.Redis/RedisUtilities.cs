@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    public static class RedisUtilities
+    internal static class RedisUtilities
     {
         public static Version Version62 = new Version("6.2");
         public static Version Version70 = new Version("7.0");
