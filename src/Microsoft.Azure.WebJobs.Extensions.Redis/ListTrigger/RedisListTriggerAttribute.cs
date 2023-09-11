@@ -16,7 +16,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in milliseconds. Default: 1000</param>
-        /// <param name="maxBatchSize">Number of entries to pull from a Redis list at one time. Default: 10</param>
+        /// <param name="maxBatchSize">Number of entries to pull from a Redis list at one time. Default: 16</param>
         /// <param name="listPopFromBeginning">Decides if the function will pop entries from the front or end of the list. Default: true</param>
         public RedisListTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, bool listPopFromBeginning = true)
             : base(connectionStringSetting, key, pollingIntervalInMs, maxBatchSize)
