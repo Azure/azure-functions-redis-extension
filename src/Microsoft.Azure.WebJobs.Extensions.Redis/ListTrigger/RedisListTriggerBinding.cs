@@ -18,17 +18,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly string connectionString;
         private readonly TimeSpan pollingInterval;
         private readonly string key;
-        private readonly int count;
+        private readonly int maxBatchSize;
         private readonly bool listPopFromBeginning;
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisListTriggerBinding(string connectionString, string key, TimeSpan pollingInterval, int count, bool listPopFromBeginning, Type parameterType, ILogger logger)
+        public RedisListTriggerBinding(string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, Type parameterType, ILogger logger)
         {
             this.connectionString = connectionString;
             this.key = key;
             this.pollingInterval = pollingInterval;
-            this.count = count;
+            this.maxBatchSize = maxBatchSize;
             this.listPopFromBeginning = listPopFromBeginning;
             this.parameterType = parameterType;
             this.logger = logger;
@@ -53,7 +53,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.LogName, connectionString, key, pollingInterval, count, listPopFromBeginning, context.Executor, logger));
+            return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.LogName, connectionString, key, pollingInterval, maxBatchSize, listPopFromBeginning, context.Executor, logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()

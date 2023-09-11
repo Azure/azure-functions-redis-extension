@@ -13,14 +13,14 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in ms.</param>
-        /// <param name="count">Number of entries to pull from Redis at one time.</param>
+        /// <param name="maxBatchSize">Number of entries to pull from Redis at one time.</param>
         /// <param name="deleteAfterProcess">Decides if the function will delete the stream entries after processing. Default: false</param>
-        public RedisStreamTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int count = 10, bool deleteAfterProcess = false)
+        public RedisStreamTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 10, bool deleteAfterProcess = false)
         {
             ConnectionStringSetting = connectionStringSetting;
             Key = key;
             PollingIntervalInMs = pollingIntervalInMs;
-            Count = count;
+            MaxBatchSize = maxBatchSize;
             DeleteAfterProcess = deleteAfterProcess;
         }
 
@@ -43,7 +43,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// <summary>
         /// Number of entries to pull from Redis at one time.
         /// </summary>
-        public int Count { get; }
+        public int MaxBatchSize { get; }
 
         /// <summary>
         /// Decides if the function will delete the stream entries after processing.
