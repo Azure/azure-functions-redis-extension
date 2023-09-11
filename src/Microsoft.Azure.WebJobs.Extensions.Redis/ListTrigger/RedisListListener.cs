@@ -71,13 +71,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        private async Task ExecuteAsync(object value, CancellationToken cancellationToken)
+        private Task ExecuteAsync(object value, CancellationToken cancellationToken)
         {
-            FunctionResult result = await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
-            if (!result.Succeeded)
-            {
-                logger?.LogCritical(result.Exception, "Function execution failed with exception.");
-            }
+            return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
         }
 
         public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()

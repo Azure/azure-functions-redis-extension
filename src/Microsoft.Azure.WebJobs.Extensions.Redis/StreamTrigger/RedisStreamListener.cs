@@ -81,17 +81,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private async Task ExecuteAsync(object value, RedisValue[] entryIds, CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            FunctionResult result = await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
+            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
 
-            if (result.Succeeded)
-            {
-                long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
-                logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
-            }
-            else
-            {
-                logger?.LogCritical(result.Exception, "Function execution failed with exception.");
-            }
+            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
+            logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
         }
 
         public async override void BeforeClosing()
