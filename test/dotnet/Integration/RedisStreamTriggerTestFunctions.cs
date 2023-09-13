@@ -8,7 +8,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         public const string localhostSetting = "redisLocalhost";
         public const int pollingInterval = 100;
-        public const int count = 100;
+        public const int batchSize = 100;
 
         [FunctionName(nameof(StreamTrigger_StreamEntry))]
         public static void StreamTrigger_StreamEntry(

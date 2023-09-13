@@ -16,10 +16,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in milliseconds. Default: 1000</param>
-        /// <param name="count">Number of entries to pull from a Redis stream at one time. Default: 10</param>
+        /// <param name="maxBatchSize">Number of entries to pull from a Redis stream at one time. Default: 16</param>
         /// <param name="deleteAfterProcess">Decides if the function will delete the stream entries after processing. Default: false</param>
-        public RedisStreamTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int count = 10, bool deleteAfterProcess = false)
-            : base(connectionStringSetting, key, pollingIntervalInMs, count)
+        public RedisStreamTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, bool deleteAfterProcess = false)
+            : base(connectionStringSetting, key, pollingIntervalInMs, maxBatchSize)
         {
             DeleteAfterProcess = deleteAfterProcess;
         }

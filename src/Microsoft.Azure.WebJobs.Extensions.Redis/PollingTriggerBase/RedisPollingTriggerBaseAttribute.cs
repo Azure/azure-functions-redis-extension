@@ -14,13 +14,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in ms.</param>
-        /// <param name="count">Number of entries to pull from Redis at one time. Used to determine scaling.</param>
-        public RedisPollingTriggerBaseAttribute(string connectionStringSetting, string key, int pollingIntervalInMs, int count)
+        /// <param name="maxBatchSize">Number of entries to pull from Redis at one time. Used to determine scaling.</param>
+        public RedisPollingTriggerBaseAttribute(string connectionStringSetting, string key, int pollingIntervalInMs, int maxBatchSize)
         {
             this.ConnectionStringSetting = connectionStringSetting;
             this.Key = key;
             this.PollingIntervalInMs = pollingIntervalInMs;
-            this.Count = count;
+            this.MaxBatchSize = maxBatchSize;
         }
 
         /// <summary>
@@ -44,6 +44,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Number of entries to pull from Redis at one time.
         /// </summary>
-        public int Count { get; }
+        public int MaxBatchSize { get; }
     }
 }
