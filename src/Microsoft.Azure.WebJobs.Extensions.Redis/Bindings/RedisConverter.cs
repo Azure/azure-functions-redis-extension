@@ -35,31 +35,30 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             string[] arguments = splitCommand.Skip(1).ToArray();
+
+            logger?.LogDebug($"Executing command '{command}'");
             RedisResult result = await db.ExecuteAsync(command, arguments);
             return (T)RedisResultTypeConverter(result, typeof(T));
         }
 
-        public static object RedisResultTypeConverter(RedisResult value, Type destinationType)
+        internal static object RedisResultTypeConverter(RedisResult value, Type destinationType)
         {
-            if (value.Type.Equals(ResultType.None))
+            switch (value.Type)
             {
-                return null;
-            }
-            if (value.Type.Equals(ResultType.Error))
-            {
-                throw new RedisException((string)value);
-            }
-            if (value.Type.Equals(ResultType.SimpleString) || value.Type.Equals(ResultType.Integer) || value.Type.Equals(ResultType.BulkString))
-            {
-                return RedisUtilities.RedisValueTypeConverter((RedisValue)value, destinationType);
-            }
-            else
-            {
-                throw new InvalidOperationException($"Redis Output BindingResultTypeConverter does not support RedisResult type '{value.Type}'.");
+                case ResultType.None:
+                    return null;
+                case ResultType.Error:
+                    throw new RedisException((string)value);
+                case ResultType.SimpleString:
+                case ResultType.Integer:
+                case ResultType.BulkString:
+                    return RedisUtilities.RedisValueTypeConverter((RedisValue)value, destinationType);
+                default:
+                    throw new InvalidOperationException($"Redis Output BindingResultTypeConverter does not support RedisResult type '{value.Type}'.");
             }
         }
 
-        public static readonly HashSet<string> SingleOutputReadCommands = new HashSet<string>()
+        internal static readonly HashSet<string> SingleOutputReadCommands = new HashSet<string>()
         {
             "BITCOUNT",
             "BITPOS",

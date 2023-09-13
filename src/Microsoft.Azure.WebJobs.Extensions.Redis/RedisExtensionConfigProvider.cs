@@ -60,7 +60,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 #pragma warning restore CS0618
         }
 
-        public static IConnectionMultiplexer GetOrCreateConnectionMultiplexer(IConfiguration configuration, string connectionStringSetting)
+        internal static IConnectionMultiplexer GetOrCreateConnectionMultiplexer(IConfiguration configuration, string connectionStringSetting)
         {
             string connectionString = RedisUtilities.ResolveConnectionString(configuration, connectionStringSetting);
             return connectionMultiplexerCache.GetOrAdd(connectionString, (string cs) => ConnectionMultiplexer.Connect(cs));
