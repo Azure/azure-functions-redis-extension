@@ -23,7 +23,9 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         }
 
         /// <summary>
+        /// Redis connection string setting.
         /// This setting will be used to resolve the actual connection string from the appsettings.
+        /// </summary>
         public string ConnectionStringSetting { get; }
 
         /// <summary>
