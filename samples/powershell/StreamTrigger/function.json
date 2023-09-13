@@ -2,7 +2,6 @@
   "bindings": [
     {
       "type": "redisStreamTrigger",
-      "deleteAfterProcess": false,
       "connectionStringSetting": "redisLocalhost",
       "key": "streamTest",
       "pollingIntervalInMs": 1000,
