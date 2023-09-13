@@ -8,7 +8,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         public const string localhostSetting = "redisLocalhost";
         public const int pollingIntervalShort = 100;
         public const int pollingIntervalLong = 10000;
-        public const int count = 10;
+        public const int batchSize = 10;
 
         [FunctionName(nameof(ListTrigger_RedisValue))]
         public static void ListTrigger_RedisValue(
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListTrigger_Batch_RedisValue))]
         public static void ListTrigger_Batch_RedisValue(
-            [RedisListTrigger(localhostSetting, nameof(ListTrigger_Batch_RedisValue), pollingIntervalInMs: pollingIntervalShort, count: count)] RedisValue[] entry,
+            [RedisListTrigger(localhostSetting, nameof(ListTrigger_Batch_RedisValue), pollingIntervalInMs: pollingIntervalShort, maxBatchSize: batchSize)] RedisValue[] entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
@@ -52,7 +52,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListTrigger_Batch_String))]
         public static void ListTrigger_Batch_String(
-            [RedisListTrigger(localhostSetting, nameof(ListTrigger_Batch_String), pollingIntervalInMs: pollingIntervalShort, count: count)] string[] entry,
+            [RedisListTrigger(localhostSetting, nameof(ListTrigger_Batch_String), pollingIntervalInMs: pollingIntervalShort, maxBatchSize: batchSize)] string[] entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ListTrigger_Batch_ByteArray))]
         public static void ListTrigger_Batch_ByteArray(
-            [RedisListTrigger(localhostSetting, nameof(ListTrigger_Batch_ByteArray), pollingIntervalInMs: pollingIntervalShort, count: count)] byte[][] entry,
+            [RedisListTrigger(localhostSetting, nameof(ListTrigger_Batch_ByteArray), pollingIntervalInMs: pollingIntervalShort, maxBatchSize: batchSize)] byte[][] entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));

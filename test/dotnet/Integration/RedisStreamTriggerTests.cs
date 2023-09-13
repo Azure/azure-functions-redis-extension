@@ -138,8 +138,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             int elements = 1000;
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
-                { $"Executed '{functionName}' (Succeeded",  elements / RedisStreamTriggerTestFunctions.count},
-                { destinationType.FullName, elements / RedisStreamTriggerTestFunctions.count},
+                { $"Executed '{functionName}' (Succeeded",  elements / RedisStreamTriggerTestFunctions.batchSize},
+                { destinationType.FullName, elements / RedisStreamTriggerTestFunctions.batchSize},
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisStreamTriggerTestFunctions.localhostSetting)))
@@ -151,7 +151,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                    await Task.Delay(elements / RedisStreamTriggerTestFunctions.count * RedisStreamTriggerTestFunctions.pollingInterval * 2);
+                    await Task.Delay(elements / RedisStreamTriggerTestFunctions.batchSize * RedisStreamTriggerTestFunctions.pollingInterval * 2);
 
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();

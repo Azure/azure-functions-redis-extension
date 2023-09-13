@@ -115,8 +115,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         //{
         //    int elements = 1000;
         //    ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
-        //    counts.TryAdd($"Executed '{functionName}' (Succeeded", elements / RedisListTriggerTestFunctions.count);
-        //    counts.TryAdd(destinationType.FullName, elements / RedisListTriggerTestFunctions.count);
+        //    counts.TryAdd($"Executed '{functionName}' (Succeeded", elements / RedisListTriggerTestFunctions.batchSize);
+        //    counts.TryAdd(destinationType.FullName, elements / RedisListTriggerTestFunctions.batchSize);
 
         //    using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
         //    {
@@ -127,7 +127,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         //        {
         //            functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-        //            await Task.Delay(TimeSpan.FromMilliseconds(elements / RedisListTriggerTestFunctions.count * RedisListTriggerTestFunctions.pollingIntervalShort * 2));
+        //            await Task.Delay(TimeSpan.FromMilliseconds(elements / RedisListTriggerTestFunctions.batchSize * RedisListTriggerTestFunctions.pollingIntervalShort * 2));
 
         //            await multiplexer.CloseAsync();
         //            functionsProcess.Kill();
