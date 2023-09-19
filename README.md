@@ -100,8 +100,6 @@ Each functions instance creates a new random GUID to use as its consumer name wi
   - Default: `1000`
 - `MaxBatchSize`: Number of entries to read from Redis at one time. These are processed in parallel.
   - Default: `16`
-- `DeleteAfterProcess`: Whether to delete the stream entries after the function has run.
-  - Default: `false`
 
 #### Avaiable Output Types
 - [`StackExchange.Redis.StreamEntry`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs): The value returned by `StackExchange.Redis`.

@@ -70,8 +70,7 @@ public class RedisSamples {
                 connectionStringSetting = "redisLocalhost",
                 key = "streamTest",
                 pollingIntervalInMs = 100,
-                maxBatchSize = 1,
-                deleteAfterProcess = true)
+                maxBatchSize = 1)
                 String entry,
             final ExecutionContext context) {
             context.getLogger().info(entry);

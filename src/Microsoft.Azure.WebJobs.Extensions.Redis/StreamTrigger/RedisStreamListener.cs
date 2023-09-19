@@ -15,15 +15,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     internal sealed class RedisStreamListener : RedisPollingTriggerBaseListener
     {
-        internal bool deleteAfterProcess;
         internal string consumerGroup;
         internal string consumerName;
 
-        public RedisStreamListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, string consumerGroup, bool deleteAfterProcess, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisStreamListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, string consumerGroup, ITriggeredFunctionExecutor executor, ILogger logger)
             : base(name, connectionString, key, pollingInterval, maxBatchSize, executor, logger)
         {
             this.consumerGroup = consumerGroup;
-            this.deleteAfterProcess = deleteAfterProcess;
             this.consumerName = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? Guid.NewGuid().ToString();
 
             this.logPrefix = $"[Name:{name}][Trigger:RedisStreamTrigger][ConsumerGroup:{consumerGroup}][Key:{key}][Consumer:{consumerName}]";
@@ -77,12 +75,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             RedisValue[] entryIds = new RedisValue[] { entry.Id };
             long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
             logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
-
-            if (deleteAfterProcess)
-            {
-                long deleted = await db.StreamDeleteAsync(key, entryIds);
-                logger?.LogDebug($"{logPrefix} Deleted {deleted} entries from the stream at key '{key}'.");
-            }
         }
 
         public async override void BeforeClosing()

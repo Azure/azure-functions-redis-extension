@@ -44,9 +44,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string key = RedisUtilities.ResolveString(nameResolver, attribute.Key, nameof(attribute.Key));
             int maxBatchSize = attribute.MaxBatchSize;
             TimeSpan pollingInterval = TimeSpan.FromMilliseconds(attribute.PollingIntervalInMs);
-            bool deleteAfterProcess = attribute.DeleteAfterProcess;
 
-            return Task.FromResult<ITriggerBinding>(new RedisStreamTriggerBinding(connectionString, key, pollingInterval, maxBatchSize, deleteAfterProcess, parameter.ParameterType, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisStreamTriggerBinding(connectionString, key, pollingInterval, maxBatchSize, parameter.ParameterType, logger));
         }
     }
 }

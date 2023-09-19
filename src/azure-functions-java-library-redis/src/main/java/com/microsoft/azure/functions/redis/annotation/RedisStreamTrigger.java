@@ -73,11 +73,5 @@ public @interface RedisStreamTrigger {
      * Number of entries to pull from Redis at one time.
      * @return Number of entries to pull from Redis at one time.
      */
-    int maxBatchSize() default 10;
-
-    /**
-     * Whether the listener will delete the stream entries after the function runs.
-     * @return Whether the listener will delete the stream entries after the function runs.
-     */
-    boolean deleteAfterProcess() default false;
+    int maxBatchSize() default 16;
 }
