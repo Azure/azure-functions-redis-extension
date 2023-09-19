@@ -7,14 +7,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal class RedisAsyncCollector : IAsyncCollector<string[]>
     {
-        private readonly IConnectionMultiplexer multiplexer;
         private readonly string command;
         private readonly ILogger logger;
         private readonly IBatch batch;
 
         public RedisAsyncCollector(IConnectionMultiplexer multiplexer, string command, ILogger logger)
         {
-            this.multiplexer = multiplexer;
             this.command = command;
             this.logger = logger;
             this.batch = multiplexer.GetDatabase().CreateBatch();

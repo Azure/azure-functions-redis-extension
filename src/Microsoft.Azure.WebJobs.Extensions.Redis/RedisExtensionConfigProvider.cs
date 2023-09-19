@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Description;
+using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -12,7 +13,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// Adds Redis triggers and bindings to the extension context.
     /// </summary>
     [Extension("Redis")]
-    public class RedisExtensionConfigProvider : IExtensionConfigProvider
+    internal class RedisExtensionConfigProvider : IExtensionConfigProvider
     {
         internal readonly IConfiguration configuration;
         internal readonly INameResolver nameResolver;
@@ -53,14 +54,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             FluentBindingRule<RedisStreamTriggerAttribute> streamTriggerRule = context.AddBindingRule<RedisStreamTriggerAttribute>();
             streamTriggerRule.BindToTrigger(new RedisStreamTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger("RedisStreamTrigger")));
 
-            FluentBindingRule<RedisAttribute> outputBindingRule = context.AddBindingRule<RedisAttribute>();
-            outputBindingRule.BindToCollector((attr) => new RedisAsyncCollector(GetOrCreateConnectionMultiplexer(attr), attr.Command, loggerFactory.CreateLogger("RedisOutputBinding")));
+            FluentBindingRule<RedisAttribute> bindingRule = context.AddBindingRule<RedisAttribute>();
+            bindingRule.BindToCollector((attr) => new RedisAsyncCollector(GetOrCreateConnectionMultiplexer(configuration, attr.ConnectionStringSetting), attr.Command, loggerFactory.CreateLogger("RedisOutputBinding")));
+            bindingRule.BindToInput<OpenType>(typeof(RedisConverter<>), configuration, nameResolver, loggerFactory.CreateLogger("RedisInputBinding"));
 #pragma warning restore CS0618
         }
 
-        internal IConnectionMultiplexer GetOrCreateConnectionMultiplexer(RedisAttribute attribute)
+        internal static IConnectionMultiplexer GetOrCreateConnectionMultiplexer(IConfiguration configuration, string connectionStringSetting)
         {
-            string connectionString = RedisUtilities.ResolveConnectionString(configuration, attribute.ConnectionStringSetting);
+            string connectionString = RedisUtilities.ResolveConnectionString(configuration, connectionStringSetting);
             return connectionMultiplexerCache.GetOrAdd(connectionString, (string cs) => ConnectionMultiplexer.Connect(cs));
         }
     }
