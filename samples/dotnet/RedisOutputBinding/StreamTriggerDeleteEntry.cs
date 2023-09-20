@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using System.Linq;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisStreamTrigger
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisOutputBinding
 {
     internal class StreamTriggerDeleteEntry
     {
