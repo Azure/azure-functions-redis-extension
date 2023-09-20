@@ -21,4 +21,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Microsoft.Azure.WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="RedisInputBinding\" />
+	</ItemGroup>
 </Project>
