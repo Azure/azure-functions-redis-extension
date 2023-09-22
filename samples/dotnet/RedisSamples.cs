@@ -91,7 +91,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
             [RedisStreamTrigger(localhostSetting, "streamArrayTest")] string[] entries,
             ILogger logger)
         {
-            logger.LogInformation(string.Join(',', entries.ToString()));
+            logger.LogInformation(string.Join(',', entries));
         }
     }
 }
