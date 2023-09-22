@@ -1,10 +1,9 @@
 {
   "bindings": [
     {
-      "type": "redisListTrigger",
-      "listPopFromBeginning": true,
+      "type": "redisStreamTrigger",
       "connectionStringSetting": "redisLocalhost",
-      "key": "listTest",
+      "key": "streamTest",
       "pollingIntervalInMs": 1000,
       "maxBatchSize": 10,
       "name": "entry",
