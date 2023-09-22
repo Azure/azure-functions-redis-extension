@@ -9,7 +9,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisPubSubTrigger
             [RedisPubSubTrigger(Common.localhostSetting, "__keyevent@0__:del")] string message,
             ILogger logger)
         {
-            logger.LogInformation(message);
+            logger.LogInformation($"Key '{message}' deleted.");
         }
     }
 }

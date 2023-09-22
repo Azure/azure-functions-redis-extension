@@ -1,4 +1,4 @@
 import logging
 
 def main(message: str):
-    logging.info(message)
+    logging.info("Command '" + message + "' on key 'keyspaceTest'")

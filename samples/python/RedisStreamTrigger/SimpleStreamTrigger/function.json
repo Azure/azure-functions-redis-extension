@@ -5,7 +5,7 @@
       "connectionStringSetting": "redisLocalhost",
       "key": "streamTest",
       "pollingIntervalInMs": 1000,
-      "maxBatchSize": 10,
+      "maxBatchSize": 16,
       "name": "entry",
       "direction": "in"
     }
