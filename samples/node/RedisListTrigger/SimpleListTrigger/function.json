@@ -1,0 +1,15 @@
+{
+    "bindings": [
+        {
+            "type": "redisListTrigger",
+            "listPopFromBeginning": true,
+            "connectionStringSetting": "redisLocalhost",
+            "key": "listTest",
+            "pollingIntervalInMs": 1000,
+            "maxBatchSize": 16,
+            "name": "entry",
+            "direction": "in"
+        }
+      ],
+    "scriptFile": "index.js"
+}
