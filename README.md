@@ -40,7 +40,7 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
 - `Channel`: pubsub channel that the trigger should listen to.
   - Supports channel patterns.
 
-#### Avaiable Parameter Types
+#### Available Parameter Types
 - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The message from the channel.
 - `Custom`: The trigger uses Json.NET serialization to map the message from the channel from a `string` into a custom type.
@@ -131,6 +131,8 @@ public static void StreamsTrigger(
 
 > **Note**
 > Not all commands are supported for this binding. At the moment, only read commands that return a single output are supported.
+> (e.g. `GET`, `HGET`)
+> The full list can be found [here](./src/Microsoft.Azure.WebJobs.Extensions.Redis/Bindings/RedisConverter.cs#L61)
 
 #### Avaiable Output Types
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The value returned by the command.
