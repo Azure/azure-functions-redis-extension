@@ -4,14 +4,14 @@ import com.microsoft.azure.functions.*;
 import com.microsoft.azure.functions.annotation.*;
 import com.microsoft.azure.functions.redis.annotation.*;
 
-public class SimpleStreamTrigger {
-    @FunctionName("SimpleStreamTrigger")
+public class FastPollingStreamTrigger {
+    @FunctionName("FastPollingStreamTrigger")
     public void run(
             @RedisStreamTrigger(
-                name = "req",
+                name = "entry",
                 connectionStringSetting = "redisLocalhost",
                 key = "streamTest",
-                pollingIntervalInMs = 1000,
+                pollingIntervalInMs = 100,
                 maxBatchSize = 1)
                 String message,
             final ExecutionContext context) {

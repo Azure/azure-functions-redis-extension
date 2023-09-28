@@ -1,17 +1,17 @@
-package com.function.RedisStreamTrigger;
+package com.function.RedisListTrigger;
 
 import com.microsoft.azure.functions.*;
 import com.microsoft.azure.functions.annotation.*;
 import com.microsoft.azure.functions.redis.annotation.*;
 
-public class SimpleStreamTrigger {
-    @FunctionName("SimpleStreamTrigger")
+public class FastPollingListTrigger {
+    @FunctionName("FastPollingListTrigger")
     public void run(
-            @RedisStreamTrigger(
+            @RedisListTrigger(
                 name = "req",
                 connectionStringSetting = "redisLocalhost",
-                key = "streamTest",
-                pollingIntervalInMs = 1000,
+                key = "listTest",
+                pollingIntervalInMs = 100,
                 maxBatchSize = 1)
                 String message,
             final ExecutionContext context) {
