@@ -36,7 +36,7 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
 > This trigger is not capable of listening to keyspace notifications on clustered caches.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Channel`: pubsub channel that the trigger should listen to.
   - Supports channel patterns.
 
@@ -62,7 +62,7 @@ public static void PubSubTrigger(
 The `RedisListTrigger` pops entries from a list and surfaces those entries to the function. The trigger polls Redis at a configurable fixed interval, and uses [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/) to pop entries from the lists.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Key`: Key to read from.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
@@ -72,7 +72,7 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
 - `ListPopFromBeginning`: determines whether to pop entries from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop entries from the end using [`RPOP`](https://redis.io/commands/rpop/).
   - Default: `true`
 
-#### Avaiable Output Types
+#### Avaiable Parameter Types
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The entry from the list.
 - `Custom`: The trigger uses Json.NET serialization to map the entry from the list from a `string` into a custom type.
 
@@ -91,18 +91,18 @@ public static void ListsTrigger(
 ### `RedisStreamTrigger`
 The `RedisStreamTrigger` reads entries from a stream and surfaces those entries to the function.
 The trigger polls Redis at a configurable fixed interval, and uses [`XREADGROUP`](https://redis.io/commands/xreadgroup/) to read entries from the stream.
-The consumer group for all function instances will be the ID of the function (eg `Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisSamples.StreamTrigger` for the [StreamTrigger sample](samples/dotnet/RedisSamples.cs)).
+The consumer group for all function instances will be the ID of the function (e.g. `Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisSamples.StreamTrigger` for the [StreamTrigger sample](samples/dotnet/RedisSamples.cs)).
 Each functions instance creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Key`: Key to read from.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
 - `MaxBatchSize`: Number of entries to read from Redis at one time. These are processed in parallel.
   - Default: `16`
 
-#### Avaiable Output Types
+#### Avaiable Parameter Types
 - [`StackExchange.Redis.StreamEntry`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs): The value returned by `StackExchange.Redis`.
 - `StackExchange.Redis.NameValueEntry[]`, `Dictionary<string, string>`: The values contained within the entry.
 - `string`, `byte[]`, `ReadOnlyMemory<byte>`: The stream entry serialized as JSON (UTF-8 encoded for byte types) in the following format:
@@ -126,15 +126,14 @@ public static void StreamsTrigger(
 ### `Redis` Input Binding
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
-- `Command`: The redis-cli command to be executed on the cache with all arguments separated by spaces.
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `Command`: The redis-cli command to be executed on the cache with all arguments separated by spaces. (e.g. `"GET key"`, `"HGET key field"`)
 
 > **Note**
 > Not all commands are supported for this binding. At the moment, only read commands that return a single output are supported.
-> (e.g. `GET`, `HGET`)
 > The full list can be found [here](./src/Microsoft.Azure.WebJobs.Extensions.Redis/Bindings/RedisConverter.cs#L61)
 
-#### Avaiable Output Types
+#### Avaiable Parameter Types
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The value returned by the command.
 - `Custom`: The trigger uses Json.NET serialization to map the value returned by the command from a `string` into a custom type.
 
@@ -154,8 +153,8 @@ public static void SetGetter(
 ### `Redis` Output Binding
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (eg `<cacheName>.redis.cache.windows.net:6380,password=...`).
-- `Command`: The Redis command to be executed on the cache without any arguments.
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `Command`: The Redis command to be executed on the cache without any arguments. (e.g. `"GET"`, `"HGET"`)
 
 #### Function Return type
 - `string[]`: Arguments for the redis command.
