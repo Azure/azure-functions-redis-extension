@@ -1,0 +1,14 @@
+{
+  "bindings": [
+    {
+      "type": "redisStreamTrigger",
+      "connectionStringSetting": "redisLocalhost",
+      "key": "streamTest",
+      "pollingIntervalInMs": 100,
+      "maxBatchSize": 16,
+      "name": "entry",
+      "direction": "in"
+    }
+  ],
+  "scriptFile": "index.js"
+}
