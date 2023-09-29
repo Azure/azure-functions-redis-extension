@@ -72,7 +72,7 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
 - `ListPopFromBeginning`: determines whether to pop entries from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop entries from the end using [`RPOP`](https://redis.io/commands/rpop/).
   - Default: `true`
 
-#### Avaiable Parameter Types
+#### Available Parameter Types
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The entry from the list.
 - `Custom`: The trigger uses Json.NET serialization to map the entry from the list from a `string` into a custom type.
 
@@ -102,7 +102,7 @@ Each functions instance creates a new random GUID to use as its consumer name wi
 - `MaxBatchSize`: Number of entries to read from Redis at one time. These are processed in parallel.
   - Default: `16`
 
-#### Avaiable Parameter Types
+#### Available Parameter Types
 - [`StackExchange.Redis.StreamEntry`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs): The value returned by `StackExchange.Redis`.
 - `StackExchange.Redis.NameValueEntry[]`, `Dictionary<string, string>`: The values contained within the entry.
 - `string`, `byte[]`, `ReadOnlyMemory<byte>`: The stream entry serialized as JSON (UTF-8 encoded for byte types) in the following format:
@@ -133,7 +133,7 @@ public static void StreamsTrigger(
 > Not all commands are supported for this binding. At the moment, only read commands that return a single output are supported.
 > The full list can be found [here](./src/Microsoft.Azure.WebJobs.Extensions.Redis/Bindings/RedisConverter.cs#L61)
 
-#### Avaiable Parameter Types
+#### Available Parameter Types
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The value returned by the command.
 - `Custom`: The trigger uses Json.NET serialization to map the value returned by the command from a `string` into a custom type.
 
@@ -155,6 +155,9 @@ public static void SetGetter(
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
 - `Command`: The Redis command to be executed on the cache without any arguments. (e.g. `"GET"`, `"HGET"`)
+
+> **Note**
+> All commands are supported for this binding.
 
 #### Function Return type
 - `string[]`: Arguments for the redis command.
