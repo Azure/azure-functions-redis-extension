@@ -64,7 +64,7 @@ jobs:
         displayName: Sign Microsoft.Azure.WebJobs.Extensions.Redis.dll Release
         condition: eq(variables.isReleaseBuild, 'True')
         inputs:
-          connectedServiceName: 'redis-codesign'
+          connectedServiceName: 'codesign-redis'
           folderPath: $(Build.SourcesDirectory)/src/Microsoft.Azure.WebJobs.Extensions.Redis/bin/Release/netstandard2.0
           pattern: Microsoft.Azure.WebJobs.Extensions.Redis.dll
           signConfigType: inlineSignParams
@@ -103,7 +103,7 @@ jobs:
         displayName: Sign Microsoft.Azure.Functions.Worker.Extensions.Redis.dll Release
         condition: eq(variables.isReleaseBuild, 'True')
         inputs:
-          connectedServiceName: 'redis-codesign'
+          connectedServiceName: 'codesign-redis'
           folderPath: $(Build.SourcesDirectory)/src/Microsoft.Azure.Functions.Worker.Extensions.Redis/bin/Release/netstandard2.0
           pattern: Microsoft.Azure.Functions.Worker.Extensions.Redis.dll
           signConfigType: inlineSignParams
@@ -151,7 +151,7 @@ jobs:
         displayName: Sign NuGet Packages
         condition: eq(variables.isReleaseBuild, 'True')
         inputs:
-          connectedServiceName: 'redis-codesign'
+          connectedServiceName: 'codesign-redis'
           folderPath: $(Build.ArtifactStagingDirectory)
           pattern: Microsoft.*.Extensions.Redis.*.*nupkg
           signConfigType: inlineSignParams
