@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Executors;
-using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -23,10 +22,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             this.consumerGroup = consumerGroup;
             this.consumerName = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? Guid.NewGuid().ToString();
-
             this.logPrefix = $"[Name:{name}][Trigger:RedisStreamTrigger][ConsumerGroup:{consumerGroup}][Key:{key}][Consumer:{consumerName}]";
-            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisStreamTrigger-{consumerGroup}-{key}");
-            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisStreamTrigger-{consumerGroup}-{key}");
+            this.scaleMonitor = new RedisStreamTriggerScaleMonitor(multiplexer, name, maxBatchSize, key);
         }
 
         public override async void BeforePolling()
@@ -83,17 +80,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             logger?.LogInformation($"{logPrefix} Attempting to delete consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'.");
             long pending = await db.StreamDeleteConsumerAsync(key, consumerGroup, consumerName);
             logger?.LogInformation($"{logPrefix} Successfully deleted consumer name '{consumerName}' from the consumer group '{consumerGroup}' for the stream at key '{key}'. There were {pending} pending messages for the consumer.");
-        }
-
-        public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
-        {
-            var metrics = new RedisPollingTriggerBaseMetrics
-            {
-                Remaining = multiplexer.GetDatabase().StreamLength(key),
-                Timestamp = DateTime.UtcNow,
-            };
-
-            return Task.FromResult(metrics);
         }
     }
 }
