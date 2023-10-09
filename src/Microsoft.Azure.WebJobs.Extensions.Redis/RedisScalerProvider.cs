@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.WebJobs.Host.Scale;
+﻿using Microsoft.Azure.WebJobs.Description;
+using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -26,11 +27,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             IConfiguration configuration = serviceProvider.GetService<IConfiguration>();
             INameResolver nameResolver = serviceProvider.GetService<INameResolver>();
 
-            RedisPollingTriggerBaseAttribute attribute = JsonConvert.DeserializeObject<RedisPollingTriggerBaseAttribute>(triggerMetadata.Metadata.ToString());
-            string connectionString = RedisUtilities.ResolveConnectionString(configuration, attribute.ConnectionStringSetting);
-            string key = RedisUtilities.ResolveString(nameResolver, attribute.Key, nameof(attribute.Key));
-            int maxBatchSize = attribute.MaxBatchSize;
-            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionString);
+            RedisPollingTriggerMetadata metadata = JsonConvert.DeserializeObject<RedisPollingTriggerMetadata>(triggerMetadata.Metadata.ToString());
+            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, metadata.connectionStringSetting);
+            int maxBatchSize = metadata.maxBatchSize;
+            string key = RedisUtilities.ResolveString(nameResolver, metadata.key, nameof(metadata.key));
 
             if (string.Equals(triggerMetadata.Type, "redisListTrigger", StringComparison.OrdinalIgnoreCase))
             {
@@ -44,6 +44,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 throw new ArgumentException("Trigger is not the RedisStreamTrigger or the RedisListTrigger");
             }
+        }
+
+        public class RedisPollingTriggerMetadata
+        {
+            [JsonProperty]
+            public string connectionStringSetting { get; set; }
+
+            [JsonProperty]
+            public string key { get; set; }
+
+            [JsonProperty]
+            public int maxBatchSize { get; set; }
         }
     }
 }

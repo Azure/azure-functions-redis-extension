@@ -85,7 +85,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         private static string GetFunctionsFileName()
         {
             string filepath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
+                ? @"C:\Program Files\Microsoft\Azure Functions Core Tools\func.exe"
+                // ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
                 : @"/usr/bin/func"; 
             if (!File.Exists(filepath))
             {
@@ -102,12 +103,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         internal static string GetLogValue(object value)
         {
             return value.GetType().FullName + ":" + JsonConvert.SerializeObject(value);
-        }
-
-        public class ScaleStatus
-        {
-            public int vote;
-            public int targetWorkerCount;
         }
     }
 }
