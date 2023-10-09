@@ -1,6 +1,8 @@
-﻿using FakeItEasy;
+﻿using Castle.Core.Configuration;
+using FakeItEasy;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -149,6 +151,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             IConnectionMultiplexer fakeMultiplexer = A.Fake<IConnectionMultiplexer>();
             A.CallTo(() => fakeMultiplexer.GetDatabase(A<int>._, A<object>._)).Returns(fakeDatabase);
             listener.multiplexer = fakeMultiplexer;
+            listener.scaleMonitor.multiplexer = fakeMultiplexer;
             Assert.Equal(expected, (await listener.GetTargetScaler().GetScaleResultAsync(null)).TargetWorkerCount);
         }
     }
