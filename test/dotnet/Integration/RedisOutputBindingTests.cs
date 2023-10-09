@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
             bool exists = true;
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.appsettingsJson, RedisListTriggerTestFunctions.localhostSetting)))
             {
                 using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
                 {
@@ -57,7 +57,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
 
             long length = 1;
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.appsettingsJson, RedisListTriggerTestFunctions.localhostSetting)))
             {
                 using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
                 {
@@ -90,7 +90,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             string message = string.Join(',', keys);
 
             long actualKeys = 0;
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisListTriggerTestFunctions.localhostSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.appsettingsJson, RedisListTriggerTestFunctions.localhostSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(rKeys);
                 using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))

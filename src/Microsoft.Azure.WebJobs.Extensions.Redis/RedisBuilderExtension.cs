@@ -30,7 +30,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <param name="builder">The <see cref="IWebJobsBuilder"/> to add the <see cref="RedisScalerProvider"/> to.</param>
         /// <param name="triggerMetadata">The metadata for the trigger.</param>
         /// <returns></returns>
-        internal static IWebJobsBuilder AddServiceBusScaleForTrigger(this IWebJobsBuilder builder, TriggerMetadata triggerMetadata)
+        internal static IWebJobsBuilder AddRedisScaleForTrigger(this IWebJobsBuilder builder, TriggerMetadata triggerMetadata)
         {
             IServiceProvider serviceProvider = null;
             Lazy<RedisScalerProvider> scalerProvider = new Lazy<RedisScalerProvider>(() => new RedisScalerProvider(serviceProvider, triggerMetadata));
