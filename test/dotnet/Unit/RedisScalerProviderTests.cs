@@ -112,6 +112,7 @@ $@"{{
             IScaleStatusProvider scaleStatusProvider = scaleHost.Services.GetService<IScaleStatusProvider>();
             AggregateScaleStatus scaleStatus = await scaleStatusProvider.GetScaleStatusAsync(new ScaleStatusContext());
 
+            await scaleHost.StopAsync();
             Assert.Equal(ScaleVote.ScaleOut, scaleStatus.Vote);
             Assert.Equal(expectedTarget, scaleStatus.TargetWorkerCount);
         }

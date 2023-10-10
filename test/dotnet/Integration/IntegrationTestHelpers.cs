@@ -52,10 +52,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.BeginErrorReadLine();
             if (!hostStarted.Task.Wait(TimeSpan.FromMinutes(1)))
             {
+                functionsProcess.Kill();
                 throw new Exception("Azure Functions Host did not start");
             }
             if (!functionLoaded.Task.Wait(TimeSpan.FromMinutes(1)))
             {
+                functionsProcess.Kill();
                 throw new Exception($"Did not load Function {functionName}");
             }
             functionsProcess.OutputDataReceived -= hostStartupHandler;
@@ -89,8 +91,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         private static string GetFunctionsFileName()
         {
             string filepath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? @"C:\Program Files\Microsoft\Azure Functions Core Tools\func.exe"
-                // ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
+                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
                 : @"/usr/bin/func"; 
             if (!File.Exists(filepath))
             {
