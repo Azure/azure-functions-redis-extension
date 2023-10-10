@@ -47,7 +47,7 @@ $@"{{
         public void ReturnsCorrectMonitorType(string triggerJson, string monitorType)
         {
             IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
-            A.CallTo(() => serviceProvider.GetService(typeof(IConfiguration))).Returns(IntegrationTestHelpers.appsettingsJson);
+            A.CallTo(() => serviceProvider.GetService(typeof(IConfiguration))).Returns(IntegrationTestHelpers.localsettings);
             A.CallTo(() => serviceProvider.GetService(typeof(INameResolver))).Returns(A.Fake<INameResolver>());
             TriggerMetadata metadata = new TriggerMetadata(JObject.Parse(triggerJson));
             RedisScalerProvider scalerProvider = new RedisScalerProvider(serviceProvider, metadata);
@@ -65,8 +65,8 @@ $@"{{
             RedisScalerProvider.RedisPollingTriggerMetadata redisMetadata = JsonConvert.DeserializeObject<RedisScalerProvider.RedisPollingTriggerMetadata>(triggerMetadata.Metadata.ToString());
             hostBuilder.ConfigureAppConfiguration((hostBuilderContext, config) =>
             {
-                config.AddConfiguration(IntegrationTestHelpers.hostJson);
-                config.AddConfiguration(IntegrationTestHelpers.appsettingsJson);
+                config.AddConfiguration(IntegrationTestHelpers.hostsettings);
+                config.AddConfiguration(IntegrationTestHelpers.localsettings);
             })
             .ConfigureServices(services =>
             {
@@ -89,7 +89,7 @@ $@"{{
                 scaleOptions.ScaleMetricsSampleInterval = TimeSpan.FromSeconds(1);
             });
 
-            ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.appsettingsJson, "redisLocalHost"));
+            ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, "redisLocalHost"));
             await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
 
             IHost scaleHost = hostBuilder.Build();
