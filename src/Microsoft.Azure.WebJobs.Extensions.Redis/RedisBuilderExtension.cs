@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -19,6 +21,32 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             builder.AddExtension<RedisExtensionConfigProvider>();
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="RedisScalerProvider"/> to the provided <see cref="IWebJobsBuilder"/>.
+        /// </summary>
+        /// <param name="builder">The <see cref="IWebJobsBuilder"/> to add the <see cref="RedisScalerProvider"/> to.</param>
+        /// <param name="triggerMetadata">The metadata for the trigger.</param>
+        /// <returns></returns>
+        internal static IWebJobsBuilder AddRedisScaleForTrigger(this IWebJobsBuilder builder, TriggerMetadata triggerMetadata)
+        {
+            IServiceProvider serviceProvider = null;
+            Lazy<RedisScalerProvider> scalerProvider = new Lazy<RedisScalerProvider>(() => new RedisScalerProvider(serviceProvider, triggerMetadata));
+
+            builder.Services.AddSingleton<IScaleMonitorProvider>(resolvedServiceProvider =>
+            {
+                serviceProvider = serviceProvider ?? resolvedServiceProvider;
+                return scalerProvider.Value;
+            });
+
+            builder.Services.AddSingleton<ITargetScalerProvider>(resolvedServiceProvider =>
+            {
+                serviceProvider = serviceProvider ?? resolvedServiceProvider;
+                return scalerProvider.Value;
+            });
+
             return builder;
         }
     }

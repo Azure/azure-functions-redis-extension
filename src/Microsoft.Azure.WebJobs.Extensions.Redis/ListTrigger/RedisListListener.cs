@@ -1,7 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Executors;
-using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
 using System.Linq;
@@ -22,8 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             this.listPopFromBeginning = listPopFromBeginning;
             this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Key:{key}]";
-            this.Descriptor = new ScaleMonitorDescriptor(name, $"{name}-RedisListTrigger-{key}");
-            this.TargetScalerDescriptor = new TargetScalerDescriptor($"{name}-RedisListTrigger-{key}");
+            this.scaleMonitor = new RedisListTriggerScaleMonitor(multiplexer, name, maxBatchSize, key);
         }
 
         public override void BeforePolling()
@@ -68,17 +65,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private Task ExecuteAsync(RedisValue value, CancellationToken cancellationToken)
         {
             return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
-        }
-
-        public override Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
-        {
-            var metrics = new RedisPollingTriggerBaseMetrics
-            {
-                Remaining = multiplexer.GetDatabase().ListLength(key),
-                Timestamp = DateTime.UtcNow,
-            };
-
-            return Task.FromResult(metrics);
         }
     }
 }

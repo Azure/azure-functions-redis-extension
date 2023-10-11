@@ -4,7 +4,6 @@ using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,9 +13,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// <summary>
     /// Responsible for polling a cache.
     /// </summary>
-    internal abstract class RedisPollingTriggerBaseListener : IListener, IScaleMonitor, IScaleMonitor<RedisPollingTriggerBaseMetrics>, ITargetScaler
+    internal abstract class RedisPollingTriggerBaseListener : IListener, IScaleMonitorProvider, ITargetScalerProvider
     {
-        private const int MINIMUM_SAMPLES = 5;
         internal string name;
         internal string connectionString;
         internal string key;
@@ -26,11 +24,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal ILogger logger;
 
         internal string logPrefix;
-        public ScaleMonitorDescriptor Descriptor { get; internal set; }
-        public TargetScalerDescriptor TargetScalerDescriptor { get; internal set; }
-
         internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
+        internal RedisPollingTriggerBaseScaleMonitor scaleMonitor;
 
         public RedisPollingTriggerBaseListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, ITriggeredFunctionExecutor executor, ILogger logger)
         {
@@ -98,7 +94,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public abstract Task PollAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Any Redis commands necessart to run before the connection is terminated.
+        /// Any Redis commands necessary to run before the connection is terminated.
         /// </summary>
         public virtual void BeforeClosing() { }
 
@@ -114,50 +110,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        async Task<ScaleMetrics> IScaleMonitor.GetMetricsAsync()
+        public IScaleMonitor GetMonitor()
         {
-            return await this.GetMetricsAsync().ConfigureAwait(false);
+            return scaleMonitor;
         }
 
-        public abstract Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync();
-
-        public ScaleStatus GetScaleStatus(ScaleStatusContext<RedisPollingTriggerBaseMetrics> context)
+        public ITargetScaler GetTargetScaler()
         {
-            return GetScaleStatusCore(context.WorkerCount, context.Metrics?.ToArray());
-        }
-
-        public ScaleStatus GetScaleStatus(ScaleStatusContext context)
-        {
-            return GetScaleStatusCore(context.WorkerCount, context.Metrics?.Cast<RedisPollingTriggerBaseMetrics>().ToArray());
-        }
-
-        private ScaleStatus GetScaleStatusCore(int workerCount, RedisPollingTriggerBaseMetrics[] metrics)
-        {
-            // don't scale up or down if we don't have enough metrics
-            if (metrics is null || metrics.Length < MINIMUM_SAMPLES)
-            {
-                return new ScaleStatus { Vote = ScaleVote.None };
-            }
-
-            double average = metrics.OrderByDescending(metric => metric.Timestamp).Take(MINIMUM_SAMPLES).Select(metric => metric.Remaining).Average();
-
-            if (workerCount * maxBatchSize < average)
-            {
-                return new ScaleStatus { Vote = ScaleVote.ScaleOut };
-            }
-
-            if ((workerCount - 1) * maxBatchSize > average)
-            {
-                return new ScaleStatus { Vote = ScaleVote.ScaleIn };
-            }
-
-            return new ScaleStatus { Vote = ScaleVote.None };
-        }
-
-        public async Task<TargetScalerResult> GetScaleResultAsync(TargetScalerContext context)
-        {
-            RedisPollingTriggerBaseMetrics metric = await GetMetricsAsync();
-            return new TargetScalerResult() { TargetWorkerCount = (int)Math.Ceiling(metric.Remaining / (decimal)maxBatchSize) };
+            return scaleMonitor;
         }
     }
 }
