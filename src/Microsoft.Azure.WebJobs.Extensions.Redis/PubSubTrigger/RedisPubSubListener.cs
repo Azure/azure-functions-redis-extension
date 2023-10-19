@@ -19,7 +19,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal ILogger logger;
         internal string logPrefix;
 
-
         public RedisPubSubListener(string name, IConnectionMultiplexer multiplexer, string channel, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.multiplexer = multiplexer;
