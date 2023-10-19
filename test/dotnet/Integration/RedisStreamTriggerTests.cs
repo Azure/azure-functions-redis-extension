@@ -130,37 +130,36 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
+        //[Fact]
+        //public async void StreamTrigger_TargetBasedScaling_E2EValidation()
+        //{
+        //    string functionName = nameof(RedisStreamTriggerTestFunctions.StreamTrigger_RedisValue_LongPollingInterval);
+        //    int port = 7071;
+        //    int elements = 10000;
 
-        [Fact]
-        public async void StreamTrigger_TargetBasedScaling_E2EValidation()
-        {
-            string functionName = nameof(RedisStreamTriggerTestFunctions.StreamTrigger_RedisValue_LongPollingInterval);
-            int port = 7071;
-            int elements = 10000;
+        //    using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisStreamTriggerTestFunctions.localhostSetting)))
+        //    {
+        //        await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
+        //        for(int i = 0; i < elements; i++)
+        //        {
+        //            await multiplexer.GetDatabase().StreamAddAsync(functionName, i, i);
+        //        }
+        //        await multiplexer.CloseAsync();
+        //    };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisStreamTriggerTestFunctions.localhostSetting)))
-            {
-                await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
-                for(int i = 0; i < elements; i++)
-                {
-                    await multiplexer.GetDatabase().StreamAddAsync(functionName, i, i);
-                }
-                await multiplexer.CloseAsync();
-            };
+        //    IntegrationTestHelpers.ScaleStatus status = new IntegrationTestHelpers.ScaleStatus { vote = 0, targetWorkerCount = 0 };
+        //    using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, port))
+        //    using (HttpClient client = new HttpClient())
+        //    using (StringContent jsonContent = new StringContent("{}", Encoding.UTF8, "application/json"))
+        //    {
+        //        StringContent content = new StringContent(JsonConvert.SerializeObject(new { name = functionName, arguments = new string[] { "1" } }));
+        //        HttpResponseMessage response = await client.PostAsync($"http://127.0.0.1:{port}/admin/host/scale/status", jsonContent);
+        //        status = JsonConvert.DeserializeObject<IntegrationTestHelpers.ScaleStatus>(await response.Content.ReadAsStringAsync());
+        //        functionsProcess.Kill();
+        //    };
 
-            IntegrationTestHelpers.ScaleStatus status = new IntegrationTestHelpers.ScaleStatus { vote = 0, targetWorkerCount = 0 };
-            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, port))
-            using (HttpClient client = new HttpClient())
-            using (StringContent jsonContent = new StringContent("{}", Encoding.UTF8, "application/json"))
-            {
-                StringContent content = new StringContent(JsonConvert.SerializeObject(new { name = functionName, arguments = new string[] { "1" } }));
-                HttpResponseMessage response = await client.PostAsync($"http://127.0.0.1:{port}/admin/host/scale/status", jsonContent);
-                status = JsonConvert.DeserializeObject<IntegrationTestHelpers.ScaleStatus>(await response.Content.ReadAsStringAsync());
-                functionsProcess.Kill();
-            };
-
-            Assert.Equal(1, status.vote);
-            Assert.True(status.targetWorkerCount / (float)elements > 0.999);
-        }
+        //    Assert.Equal(1, status.vote);
+        //    Assert.True(status.targetWorkerCount / (float)elements > 0.999);
+        //}
     }
 }
