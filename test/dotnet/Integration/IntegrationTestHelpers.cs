@@ -109,5 +109,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             return value.GetType().FullName + ":" + JsonConvert.SerializeObject(value);
         }
+
+        internal class ScaleStatus
+        {
+            public int vote;
+            public int targetWorkerCount;
+        }
     }
 }

@@ -13,7 +13,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal IConnectionMultiplexer multiplexer;
         internal int maxBatchSize;
         internal string key;
-
         public RedisPollingTriggerBaseScaleMonitor(IConnectionMultiplexer multiplexer, int maxBatchSize, string key) 
         {
             this.multiplexer = multiplexer;
