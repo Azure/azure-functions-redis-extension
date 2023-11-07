@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Microsoft.Azure.WebJobs.Extensions.Redis.Samples": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED": "1"
+      }
+    }
+  }
+}

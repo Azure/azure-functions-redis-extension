@@ -16,7 +16,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal abstract class RedisPollingTriggerBaseListener : IListener, IScaleMonitorProvider, ITargetScalerProvider
     {
         internal string name;
-        internal string connectionString;
+        internal IConnectionMultiplexer multiplexer;
         internal string key;
         internal TimeSpan pollingInterval;
         internal int maxBatchSize;
@@ -24,14 +24,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal ILogger logger;
 
         internal string logPrefix;
-        internal IConnectionMultiplexer multiplexer;
         internal Version serverVersion;
         internal RedisPollingTriggerBaseScaleMonitor scaleMonitor;
 
-        public RedisPollingTriggerBaseListener(string name, string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPollingTriggerBaseListener(string name, IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.name = name;
-            this.connectionString = connectionString;
+            this.multiplexer = multiplexer;
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
@@ -42,16 +41,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Executes enabled functions, primary listener method.
         /// </summary>
-        public virtual async Task StartAsync(CancellationToken cancellationToken)
+        public virtual Task StartAsync(CancellationToken cancellationToken)
         {
-            if (multiplexer is null)
-            {
-                logger?.LogInformation($"{logPrefix} Connecting to Redis.");
-                multiplexer = await ConnectionMultiplexer.ConnectAsync(connectionString);
-                serverVersion = multiplexer.GetServers()[0].Version;
-                BeforePolling();
-                _ = Task.Run(() => Loop(cancellationToken));
-            }
+            logger?.LogInformation($"{logPrefix} Connecting to Redis.");
+            serverVersion = multiplexer.GetServers()[0].Version;
+            BeforePolling();
+            _ = Task.Run(() => Loop(cancellationToken));
+            return Task.CompletedTask;
         }
 
         /// <summary>
