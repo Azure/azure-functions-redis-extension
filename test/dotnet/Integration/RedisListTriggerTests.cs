@@ -140,7 +140,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         //Target Scaler Integration Tests not required.
         // Keeping this as a manual test for local development.
         //[Fact]
-        //public async void ListTrigger_TargetBasedScaling_WorksCorrectly()
+        //public async void ListTrigger_TargetBasedScaling_E2EValidation()
         //{
         //    string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue_LongPollingInterval);
         //    int port = 7071;
@@ -166,7 +166,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         //    };
 
         //    Assert.Equal(1, status.vote);
-        //    Assert.True(status.targetWorkerCount / (float) elements > 0.999);
+        //    Assert.True(status.targetWorkerCount / (float)elements > 0.999);
         //}
     }
 }

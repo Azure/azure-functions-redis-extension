@@ -1,6 +1,8 @@
-﻿using FakeItEasy;
+﻿using Castle.Core.Configuration;
+using FakeItEasy;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -10,9 +12,9 @@ using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
 {
-    public class RedisPollingListenerBaseTests
+    public class RedisPollingTriggerBaseScaleMonitorTests
     {
-        private const string name = nameof(RedisPollingListenerBaseTests);
+        private const string name = nameof(RedisPollingTriggerBaseScaleMonitorTests);
         private const string connectionString = "127.0.0.1:6379";
         private const int defaultBatchSize = 10;
         private const string key = "a";
@@ -65,7 +67,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public async void StartAsync_CreatesConnectionMultiplexerAsync()
         {
-            RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, defaultBatchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
+            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            RedisPollingTriggerBaseListener listener = new RedisListListener(name, multiplexer, key, defaultPollingInterval, defaultBatchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
             await listener.StartAsync(new CancellationToken());
             Assert.NotNull(listener.multiplexer);
             Assert.Equal(connectionString, listener.multiplexer.Configuration, ignoreCase: true);
@@ -74,7 +77,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public async void StopAsync_ClosesAndDisposesConnectionMultiplexerAsync()
         {
-            RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, defaultBatchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
+            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            RedisPollingTriggerBaseListener listener = new RedisListListener(name, multiplexer, key, defaultPollingInterval, defaultBatchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
             listener.multiplexer = A.Fake<IConnectionMultiplexer>();
             await listener.StopAsync(new CancellationToken());
             A.CallTo(() => listener.multiplexer.CloseAsync(A<bool>._)).MustHaveHappened();
@@ -90,9 +94,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(5, 20, ScaleVote.ScaleIn)]
         public void ScalingLogic_ConstantMetrics(int workerCount, int batchSize, ScaleVote expected)
         {
-            RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
+            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            RedisPollingTriggerBaseListener listener = new RedisListListener(name, multiplexer, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = constantMetrics };
-            Assert.Equal(expected, listener.GetScaleStatus(context).Vote);
+            Assert.Equal(expected, listener.GetMonitor().GetScaleStatus(context).Vote);
         }
 
         [Theory]
@@ -104,9 +109,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(5, 20)]
         public void ScalingLogic_FewMetrics(int workerCount, int batchSize)
         {
-            RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
+            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            RedisPollingTriggerBaseListener listener = new RedisListListener(name, multiplexer, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = fewMetrics };
-            Assert.Equal(ScaleVote.None, listener.GetScaleStatus(context).Vote);
+            Assert.Equal(ScaleVote.None, listener.GetMonitor().GetScaleStatus(context).Vote);
         }
 
         [Theory]
@@ -116,9 +122,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(10, 10, ScaleVote.ScaleIn)]
         public void ScalingLogic_DecreasingMetrics(int workerCount, int batchSize, ScaleVote expected)
         {
-            RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
+            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            RedisPollingTriggerBaseListener listener = new RedisListListener(name, multiplexer, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = decreasingMetrics };
-            Assert.Equal(expected, listener.GetScaleStatus(context).Vote);
+            Assert.Equal(expected, listener.GetMonitor().GetScaleStatus(context).Vote);
         }
         [Theory]
         [InlineData(1, 10, ScaleVote.ScaleOut)]
@@ -127,9 +134,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(10, 10, ScaleVote.ScaleIn)]
         public void ScalingLogic_IncreasingMetrics(int workerCount, int batchSize, ScaleVote expected)
         {
-            RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
+            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            RedisPollingTriggerBaseListener listener = new RedisListListener(name, multiplexer, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = increasingMetrics };
-            Assert.Equal(expected, listener.GetScaleStatus(context).Vote);
+            Assert.Equal(expected, listener.GetMonitor().GetScaleStatus(context).Vote);
         }
 
         [Theory]
@@ -142,13 +150,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(10000, 10, 1000)]
         public async Task TargetScaler_IncreasingMetricsAsync(long remaining, int batchSize, int expected)
         {
-            RedisPollingTriggerBaseListener listener = new RedisListListener(name, connectionString, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
+            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            RedisPollingTriggerBaseListener listener = new RedisListListener(name, multiplexer, key, defaultPollingInterval, batchSize, false, true, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
             IDatabase fakeDatabase = A.Fake<IDatabase>();
             A.CallTo(() => fakeDatabase.ListLength(A<RedisKey>._, A<CommandFlags>._)).Returns(remaining);
             IConnectionMultiplexer fakeMultiplexer = A.Fake<IConnectionMultiplexer>();
             A.CallTo(() => fakeMultiplexer.GetDatabase(A<int>._, A<object>._)).Returns(fakeDatabase);
             listener.multiplexer = fakeMultiplexer;
-            Assert.Equal(expected, (await listener.GetScaleResultAsync(null)).TargetWorkerCount);
+            listener.scaleMonitor.multiplexer = fakeMultiplexer;
+            Assert.Equal(expected, (await listener.GetTargetScaler().GetScaleResultAsync(null)).TargetWorkerCount);
         }
     }
 }

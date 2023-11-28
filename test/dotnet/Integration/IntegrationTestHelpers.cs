@@ -52,10 +52,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.BeginErrorReadLine();
             if (!hostStarted.Task.Wait(TimeSpan.FromMinutes(1)))
             {
+                functionsProcess.Kill();
                 throw new Exception("Azure Functions Host did not start");
             }
             if (!functionLoaded.Task.Wait(TimeSpan.FromMinutes(1)))
             {
+                functionsProcess.Kill();
                 throw new Exception($"Did not load Function {functionName}");
             }
             functionsProcess.OutputDataReceived -= hostStartupHandler;
@@ -82,6 +84,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
             "local.settings.json")).Build();
 
+        internal static IConfiguration hostsettings = new ConfigurationBuilder().AddJsonFile(Path.Combine(
+            new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
+            "host.json")).Build();
+
         private static string GetFunctionsFileName()
         {
             string filepath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
@@ -104,7 +110,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             return value.GetType().FullName + ":" + JsonConvert.SerializeObject(value);
         }
 
-        public class ScaleStatus
+        internal class ScaleStatus
         {
             public int vote;
             public int targetWorkerCount;

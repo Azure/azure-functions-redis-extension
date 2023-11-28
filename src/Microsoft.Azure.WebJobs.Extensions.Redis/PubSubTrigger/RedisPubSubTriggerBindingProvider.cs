@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Triggers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -40,10 +41,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
-            string connectionString = RedisUtilities.ResolveConnectionString(configuration, attribute.ConnectionStringSetting);
+            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, attribute.ConnectionStringSetting);
             string channel = RedisUtilities.ResolveString(nameResolver, attribute.Channel, nameof(attribute.Channel));
 
-            return Task.FromResult<ITriggerBinding>(new RedisPubSubTriggerBinding(connectionString, channel, parameter.ParameterType, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisPubSubTriggerBinding(multiplexer, channel, parameter.ParameterType, logger));
         }
     }
 }

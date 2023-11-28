@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     internal class RedisListTriggerBinding : ITriggerBinding
     {
-        private readonly string connectionString;
+        private readonly IConnectionMultiplexer multiplexer;
         private readonly TimeSpan pollingInterval;
         private readonly string key;
         private readonly int maxBatchSize;
@@ -23,9 +23,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisListTriggerBinding(string connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, Type parameterType, ILogger logger)
+        public RedisListTriggerBinding(IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, Type parameterType, ILogger logger)
         {
-            this.connectionString = connectionString;
+            this.multiplexer = multiplexer;
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
@@ -64,7 +64,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             return Task.FromResult<IListener>(new RedisListListener(
                 context.Descriptor.LogName,
-                connectionString,
+                multiplexer,
                 key,
                 pollingInterval,
                 maxBatchSize,
