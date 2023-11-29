@@ -28,7 +28,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal Version serverVersion;
         internal RedisPollingTriggerBaseScaleMonitor scaleMonitor;
 
-        public RedisPollingTriggerBaseListener(string name, IConnectionMultiplexer connectionString, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPollingTriggerBaseListener(string name, IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.name = name;
             this.multiplexer = multiplexer;

@@ -153,7 +153,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                    await Task.Delay(elements / RedisStreamTriggerTestFunctions.batchSize * RedisStreamTriggerTestFunctions.pollingInterval * 2);
+                    await Task.Delay(elements / RedisStreamTriggerTestFunctions.batchSize * RedisStreamTriggerTestFunctions.pollingIntervalShort * 2);
 
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();
