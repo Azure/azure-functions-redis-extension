@@ -67,20 +67,29 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             if (batch)
             {
-                await ExecuteAsync(entries, Array.ConvertAll(entries, entry => entry.Id), cancellationToken);
+                await ExecuteBatchAsync(entries, cancellationToken);
             }
             else
             {
-                await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, new RedisValue[] { entry.Id }, cancellationToken)));
+                await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, cancellationToken)));
             }
         }
 
-        private async Task ExecuteAsync(object value, RedisValue[] entryIds, CancellationToken cancellationToken)
+        private async Task ExecuteAsync(StreamEntry value, CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
             await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
 
-            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
+            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, value.Id);
+            logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
+        }
+
+        private async Task ExecuteBatchAsync(StreamEntry[] values, CancellationToken cancellationToken)
+        {
+            IDatabase db = multiplexer.GetDatabase();
+            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = values }, cancellationToken);
+
+            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, Array.ConvertAll(values, value => value.Id));
             logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
         }
 

@@ -46,7 +46,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     logger?.LogDebug($"{logPrefix} Received {result.Length} entries from the list at key '{key}'.");
                     if (batch)
                     {
-                        await ExecuteAsync(result, cancellationToken);
+                        await ExecuteBatchAsync(result, cancellationToken);
                     }
                     else
                     {
@@ -69,7 +69,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
-        private Task ExecuteAsync(object value, CancellationToken cancellationToken)
+        private Task ExecuteAsync(RedisValue value, CancellationToken cancellationToken)
+        {
+            return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
+        }
+
+        private Task ExecuteBatchAsync(RedisValue[] value, CancellationToken cancellationToken)
         {
             return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
         }
