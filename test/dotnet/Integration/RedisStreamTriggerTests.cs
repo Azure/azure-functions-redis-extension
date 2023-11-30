@@ -130,6 +130,39 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
+        [Theory]
+        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_StreamEntry), typeof(StreamEntry[]))]
+        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_NameValueEntryArray), typeof(NameValueEntry[][]))]
+        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_ByteArray), typeof(byte[][]))]
+        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_String), typeof(string[]))]
+        public async void StreamTrigger_Batch_ExecutesFewerTimes(string functionName, Type destinationType)
+        {
+            int elements = 1000;
+            Dictionary<string, int> counts = new Dictionary<string, int>
+            {
+                { $"Executed '{functionName}' (Succeeded",  elements / RedisStreamTriggerTestFunctions.batchSize},
+                { destinationType.FullName, elements / RedisStreamTriggerTestFunctions.batchSize},
+            };
+
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, RedisStreamTriggerTestFunctions.localhostSetting)))
+            {
+                await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
+                Task.WaitAll(Enumerable.Range(0, elements).Select(i => multiplexer.GetDatabase().StreamAddAsync(functionName, i, i)).ToArray());
+
+                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+                {
+                    functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
+
+                    await Task.Delay(elements / RedisStreamTriggerTestFunctions.batchSize * RedisStreamTriggerTestFunctions.pollingIntervalShort * 2);
+
+                    await multiplexer.CloseAsync();
+                    functionsProcess.Kill();
+                };
+            }
+            var incorrect = counts.Where(pair => pair.Value != 0);
+            Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
+        }
+        
         //[Fact]
         //public async void StreamTrigger_TargetBasedScaling_E2EValidation()
         //{

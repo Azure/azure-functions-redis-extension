@@ -15,8 +15,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal bool listPopFromBeginning;
 
-        public RedisListListener(string name, IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, multiplexer, key, pollingInterval, maxBatchSize, executor, logger)
+        public RedisListListener(string name, IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, multiplexer, key, pollingInterval, maxBatchSize, batch, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
             this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Key:{key}]";
@@ -44,7 +44,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 else
                 {
                     logger?.LogDebug($"{logPrefix} Received {result.Length} entries from the list at key '{key}'.");
-                    await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
+                    if (batch)
+                    {
+                        await ExecuteBatchAsync(result, cancellationToken);
+                    }
+                    else
+                    {
+                        await Task.WhenAll(result.Select(value => ExecuteAsync(value, cancellationToken)));
+                    }
                 }
             }
             else
@@ -63,6 +70,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
 
         private Task ExecuteAsync(RedisValue value, CancellationToken cancellationToken)
+        {
+            return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
+        }
+
+        private Task ExecuteBatchAsync(RedisValue[] value, CancellationToken cancellationToken)
         {
             return executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
         }

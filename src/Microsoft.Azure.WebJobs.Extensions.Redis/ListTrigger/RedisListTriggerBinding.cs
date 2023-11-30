@@ -34,15 +34,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.logger = logger;
         }
 
-        public Type TriggerValueType => typeof(RedisValue);
+        public Type TriggerValueType => IsBatchParameter() ? typeof(RedisValue[]) : typeof(RedisValue);
 
-        public IReadOnlyDictionary<string, Type> BindingDataContract => new Dictionary<string, Type>();
+        public IReadOnlyDictionary<string, Type> BindingDataContract => CreateBindingDataContract();
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            RedisValue redisValue = (RedisValue)value;
-            IReadOnlyDictionary<string, object> bindingData = CreateBindingData(redisValue);
-            return Task.FromResult<ITriggerData>(new TriggerData(new RedisValueValueProvider(redisValue, parameterType), bindingData));
+            if (IsBatchParameter())
+            {
+                RedisValue[] redisValues = (RedisValue[])value;
+                IReadOnlyDictionary<string, object> bindingData = CreateBindingData(redisValues);
+                return Task.FromResult<ITriggerData>(new TriggerData(new RedisValueArrayValueProvider(redisValues, parameterType), bindingData));
+            }
+            else
+            {
+                RedisValue redisValue = (RedisValue)value;
+                IReadOnlyDictionary<string, object> bindingData = CreateBindingData(redisValue);
+                return Task.FromResult<ITriggerData>(new TriggerData(new RedisValueValueProvider(redisValue, parameterType), bindingData));
+            }
         }
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
@@ -53,7 +62,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return Task.FromResult<IListener>(new RedisListListener(context.Descriptor.LogName, multiplexer, key, pollingInterval, maxBatchSize, listPopFromBeginning, context.Executor, logger));
+            return Task.FromResult<IListener>(new RedisListListener(
+                context.Descriptor.LogName,
+                multiplexer,
+                key,
+                pollingInterval,
+                maxBatchSize,
+                listPopFromBeginning,
+                IsBatchParameter(),
+                context.Executor,
+                logger));
         }
 
         public ParameterDescriptor ToParameterDescriptor()
@@ -64,20 +82,44 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             };
         }
 
-        internal static IReadOnlyDictionary<string, Type> CreateBindingDataContract()
+        internal IReadOnlyDictionary<string, Type> CreateBindingDataContract()
         {
-            return new Dictionary<string, Type>()
+            if (IsBatchParameter())
             {
-                { "Value", typeof(string) }
-            };
+                return new Dictionary<string, Type>()
+                {
+                    { "Key", typeof(string) },
+                    { "Count", typeof(int) }
+                };
+            }
+            else
+            {
+                return new Dictionary<string, Type>()
+                {
+                    { "Key", typeof(string) },
+                    { "Value", typeof(string) }
+                };
+            }
         }
 
-        internal static IReadOnlyDictionary<string, object> CreateBindingData(RedisValue value)
+        internal IReadOnlyDictionary<string, object> CreateBindingData(RedisValue value)
         {
             return new Dictionary<string, object>()
             {
+                { "Key", key },
                 { "Value", value.ToString() }
             };
         }
+
+        internal IReadOnlyDictionary<string, object> CreateBindingData(RedisValue[] values)
+        {
+            return new Dictionary<string, object>()
+            {
+                { "Key", key },
+                { "Count", values.Length }
+            };
+        }
+
+        internal bool IsBatchParameter() => parameterType.IsArray && parameterType != typeof(byte[]);
     }
 }

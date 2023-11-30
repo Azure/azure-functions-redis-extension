@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,8 +16,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string consumerGroup;
         internal string consumerName;
 
-        public RedisStreamListener(string name, IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, string consumerGroup, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, multiplexer, key, pollingInterval, maxBatchSize, executor, logger)
+        public RedisStreamListener(string name, IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, string consumerGroup, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, multiplexer, key, pollingInterval, maxBatchSize, batch, executor, logger)
         {
             this.consumerGroup = consumerGroup;
             this.consumerName = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? Guid.NewGuid().ToString();
@@ -61,16 +60,36 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             IDatabase db = multiplexer.GetDatabase();
             StreamEntry[] entries = await db.StreamReadGroupAsync(key, consumerGroup, consumerName, count: maxBatchSize);
             logger?.LogDebug($"{logPrefix} Received {entries.Length} entries from the stream at key '{key}'.");
-            await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, cancellationToken)));
+            if (entries.Length == 0)
+            {
+                return;
+            }
+
+            if (batch)
+            {
+                await ExecuteBatchAsync(entries, cancellationToken);
+            }
+            else
+            {
+                await Task.WhenAll(entries.Select(entry => ExecuteAsync(entry, cancellationToken)));
+            }
         }
 
-        private async Task ExecuteAsync(StreamEntry entry, CancellationToken cancellationToken)
+        private async Task ExecuteAsync(StreamEntry value, CancellationToken cancellationToken)
         {
             IDatabase db = multiplexer.GetDatabase();
-            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = entry }, cancellationToken);
+            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = value }, cancellationToken);
 
-            RedisValue[] entryIds = new RedisValue[] { entry.Id };
-            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, entryIds);
+            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, value.Id);
+            logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
+        }
+
+        private async Task ExecuteBatchAsync(StreamEntry[] values, CancellationToken cancellationToken)
+        {
+            IDatabase db = multiplexer.GetDatabase();
+            await executor.TryExecuteAsync(new TriggeredFunctionData() { TriggerValue = values }, cancellationToken);
+
+            long acknowledged = await db.StreamAcknowledgeAsync(key, consumerGroup, Array.ConvertAll(values, value => value.Id));
             logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
         }
 
