@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteBehindSamples", "sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteThroughSamples", "samples\CosmosDBIntegration\WriteThroughSamples\WriteThroughSamples.csproj", "{61001020-ABEE-4B06-BF56-1C1989838CBA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis.SamplesIsolated", "samples\dotnet-isolated\Microsoft.Azure.WebJobs.Extensions.Redis.SamplesIsolated.csproj", "{9EA54616-32DD-44C5-BB24-D0FEA4733850}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples", "samples\dotnet-isolated\Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.csproj", "{9EA54616-32DD-44C5-BB24-D0FEA4733850}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,8 +1,6 @@
-﻿using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Extensions.Redis;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.SamplesIsolated
+namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
 {
     internal class KeyeventTrigger
     {

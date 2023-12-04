@@ -12,8 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.Azure.Functions.Worker.Extensions.Redis\Microsoft.Azure.Functions.Worker.Extensions.Redis.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.Azure.WebJobs.Extensions.Redis\Microsoft.Azure.WebJobs.Extensions.Redis.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

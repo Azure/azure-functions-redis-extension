@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 using Microsoft.Extensions.Hosting;
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.SamplesIsolated
+namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
 {
     internal class Program
     {
