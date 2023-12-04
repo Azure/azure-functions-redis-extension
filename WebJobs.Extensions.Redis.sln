@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.3.32505.426
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis.Samples", "samples\dotnet\Microsoft.Azure.WebJobs.Extensions.Redis.Samples.csproj", "{287FA4E2-FABB-4E53-B3C0-B920A594E9C2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D52E32D7-FB14-4952-AA6E-D16399139E4A} = {D52E32D7-FB14-4952-AA6E-D16399139E4A}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis.Tests", "test\dotnet\Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj", "{0EF5AB9B-DB6A-4992-AA3F-F0A1BD18010D}"
 EndProject
@@ -18,6 +21,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteBehindSamples", "samples\CosmosDBIntegration\WriteBehindSamples\WriteBehindSamples.csproj", "{C6273150-22D0-4967-B7B6-9A2EA674053D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WriteThroughSamples", "samples\CosmosDBIntegration\WriteThroughSamples\WriteThroughSamples.csproj", "{61001020-ABEE-4B06-BF56-1C1989838CBA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.WebJobs.Extensions.Redis.SamplesIsolated", "samples\dotnet-isolated\Microsoft.Azure.WebJobs.Extensions.Redis.SamplesIsolated.csproj", "{9EA54616-32DD-44C5-BB24-D0FEA4733850}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +62,10 @@ Global
 		{61001020-ABEE-4B06-BF56-1C1989838CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61001020-ABEE-4B06-BF56-1C1989838CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61001020-ABEE-4B06-BF56-1C1989838CBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EA54616-32DD-44C5-BB24-D0FEA4733850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EA54616-32DD-44C5-BB24-D0FEA4733850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EA54616-32DD-44C5-BB24-D0FEA4733850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EA54616-32DD-44C5-BB24-D0FEA4733850}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
