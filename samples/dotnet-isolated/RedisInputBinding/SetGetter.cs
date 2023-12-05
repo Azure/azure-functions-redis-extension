@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
+namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisInputBinding
 {
     public class SetGetter
     {
@@ -11,12 +11,12 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
             this.logger = logger;
         }
 
-        //[Function(nameof(SetGetter))]
-        //public void Run(
-        //    [RedisPubSubTrigger(Common.localhostSetting, "__keyevent@0__:set")] string key,
-        //    [Redis(Common.localhostSetting, "GET {Message}")] string value)
-        //{
-        //    logger.LogInformation($"Key '{key}' was set to value '{value}'");
-        //}
+        [Function(nameof(SetGetter))]
+        public void Run(
+            [RedisPubSubTrigger(Common.localhostSetting, "__keyevent@0__:set")] string key,
+            [RedisInput(Common.localhostSetting, "GET {Message}")] string value)
+        {
+            logger.LogInformation($"Key '{key}' was set to value '{value}'");
+        }
     }
 }

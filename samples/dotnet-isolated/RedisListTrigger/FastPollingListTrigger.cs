@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
+namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisListTrigger
 {
     public class FastPollingListTrigger
     {
@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
 
         [Function(nameof(FastPollingListTrigger))]
         public void Run(
-            [RedisListTrigger(Common.localhostSetting, "listKey", pollingIntervalInMs: 100)] Common.CustomType entry)
+            [RedisListTrigger(Common.localhostSetting, "listKey", pollingIntervalInMs: 100)] string entry)
         {
             logger.LogInformation(JsonConvert.SerializeObject(entry));
         }

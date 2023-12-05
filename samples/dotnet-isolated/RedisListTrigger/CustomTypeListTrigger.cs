@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
+namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisListTrigger
 {
     public class CustomTypeListTrigger
     {
