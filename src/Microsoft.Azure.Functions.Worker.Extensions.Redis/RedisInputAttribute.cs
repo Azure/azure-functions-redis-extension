@@ -3,16 +3,16 @@
 namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
 {
     /// <summary>
-    /// An output binding that excutes a command on the redis instances.
+    /// An input binding that executes a command on Redis instance and returns the value to the function.
     /// </summary>
-    public sealed class RedisAttribute : BindingAttribute
+    public sealed class RedisInputAttribute : InputBindingAttribute
     {
         /// <summary>
-        /// Initializes a new <see cref="RedisAttribute"/>.
+        /// Initializes a new <see cref="RedisInputAttribute"/>.
         /// </summary>
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="command">The command to be executed on the cache.</param>
-        public RedisAttribute(string connectionStringSetting, string command)
+        public RedisInputAttribute(string connectionStringSetting, string command)
         {
             ConnectionStringSetting = connectionStringSetting;
             Command = command;

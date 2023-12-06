@@ -1,4 +1,4 @@
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
+namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
 {
     public static class Common
     {
