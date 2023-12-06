@@ -55,7 +55,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             streamTriggerRule.BindToTrigger(new RedisStreamTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger("RedisStreamTrigger")));
 
             FluentBindingRule<RedisAttribute> bindingRule = context.AddBindingRule<RedisAttribute>();
-            bindingRule.BindToCollector((attr) => new RedisAsyncCollector(GetOrCreateConnectionMultiplexer(configuration, attr.ConnectionStringSetting), attr.Command, loggerFactory.CreateLogger("RedisOutputBinding")));
+            bindingRule.BindToCollector<string>((attr) => new RedisAsyncCollector(GetOrCreateConnectionMultiplexer(configuration, attr.ConnectionStringSetting), attr.Command, loggerFactory.CreateLogger("RedisOutputBinding")));
+            bindingRule.BindToCollector<string[]>((attr) => new RedisAsyncCollector(GetOrCreateConnectionMultiplexer(configuration, attr.ConnectionStringSetting), attr.Command, loggerFactory.CreateLogger("RedisOutputBinding")));
             bindingRule.BindToInput<OpenType>(typeof(RedisConverter<>), configuration, nameResolver, loggerFactory.CreateLogger("RedisInputBinding"));
 #pragma warning restore CS0618
         }

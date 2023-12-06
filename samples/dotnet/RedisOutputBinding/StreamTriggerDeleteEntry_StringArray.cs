@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisOutputBinding
 {
-    internal class StreamTriggerDeleteEntry
+    internal class StreamTriggerDeleteEntry_StringArray
     {
-        [FunctionName(nameof(StreamTriggerDeleteEntry))]
+        [FunctionName(nameof(StreamTriggerDeleteEntry_StringArray))]
         public static void Run(
             [RedisStreamTrigger(Common.localhostSetting, "streamTest2")] StreamEntry entry,
             [Redis(Common.localhostSetting, "XDEL")] out string[] result,

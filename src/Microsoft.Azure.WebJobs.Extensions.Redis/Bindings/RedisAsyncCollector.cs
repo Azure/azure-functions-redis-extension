@@ -5,8 +5,9 @@ using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    internal class RedisAsyncCollector : IAsyncCollector<string[]>
+    internal class RedisAsyncCollector : IAsyncCollector<string[]>, IAsyncCollector<string>
     {
+        private const char DELIMITER = ' ';
         private readonly string command;
         private readonly ILogger logger;
         private readonly IBatch batch;
@@ -25,6 +26,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return Task.CompletedTask;
         }
 
+        public Task AddAsync(string argument, CancellationToken cancellationToken = default)
+        {
+            logger?.LogDebug($"Adding {command} command to batch with input string argument.");
+            _ = batch.ExecuteAsync(command, argument.Split(DELIMITER), CommandFlags.FireAndForget);
+            return Task.CompletedTask;
+        }
+
         public Task FlushAsync(CancellationToken cancellationToken = default)
         {
             logger?.LogDebug("Executing batch.");
@@ -33,3 +41,4 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
     }
 }
+ 
