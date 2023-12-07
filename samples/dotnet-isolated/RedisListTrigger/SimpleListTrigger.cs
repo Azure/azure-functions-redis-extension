@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisListTri
 
         [Function(nameof(SimpleListTrigger))]
         public void Run(
-            [RedisListTrigger(Common.localhostSetting, "listTest")] string entry)
+            [RedisListTrigger(Common.connectionStringSetting, "listTest")] string entry)
         {
             logger.LogInformation(entry);
         }

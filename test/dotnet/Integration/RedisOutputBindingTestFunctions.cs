@@ -7,14 +7,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     public static class RedisOutputBindingTestFunctions
     {
-        public const string localhostSetting = "redisLocalhost";
         public const string keyeventChannelSet = "__keyevent@0__:set";
         public const int pollingInterval = 100;
 
         [FunctionName(nameof(SetDeleter))]
         public static void SetDeleter(
-            [RedisPubSubTrigger(localhostSetting, keyeventChannelSet)] string key,
-            [Redis(localhostSetting, "DEL")] out string[] arguments,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, keyeventChannelSet)] string key,
+            [Redis(IntegrationTestHelpers.connectionStringSetting, "DEL")] out string[] arguments,
             ILogger logger)
         {
             logger.LogInformation($"Deleting recently SET key '{key}'");
@@ -23,8 +22,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(StreamTriggerDeleter))]
         public static void StreamTriggerDeleter(
-            [RedisStreamTrigger(localhostSetting, nameof(StreamTriggerDeleter), pollingIntervalInMs: pollingInterval)] StreamEntry entry,
-            [Redis(localhostSetting, "XDEL")] out string[] arguments,
+            [RedisStreamTrigger(IntegrationTestHelpers.connectionStringSetting, nameof(StreamTriggerDeleter), pollingIntervalInMs: pollingInterval)] StreamEntry entry,
+            [Redis(IntegrationTestHelpers.connectionStringSetting, "XDEL")] out string[] arguments,
             ILogger logger)
         {
             logger.LogInformation($"Stream entry from key '{nameof(StreamTriggerDeleter)}' with Id '{entry.Id}' and values '{JsonConvert.SerializeObject(entry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString()))}");
@@ -34,8 +33,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(MultipleAddAsyncCalls))]
         public static void MultipleAddAsyncCalls(
-            [RedisPubSubTrigger(localhostSetting, nameof(MultipleAddAsyncCalls))] string entry,
-            [Redis(localhostSetting, "SET")] IAsyncCollector<string[]> collector,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, nameof(MultipleAddAsyncCalls))] string entry,
+            [Redis(IntegrationTestHelpers.connectionStringSetting, "SET")] IAsyncCollector<string[]> collector,
             ILogger logger)
         {
             string[] keys = entry.Split(',');

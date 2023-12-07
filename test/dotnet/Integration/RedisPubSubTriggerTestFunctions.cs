@@ -7,7 +7,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     public static class RedisPubSubTriggerTestFunctions
     {
-        public const string localhostSetting = "redisLocalhost";
         public const string format = "triggerValue:{0}";
         public const string pubsubChannel = "testChannel";
         public const string pubsubMultiple = "testChannel*";
@@ -20,7 +19,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(SingleChannel))]
         public static void SingleChannel(
-            [RedisPubSubTrigger(localhostSetting, pubsubChannel)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, pubsubChannel)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -28,7 +27,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(MultipleChannels))]
         public static void MultipleChannels(
-            [RedisPubSubTrigger(localhostSetting, pubsubMultiple)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, pubsubMultiple)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -36,7 +35,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(AllChannels))]
         public static void AllChannels(
-            [RedisPubSubTrigger(localhostSetting, allChannels)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, allChannels)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -44,7 +43,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(SingleKey))]
         public static void SingleKey(
-            [RedisPubSubTrigger(localhostSetting, keyspaceChannel)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, keyspaceChannel)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -52,7 +51,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(MultipleKeys))]
         public static void MultipleKeys(
-            [RedisPubSubTrigger(localhostSetting, keyspaceMultiple)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, keyspaceMultiple)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -60,7 +59,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(AllKeys))]
         public static void AllKeys(
-            [RedisPubSubTrigger(localhostSetting, keyspaceChannelAll)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, keyspaceChannelAll)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -68,7 +67,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(SingleEvent))]
         public static void SingleEvent(
-            [RedisPubSubTrigger(localhostSetting, keyeventChannelSet)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, keyeventChannelSet)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -76,7 +75,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(AllEvents))]
         public static void AllEvents(
-            [RedisPubSubTrigger(localhostSetting, keyeventChannelAll)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, keyeventChannelAll)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -84,7 +83,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(SingleChannel_ChannelMessage))]
         public static void SingleChannel_ChannelMessage(
-            [RedisPubSubTrigger(localhostSetting, pubsubChannel)] ChannelMessage message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, pubsubChannel)] ChannelMessage message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -92,7 +91,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(SingleChannel_RedisValue))]
         public static void SingleChannel_RedisValue(
-            [RedisPubSubTrigger(localhostSetting, pubsubChannel)] RedisValue message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, pubsubChannel)] RedisValue message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -100,7 +99,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(SingleChannel_String))]
         public static void SingleChannel_String(
-            [RedisPubSubTrigger(localhostSetting, pubsubChannel)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, pubsubChannel)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -108,7 +107,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(ByteArray_SingleChannel))]
         public static void ByteArray_SingleChannel(
-            [RedisPubSubTrigger(localhostSetting, pubsubChannel)] byte[] message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, pubsubChannel)] byte[] message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));
@@ -116,7 +115,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         [FunctionName(nameof(SingleChannel_CustomType))]
         public static void SingleChannel_CustomType(
-            [RedisPubSubTrigger(localhostSetting, pubsubChannel)] CustomType message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, pubsubChannel)] CustomType message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));

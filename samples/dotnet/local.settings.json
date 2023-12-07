@@ -6,6 +6,6 @@
     "pubsubChannel": "resolvedChannel"
   },
   "ConnectionStrings": {
-    "redisLocalhost": "127.0.0.1:6379"
+    "redisConnectionString": "127.0.0.1:6379"
   }
 }

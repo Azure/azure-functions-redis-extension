@@ -9,7 +9,7 @@ public class FastPollingListTrigger {
     public void run(
             @RedisListTrigger(
                 name = "req",
-                connectionStringSetting = "redisLocalhost",
+                connectionStringSetting = "redisConnectionString",
                 key = "listTest",
                 pollingIntervalInMs = 100,
                 maxBatchSize = 1)

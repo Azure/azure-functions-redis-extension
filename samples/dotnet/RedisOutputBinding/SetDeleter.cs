@@ -6,8 +6,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisOutputBinding
     {
         [FunctionName(nameof(SetDeleter))]
         public static void Run(
-            [RedisPubSubTrigger(Common.localhostSetting, "__keyevent@0__:set")] string key,
-            [Redis(Common.localhostSetting, "DEL")] out string[] arguments,
+            [RedisPubSubTrigger(Common.connectionStringSetting, "__keyevent@0__:set")] string key,
+            [Redis(Common.connectionStringSetting, "DEL")] out string[] arguments,
             ILogger logger)
         {
             logger.LogInformation($"Deleting recently SET key '{key}'");

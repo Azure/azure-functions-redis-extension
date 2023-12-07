@@ -9,7 +9,7 @@ public class FastPollingStreamTrigger {
     public void run(
             @RedisStreamTrigger(
                 name = "entry",
-                connectionStringSetting = "redisLocalhost",
+                connectionStringSetting = "redisConnectionString",
                 key = "streamTest",
                 pollingIntervalInMs = 100,
                 maxBatchSize = 1)

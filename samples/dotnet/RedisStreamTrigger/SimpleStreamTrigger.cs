@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisStreamTrigger
     {
         [FunctionName(nameof(SimpleStreamTrigger))]
         public static void Run(
-            [RedisStreamTrigger(Common.localhostSetting, "streamKey")] string entry,
+            [RedisStreamTrigger(Common.connectionStringSetting, "streamKey")] string entry,
             ILogger logger)
         {
             logger.LogInformation(entry);

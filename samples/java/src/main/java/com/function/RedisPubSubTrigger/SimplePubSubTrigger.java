@@ -9,7 +9,7 @@ public class SimplePubSubTrigger {
     public void run(
             @RedisPubSubTrigger(
                 name = "req",
-                connectionStringSetting = "redisLocalhost",
+                connectionStringSetting = "redisConnectionString",
                 channel = "pubsubTest")
                 String message,
             final ExecutionContext context) {

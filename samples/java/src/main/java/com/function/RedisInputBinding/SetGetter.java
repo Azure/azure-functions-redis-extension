@@ -9,12 +9,12 @@ public class SetGetter {
     public void run(
             @RedisPubSubTrigger(
                 name = "key",
-                connectionStringSetting = "redisLocalhost",
+                connectionStringSetting = "redisConnectionString",
                 channel = "__keyevent@0__:set")
                 String key,
             @RedisInput(
                 name = "value",
-                connectionStringSetting = "redisLocalhost",
+                connectionStringSetting = "redisConnectionString",
                 command = "GET {Message}")
                 String value,
             final ExecutionContext context) {

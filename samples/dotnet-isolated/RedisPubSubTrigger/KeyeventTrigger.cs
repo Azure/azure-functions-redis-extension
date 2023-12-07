@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisPubSubT
         
         [Function(nameof(KeyeventTrigger))]
         public void Run(
-            [RedisPubSubTrigger(Common.localhostSetting, "__keyevent@0__:del")] string message)
+            [RedisPubSubTrigger(Common.connectionStringSetting, "__keyevent@0__:del")] string message)
         {
             logger.LogInformation($"Key '{message}' deleted.");
         }

@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisStreamTrigger
     {
         [FunctionName(nameof(FastPollingStreamTrigger))]
         public static void Run(
-            [RedisStreamTrigger(Common.localhostSetting, "streamKey", pollingIntervalInMs: 100)] string entry,
+            [RedisStreamTrigger(Common.connectionStringSetting, "streamKey", pollingIntervalInMs: 100)] string entry,
             ILogger logger)
         {
             logger.LogInformation(entry);

@@ -9,7 +9,7 @@ public class KeyeventTrigger {
     public void run(
             @RedisPubSubTrigger(
                 name = "req",
-                connectionStringSetting = "redisLocalhost",
+                connectionStringSetting = "redisConnectionString",
                 channel = "__keyevent@0__:del")
                 String message,
             final ExecutionContext context) {

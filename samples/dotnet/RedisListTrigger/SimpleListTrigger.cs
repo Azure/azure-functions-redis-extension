@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisListTrigger
     {
         [FunctionName(nameof(SimpleListTrigger))]
         public static void Run(
-            [RedisListTrigger(Common.localhostSetting, "listTest")] string entry,
+            [RedisListTrigger(Common.connectionStringSetting, "listTest")] string entry,
             ILogger logger)
         {
             logger.LogInformation(entry);
