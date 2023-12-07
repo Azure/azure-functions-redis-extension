@@ -2,7 +2,7 @@
   "bindings": [
     {
       "type": "redisStreamTrigger",
-      "connectionStringSetting": "redisLocalhost",
+      "connectionStringSetting": "redisConnectionString",
       "key": "streamTest",
       "pollingIntervalInMs": 1000,
       "maxBatchSize": 16,

@@ -2,7 +2,7 @@
   "bindings": [
     {
       "type": "redisPubSubTrigger",
-      "connectionStringSetting": "redisLocalhost",
+      "connectionStringSetting": "redisConnectionString",
       "channel": "__keyspace@0__:keyspaceTest",
       "name": "message",
       "direction": "in"

@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisStreamT
 
         [Function(nameof(SimpleStreamTrigger))]
         public void Run(
-            [RedisStreamTrigger(Common.localhostSetting, "streamKey")] string entry)
+            [RedisStreamTrigger(Common.connectionStringSetting, "streamKey")] string entry)
         {
             logger.LogInformation(entry);
         }

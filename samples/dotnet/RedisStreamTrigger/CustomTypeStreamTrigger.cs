@@ -7,7 +7,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisStreamTrigger
     {
         [FunctionName(nameof(CustomTypeStreamTrigger))]
         public static void Run(
-            [RedisStreamTrigger(Common.localhostSetting, "streamKey")] Common.CustomType entry,
+            [RedisStreamTrigger(Common.connectionStringSetting, "streamKey")] Common.CustomType entry,
             ILogger logger)
         {
             logger.LogInformation(JsonConvert.SerializeObject(entry));

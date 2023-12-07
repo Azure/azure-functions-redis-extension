@@ -25,7 +25,7 @@ $@"{{
     ""type"": ""redisListTrigger"",
     ""direction"": ""in"",
     ""functionName"": ""listTestName"",
-    ""connectionStringSetting"": ""redisLocalhost"",
+    ""connectionStringSetting"": ""redisConnectionString"",
     ""key"": ""listScaleTestKey"",
     ""maxBatchSize"": ""16"",
 }}";
@@ -36,7 +36,7 @@ $@"{{
     ""type"": ""redisStreamTrigger"",
     ""direction"": ""in"",
     ""functionName"": ""streamTestName"",
-    ""connectionStringSetting"": ""redisLocalhost"",
+    ""connectionStringSetting"": ""redisConnectionString"",
     ""key"": ""streamScaleTestKey"",
     ""maxBatchSize"": ""16"",
 }}";
@@ -89,7 +89,7 @@ $@"{{
                 scaleOptions.ScaleMetricsSampleInterval = TimeSpan.FromSeconds(1);
             });
 
-            ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, "redisLocalHost"));
+            ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, "redisConnectionString"));
             await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
 
             IHost scaleHost = hostBuilder.Build();

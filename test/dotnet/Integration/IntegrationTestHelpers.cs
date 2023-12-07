@@ -12,6 +12,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     internal static class IntegrationTestHelpers
     {
+        internal const string connectionStringSetting = "redisConnectionString";
+
         internal static Process StartFunction(string functionName, int port)
         {
             ProcessStartInfo info = new ProcessStartInfo
