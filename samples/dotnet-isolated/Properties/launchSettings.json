@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7148",
+      "launchBrowser": false
+    }
+  }
+}
