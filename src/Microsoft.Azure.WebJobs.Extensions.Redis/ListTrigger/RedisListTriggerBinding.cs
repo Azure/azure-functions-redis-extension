@@ -2,6 +2,7 @@
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -15,7 +16,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     internal class RedisListTriggerBinding : ITriggerBinding
     {
-        private readonly IConnectionMultiplexer multiplexer;
+        private readonly IConfiguration configuration;
+        private readonly string connectionStringSetting;
         private readonly TimeSpan pollingInterval;
         private readonly string key;
         private readonly int maxBatchSize;
@@ -23,9 +25,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisListTriggerBinding(IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, Type parameterType, ILogger logger)
+        public RedisListTriggerBinding(IConfiguration configuration, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, Type parameterType, ILogger logger)
         {
-            this.multiplexer = multiplexer;
+            this.configuration = configuration;
+            this.connectionStringSetting = connectionStringSetting;
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
@@ -61,6 +64,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 logger?.LogError($"[{nameof(RedisListTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
                 throw new ArgumentNullException(nameof(context));
             }
+            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting, context.Descriptor.ShortName);
 
             return Task.FromResult<IListener>(new RedisListListener(
                 context.Descriptor.LogName,
