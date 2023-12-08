@@ -7,7 +7,6 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
 
-
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     /// <summary>
