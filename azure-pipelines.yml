@@ -45,7 +45,7 @@ jobs:
         displayName: Download and start redis server, enable all keyspace/keyevent notifications
         inputs:
           targetType: 'inline'
-          script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
+          script: 'sudo snap install redis; sudo service redis-server start; redis-cli info | grep redis_version; redis-cli config set notify-keyspace-events KEA'
 
       - task: DotNetCoreCLI@2
         displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
