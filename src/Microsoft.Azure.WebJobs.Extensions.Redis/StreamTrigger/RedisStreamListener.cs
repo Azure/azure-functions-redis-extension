@@ -36,6 +36,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     logger?.LogCritical($"{logPrefix} Could not create consumer group '{name}' for the stream at key '{key}'.");
                     throw new Exception($"Could not create consumer group '{name}' for the stream at key '{key}'.");
                 }
+                await db.KeyDeleteAsync(entriesReadKey);
                 logger?.LogInformation($"{logPrefix} Successfully created consumer group '{name}' for the stream at key '{key}'.");
 
             }
