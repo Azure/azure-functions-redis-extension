@@ -70,7 +70,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 pollingInterval,
                 maxBatchSize,
                 IsBatchParameter(),
-                context.Descriptor.Id,
                 context.Executor,
                 logger));
         }

@@ -67,7 +67,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting, context.Descriptor.ShortName);
 
             return Task.FromResult<IListener>(new RedisListListener(
-                context.Descriptor.LogName,
+                context.Descriptor.ShortName,
                 multiplexer,
                 key,
                 pollingInterval,

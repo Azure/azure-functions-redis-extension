@@ -10,12 +10,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         private const int MINIMUM_SAMPLES = 5;
 
+        internal string name;
         internal IConnectionMultiplexer multiplexer;
         internal int maxBatchSize;
         internal string key;
 
-        public RedisPollingTriggerBaseScaleMonitor(IConnectionMultiplexer multiplexer, int maxBatchSize, string key) 
+        public RedisPollingTriggerBaseScaleMonitor(string name, IConnectionMultiplexer multiplexer, int maxBatchSize, string key)
         {
+            this.name = name;
             this.multiplexer = multiplexer;
             this.maxBatchSize = maxBatchSize;
             this.key = key;
