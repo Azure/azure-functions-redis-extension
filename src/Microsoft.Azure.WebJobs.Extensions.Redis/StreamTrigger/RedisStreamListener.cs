@@ -83,6 +83,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             long acknowledged = await db.StreamAcknowledgeAsync(key, name, value.Id);
 
+            // Redis 6/6.2 has no way to estimate number of entries read by the group, whereas Redis 7 contains entries_read and lag fields in the XINFO GROUPS command
+            // This is necessary for the scale controller to accurately estimate the number of function instances needed to process unacked entries.
             if (serverVersion < RedisUtilities.Version70)
             {
                 await db.StringIncrementAsync(entriesReadKey);
@@ -99,7 +101,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             long acknowledged = await db.StreamAcknowledgeAsync(key, name, Array.ConvertAll(values, value => value.Id));
 
             // Redis 6/6.2 has no way to estimate number of entries read by the group, whereas Redis 7 contains entries_read and lag fields in the XINFO GROUPS command
-            // This is necessary for the scale controller to accurately estimate the number of function instances needed to process messages.
+            // This is necessary for the scale controller to accurately estimate the number of function instances needed to process unacked entries.
             if (serverVersion < RedisUtilities.Version70)
             {
                 await db.StringIncrementAsync(entriesReadKey);
