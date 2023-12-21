@@ -12,7 +12,6 @@ using System.Text;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
-    [Collection("RedisTriggerTests")]
     public class RedisStreamTriggerTests
     {
         [Fact]
@@ -34,7 +33,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
-            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
@@ -67,9 +66,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", count);
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
-            using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName, 7071))
-            using (Process functionsProcess2 = IntegrationTestHelpers.StartFunction(functionName, 7072))
-            using (Process functionsProcess3 = IntegrationTestHelpers.StartFunction(functionName, 7073))
+            using (Process functionsProcess1 = IntegrationTestHelpers.StartFunction(functionName))
+            using (Process functionsProcess2 = IntegrationTestHelpers.StartFunction(functionName))
+            using (Process functionsProcess3 = IntegrationTestHelpers.StartFunction(functionName))
             {
                 functionsProcess1.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 functionsProcess2.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -115,7 +114,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
-            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 ISubscriber subscriber = multiplexer.GetSubscriber();
@@ -147,9 +146,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
-                Task.WaitAll(Enumerable.Range(0, elements).Select(i => multiplexer.GetDatabase().StreamAddAsync(functionName, i, i)).ToArray());
 
-                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+                foreach (int i in Enumerable.Range(0, elements))
+                {
+                    await multiplexer.GetDatabase().StreamAddAsync(functionName, i, i);
+                }
+
+                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
@@ -181,7 +184,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         //    };
 
         //    IntegrationTestHelpers.ScaleStatus status = new IntegrationTestHelpers.ScaleStatus { vote = 0, targetWorkerCount = 0 };
-        //    using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, port))
+        //    using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
         //    using (HttpClient client = new HttpClient())
         //    using (StringContent jsonContent = new StringContent("{}", Encoding.UTF8, "application/json"))
         //    {

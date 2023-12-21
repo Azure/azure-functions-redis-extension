@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
@@ -13,13 +14,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     internal static class IntegrationTestHelpers
     {
         internal const string connectionStringSetting = "redisConnectionString";
+        internal static int nextPort = 2000;
 
-        internal static Process StartFunction(string functionName, int port)
+        internal static Process StartFunction(string functionName)
         {
             ProcessStartInfo info = new ProcessStartInfo
             {
                 FileName = GetFunctionsFileName(),
-                Arguments = $"start --verbose --functions {functionName} --port {port} --no-build --prefix {GetPrefix()}",
+                Arguments = $"start --verbose --functions {functionName} --port {Interlocked.Increment(ref nextPort)} --no-build --prefix {GetPrefix()}",
                 WindowStyle = ProcessWindowStyle.Hidden,
                 WorkingDirectory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName,
                 RedirectStandardOutput = true,
@@ -32,7 +34,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             TaskCompletionSource<bool> hostStarted = new TaskCompletionSource<bool>();
             void hostStartupHandler(object sender, DataReceivedEventArgs e)
             {
-                if (e.Data?.Contains($"Host started") ?? false)
+                if (e.Data?.Contains("Host started") ?? false)
                 {
                     hostStarted.SetResult(true);
                 }
@@ -42,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             TaskCompletionSource<bool> functionLoaded = new TaskCompletionSource<bool>();
             void functionLoadedHandler(object sender, DataReceivedEventArgs e)
             {
-                if (e.Data?.Contains($"Generating 1 job function(s)") ?? false)
+                if (e.Data?.Contains("Generating 1 job function(s)") ?? false)
                 {
                     functionLoaded.SetResult(true);
                 }
@@ -66,6 +68,33 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.OutputDataReceived -= functionLoadedHandler;
 
             return functionsProcess;
+        }
+
+        internal static Process StartRedis()
+        {
+            ProcessStartInfo info = GetRedisProcessStartInfo(Interlocked.Increment(ref nextPort));
+
+            Process redisProcess = new Process() { StartInfo = info };
+
+            TaskCompletionSource<bool> hostStarted = new TaskCompletionSource<bool>();
+            void hostStartupHandler(object sender, DataReceivedEventArgs e)
+            {
+                if (e.Data?.Contains("* Ready to accept connections") ?? false)
+                {
+                    hostStarted.SetResult(true);
+                }
+            }
+            redisProcess.OutputDataReceived += hostStartupHandler;
+
+            redisProcess.Start();
+            redisProcess.BeginOutputReadLine();
+            redisProcess.BeginErrorReadLine();
+            if (!hostStarted.Task.Wait(TimeSpan.FromMinutes(1)))
+            {
+                redisProcess.Kill();
+                throw new Exception("Redis did not start");
+            }
+            return redisProcess;
         }
 
         internal static DataReceivedEventHandler CounterHandlerCreator(IDictionary<string, int> counts)
@@ -93,13 +122,29 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         private static string GetFunctionsFileName()
         {
             string filepath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
+                ? @"C:\Program Files\Microsoft\Azure Functions Core Tools\func.exe"
+                //? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
                 : @"/usr/bin/func"; 
             if (!File.Exists(filepath))
             {
                 throw new FileNotFoundException($"Azure Functions Core Tools not found at {filepath}");
             }
             return filepath;
+        }
+
+        private static ProcessStartInfo GetRedisProcessStartInfo(int port)
+        {
+            ProcessStartInfo info = new ProcessStartInfo
+            {
+                FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"C:\Windows\System32\wsl.exe" : @"/usr/bin/redis-server",
+                Arguments = $"{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"/usr/bin/redis-server " : "")}--port {port} --notify-keyspace-events AKE",
+                WindowStyle = ProcessWindowStyle.Hidden,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
+            };
+
+            return info;
         }
 
         private static string GetPrefix()

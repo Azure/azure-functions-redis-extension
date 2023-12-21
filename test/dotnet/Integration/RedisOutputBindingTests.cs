@@ -9,7 +9,6 @@ using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
-    [Collection("RedisTriggerTests")]
     public class RedisOutputBindingTests
     {
         [Fact]
@@ -22,7 +21,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             bool exists = true;
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             {
-                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
@@ -59,7 +58,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             long length = 1;
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             {
-                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
@@ -93,7 +92,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(rKeys);
-                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 

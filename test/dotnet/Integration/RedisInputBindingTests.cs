@@ -9,7 +9,6 @@ using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
-    [Collection("RedisTriggerTests")]
     public class RedisInputBindingTests
     {
         [Fact]
@@ -26,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
                 await multiplexer.GetDatabase().StringSetAsync(functionName, value);
 
-                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                     await multiplexer.GetSubscriber().PublishAsync(functionName, "start");
@@ -55,7 +54,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
                 await multiplexer.GetDatabase().HashSetAsync(functionName, "field", value);
 
-                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+                using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                     await multiplexer.GetSubscriber().PublishAsync(functionName, "start");
@@ -80,7 +79,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Value of key '{functionName}' is currently a type {value.GetType()}: '{JsonConvert.SerializeObject(value)}'", 1);
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
-            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
+            using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
