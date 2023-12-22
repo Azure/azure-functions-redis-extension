@@ -45,19 +45,19 @@ jobs:
         displayName: Download & Make Redis 6
         inputs:
           targetType: 'inline'
-          script: 'wget https://download.redis.io/releases/redis-6.0.20.tar.gz; tar -xzvf redis-6.0.20.tar.gz; cd redis-6.0.20; make'
+          script: 'sudo wget -P /redis https://download.redis.io/releases/redis-6.0.20.tar.gz; cd /redis; sudo tar -xzvf redis-6.0.20.tar.gz; cd redis-6.0.20; sudo make'
 
       - task: Bash@3
         displayName: Download & Make Redis 6.2
         inputs:
           targetType: 'inline'
-          script: 'wget https://download.redis.io/releases/redis-6.2.14.tar.gz; tar -xzvf redis-6.2.14.tar.gz; cd redis-6.2.14; make'
+          script: 'sudo wget -P /redis https://download.redis.io/releases/redis-6.2.14.tar.gz; cd /redis; sudo tar -xzvf redis-6.2.14.tar.gz; cd redis-6.2.14; sudo make'
 
       - task: Bash@3
         displayName: Download & Make Redis 7
         inputs:
           targetType: 'inline'
-          script: 'wget https://download.redis.io/releases/redis-7.0.14.tar.gz; tar -xzvf redis-7.0.14.tar.gz; cd redis-7.0.14; make'
+          script: 'sudo wget -P /redis https://download.redis.io/releases/redis-7.0.14.tar.gz; cd /redis; sudo tar -xzvf redis-7.0.14.tar.gz; cd redis-7.0.14; sudo make'
 
       - task: DotNetCoreCLI@2
         displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug

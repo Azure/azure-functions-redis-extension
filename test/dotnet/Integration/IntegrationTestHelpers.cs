@@ -15,6 +15,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         internal const string connectionStringSetting = "redisConnectionString";
         internal static int nextPort = 2000;
+        internal static string Redis60 = "/redis/redis-6.0.20";
+        internal static string Redis62 = "/redis/redis-6.2.14";
+        internal static string Redis70 = "/redis/redis-7.0.14";
 
         internal static Process StartFunction(string functionName)
         {
@@ -70,9 +73,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             return functionsProcess;
         }
 
-        internal static Process StartRedis()
+        internal static Process StartRedis(string versionPath)
         {
-            ProcessStartInfo info = GetRedisProcessStartInfo(Interlocked.Increment(ref nextPort));
+            ProcessStartInfo info = GetRedisProcessStartInfo(versionPath, 6379);
 
             Process redisProcess = new Process() { StartInfo = info };
 
@@ -121,10 +124,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
         private static string GetFunctionsFileName()
         {
-            string filepath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? @"C:\Program Files\Microsoft\Azure Functions Core Tools\func.exe"
-                //? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
-                : @"/usr/bin/func"; 
+            string filepath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? GetWindowsFunctionsFilePath() : @"/usr/bin/func"; 
             if (!File.Exists(filepath))
             {
                 throw new FileNotFoundException($"Azure Functions Core Tools not found at {filepath}");
@@ -132,12 +132,33 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             return filepath;
         }
 
-        private static ProcessStartInfo GetRedisProcessStartInfo(int port)
+        private static string GetWindowsFunctionsFilePath()
+        {
+            var proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = "/c where func",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            proc.Start();
+            string filepath = proc.StandardOutput.ReadLine();
+            proc.WaitForExit();
+            return filepath;
+        }
+
+        private static ProcessStartInfo GetRedisProcessStartInfo(string versionPath, int port)
         {
             ProcessStartInfo info = new ProcessStartInfo
             {
-                FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"C:\Windows\System32\wsl.exe" : @"/usr/bin/redis-server",
-                Arguments = $"{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"/usr/bin/redis-server " : "")}--port {port} --notify-keyspace-events AKE",
+                FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"C:\Windows\System32\wsl.exe" : $"{versionPath}/src/redis-server",
+                Arguments = $"{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"{versionPath}/src/redis-server " : "")}--port {port} --notify-keyspace-events AKE",
                 WindowStyle = ProcessWindowStyle.Hidden,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
