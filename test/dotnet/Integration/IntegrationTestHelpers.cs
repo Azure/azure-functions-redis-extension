@@ -93,12 +93,33 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         private static string GetFunctionsFileName()
         {
             string filepath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"npm\node_modules\azure-functions-core-tools\bin\func.exe")
+                ? GetWindowsFunctionsFilePath()
                 : @"/usr/bin/func"; 
             if (!File.Exists(filepath))
             {
                 throw new FileNotFoundException($"Azure Functions Core Tools not found at {filepath}");
             }
+            return filepath;
+        }
+
+        private static string GetWindowsFunctionsFilePath()
+        {
+            var proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = "/c where func",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            proc.Start();
+            string filepath = proc.StandardOutput.ReadLine();
+            proc.WaitForExit();
             return filepath;
         }
 
