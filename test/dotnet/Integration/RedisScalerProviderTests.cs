@@ -5,7 +5,6 @@ using Microsoft.Azure.WebJobs.Host.Scale;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
-using Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,8 +12,9 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Azure;
+using System.Diagnostics;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     [Collection("RedisTriggerTests")]
     public class RedisScalerProviderTests
@@ -50,7 +50,10 @@ $@"{{
             A.CallTo(() => serviceProvider.GetService(typeof(IConfiguration))).Returns(IntegrationTestHelpers.localsettings);
             A.CallTo(() => serviceProvider.GetService(typeof(INameResolver))).Returns(A.Fake<INameResolver>());
             TriggerMetadata metadata = new TriggerMetadata(JObject.Parse(triggerJson));
+
+            Process redis = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60);
             RedisScalerProvider scalerProvider = new RedisScalerProvider(serviceProvider, metadata);
+            redis.Kill();
             Assert.Equal(monitorType, scalerProvider.GetMonitor().GetType().Name);
         }
 
@@ -89,6 +92,7 @@ $@"{{
                 scaleOptions.ScaleMetricsSampleInterval = TimeSpan.FromSeconds(1);
             });
 
+            Process redis = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60);
             ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, "redisConnectionString"));
             await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
 
@@ -113,6 +117,7 @@ $@"{{
             AggregateScaleStatus scaleStatus = await scaleStatusProvider.GetScaleStatusAsync(new ScaleStatusContext());
 
             await scaleHost.StopAsync();
+            redis.Kill();
             Assert.Equal(ScaleVote.ScaleOut, scaleStatus.Vote);
             Assert.Equal(expectedTarget, scaleStatus.TargetWorkerCount);
         }
