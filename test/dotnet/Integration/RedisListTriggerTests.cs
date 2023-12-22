@@ -11,6 +11,7 @@ using System.Text;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
+    [Collection("RedisIntegrationTests")]
     public class RedisListTriggerTests
     {
         [Fact]
@@ -69,7 +70,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
                     await multiplexer.GetDatabase().ListLeftPushAsync(functionName, valuesArray);
 
-                    await Task.Delay(TimeSpan.FromSeconds(count / 5));
+                    await Task.Delay(TimeSpan.FromSeconds(count / 4));
 
                     await multiplexer.CloseAsync();
                     functionsProcess1.Kill();
@@ -122,7 +123,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", elements / RedisListTriggerTestFunctions.batchSize);
             counts.TryAdd(destinationType.FullName, elements / RedisListTriggerTestFunctions.batchSize);
 
-            using (Process redis = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
+            using (Process redis = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis62))
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);

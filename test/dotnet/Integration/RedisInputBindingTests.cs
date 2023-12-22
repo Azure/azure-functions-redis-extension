@@ -9,6 +9,7 @@ using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
+    [Collection("RedisIntegrationTests")]
     public class RedisInputBindingTests
     {
         [Fact]
@@ -20,6 +21,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
             counts.TryAdd($"Value of key '{functionName}' is currently a type {value.GetType()}: '{value}'", 1);
 
+            using (Process redis = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
@@ -35,6 +37,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();
                 };
+
+                redis.Kill();
                 var incorrect = counts.Where(pair => pair.Value != 0);
                 Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
             }
@@ -49,6 +53,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
             counts.TryAdd($"Value of field 'field' in hash '{functionName}' is currently '{value}'", 1);
 
+            using (Process redis = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
@@ -64,6 +69,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();
                 };
+
+                redis.Kill();
                 var incorrect = counts.Where(pair => pair.Value != 0);
                 Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
             }
@@ -78,6 +85,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
             counts.TryAdd($"Value of key '{functionName}' is currently a type {value.GetType()}: '{JsonConvert.SerializeObject(value)}'", 1);
 
+            using (Process redis = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName))
             {
@@ -90,6 +98,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
                 await multiplexer.CloseAsync();
                 functionsProcess.Kill();
+                redis.Kill();
             };
             var incorrect = counts.Where(pair => pair.Value != 0);
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
