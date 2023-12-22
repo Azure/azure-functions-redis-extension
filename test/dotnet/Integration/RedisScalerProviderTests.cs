@@ -5,7 +5,6 @@ using Microsoft.Azure.WebJobs.Host.Scale;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
-using Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +13,7 @@ using StackExchange.Redis;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Azure;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     [Collection("RedisTriggerTests")]
     public class RedisScalerProviderTests

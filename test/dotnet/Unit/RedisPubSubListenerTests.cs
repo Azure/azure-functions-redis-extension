@@ -9,26 +9,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
 {
     public class RedisPubSubListenerTests
     {
-        private const string id = nameof(RedisPubSubListenerTests);
-        private const string connectionString = "127.0.0.1:6379";
-        private const string channel = "channel";
-
-        [Fact]
-        public async void StartAsync_CreatesConnectionMultiplexer()
-        {
-            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(connectionString);
-            RedisPubSubListener listener = new RedisPubSubListener(id, multiplexer, channel, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
-            await listener.StartAsync(new CancellationToken());
-            Assert.NotNull(listener.multiplexer);
-            Assert.Equal(connectionString, listener.multiplexer.Configuration, ignoreCase: true);
-        }
-
         [Fact]
         public async void StopAsync_ClosesAndDisposesConnectionMultiplexer()
         {
-            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(connectionString);
-            RedisPubSubListener listener = new RedisPubSubListener(id, multiplexer, channel, A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
-            listener.multiplexer = A.Fake<IConnectionMultiplexer>();
+            IConnectionMultiplexer multiplexer = A.Fake<IConnectionMultiplexer>();
+            RedisPubSubListener listener = new RedisPubSubListener("name", multiplexer, "channel", A.Fake<ITriggeredFunctionExecutor>(), A.Fake<ILogger>());
             await listener.StopAsync(new CancellationToken());
             A.CallTo(() => listener.multiplexer.CloseAsync(A<bool>._)).MustHaveHappened();
             A.CallTo(() => listener.multiplexer.DisposeAsync()).MustHaveHappened();
