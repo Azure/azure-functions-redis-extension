@@ -42,10 +42,22 @@ jobs:
           script: 'wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb; sudo dpkg -i packages-microsoft-prod.deb; sudo apt-get update; sudo apt-get install -qq -y azure-functions-core-tools-4'
 
       - task: Bash@3
-        displayName: Download and start redis server, enable all keyspace/keyevent notifications
+        displayName: Download & Make Redis 6
         inputs:
           targetType: 'inline'
-          script: 'sudo apt-get install -qq -y redis; sudo service redis-server start; redis-cli config set notify-keyspace-events KEA'
+          script: 'sudo wget -P /redis https://download.redis.io/releases/redis-6.0.20.tar.gz; cd /redis; sudo tar -xzvf redis-6.0.20.tar.gz; cd redis-6.0.20; sudo make'
+
+      - task: Bash@3
+        displayName: Download & Make Redis 6.2
+        inputs:
+          targetType: 'inline'
+          script: 'sudo wget -P /redis https://download.redis.io/releases/redis-6.2.14.tar.gz; cd /redis; sudo tar -xzvf redis-6.2.14.tar.gz; cd redis-6.2.14; sudo make'
+
+      - task: Bash@3
+        displayName: Download & Make Redis 7
+        inputs:
+          targetType: 'inline'
+          script: 'sudo wget -P /redis https://download.redis.io/releases/redis-7.0.14.tar.gz; cd /redis; sudo tar -xzvf redis-7.0.14.tar.gz; cd redis-7.0.14; sudo make'
 
       - task: DotNetCoreCLI@2
         displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
