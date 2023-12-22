@@ -16,7 +16,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
-    [Collection("RedisTriggerTests")]
+    [Collection("RedisIntegrationTests")]
     public class RedisScalerProviderTests
     {
         private const string listTrigger =
