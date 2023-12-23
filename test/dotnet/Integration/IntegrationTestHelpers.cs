@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -64,6 +65,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
             functionsProcess.OutputDataReceived -= hostStartupHandler;
             functionsProcess.OutputDataReceived -= functionLoadedHandler;
+
+            // Ensure that the client name is correctly set
+            string connectionString = RedisUtilities.ResolveConnectionString(localsettings, connectionStringSetting);
+            ConfigurationOptions options = ConfigurationOptions.Parse(connectionString);
+            options.AllowAdmin = true;
+            options.ClientName = nameof(IntegrationTestHelpers);
+            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(options);
+            ClientInfo[] clients = multiplexer.GetServers()[0].ClientList();
+            if (!clients.Any(client => client.Name == "AzureFunctionsRedisExtension." + functionName))
+            {
+                functionsProcess.Kill();
+                throw new Exception("Function client not found on redis server.");
+            }
 
             return functionsProcess;
         }
