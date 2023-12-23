@@ -21,11 +21,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
             long entriesRemaining = 0;
-            if (multiplexer.GetServers()[0].Version <= RedisUtilities.Version70)
+
+            // Redis 7: Trigger gets number of unacked stream entries for the consumer group from XINFO GROUPS.
+            if (multiplexer.GetServers()[0].Version >= RedisUtilities.Version70)
             {
                 StreamGroupInfo[] groups = multiplexer.GetDatabase().StreamGroupInfo(key);
                 entriesRemaining = groups.Where(group => group.Name == name).First().Lag ?? 0;
             }
+            // Redis 6/6.2: Trigger uses a key to count the number of acked stream entries for the consumer group.
+            // Defaults to the length of the stream if that count does not exist.
             else
             {
                 long length = await multiplexer.GetDatabase().StreamLengthAsync(key);
