@@ -3,7 +3,7 @@ using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
-    public static class RedisListTriggerTestFunctions
+    public class RedisListTriggerTestFunctions
     {
         public const int pollingIntervalShort = 100;
         public const int pollingIntervalLong = 10000;

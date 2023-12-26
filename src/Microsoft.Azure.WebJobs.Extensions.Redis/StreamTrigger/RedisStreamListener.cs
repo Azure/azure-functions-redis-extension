@@ -87,7 +87,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             // This is necessary for the scale controller to accurately estimate the number of function instances needed to process unacked entries.
             if (serverVersion < RedisUtilities.Version70)
             {
-                await db.StringIncrementAsync(entriesReadKey);
+                await db.StringIncrementAsync(entriesReadKey, acknowledged);
             }
 
             logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");
@@ -104,7 +104,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             // This is necessary for the scale controller to accurately estimate the number of function instances needed to process unacked entries.
             if (serverVersion < RedisUtilities.Version70)
             {
-                await db.StringIncrementAsync(entriesReadKey);
+                await db.StringIncrementAsync(entriesReadKey, acknowledged);
             }
 
             logger?.LogDebug($"{logPrefix} Acknowledged {acknowledged} entries from the stream at key '{key}'.");

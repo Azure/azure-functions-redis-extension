@@ -14,9 +14,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     internal static class IntegrationTestHelpers
     {
         internal const string connectionStringSetting = "redisConnectionString";
-        internal static string Redis60 = "/redis/redis-6.0.20";
-        internal static string Redis62 = "/redis/redis-6.2.14";
-        internal static string Redis70 = "/redis/redis-7.0.14";
+        internal const string Redis60 = "/redis/redis-6.0.20";
+        internal const string Redis62 = "/redis/redis-6.2.14";
+        internal const string Redis70 = "/redis/redis-7.0.14";
 
         internal static Process StartFunction(string functionName, int port)
         {
