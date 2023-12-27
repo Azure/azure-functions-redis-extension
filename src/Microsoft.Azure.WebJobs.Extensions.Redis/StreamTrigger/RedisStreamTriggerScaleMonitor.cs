@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             if (multiplexer.GetServers()[0].Version >= RedisUtilities.Version70 && group.Lag.HasValue)
             {
                 // Redis 7: Scaler gets number of remaining entries for the consumer group from XINFO GROUPS.
-                new RedisPollingTriggerBaseMetrics
+                return new RedisPollingTriggerBaseMetrics
                 {
                     Remaining = group.Lag.Value,
                     Timestamp = DateTime.UtcNow,
