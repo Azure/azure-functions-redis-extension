@@ -21,20 +21,36 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
             long entriesRemaining = 0;
+            long streamLength = await multiplexer.GetDatabase().StreamLengthAsync(key);
+            StreamGroupInfo group = multiplexer.GetDatabase().StreamGroupInfo(key).Where(g => g.Name == name).First();
+            long? lag = group.Lag;
 
-            // Redis 7: Trigger gets number of unacked stream entries for the consumer group from XINFO GROUPS.
-            if (multiplexer.GetServers()[0].Version >= RedisUtilities.Version70)
+            if (lag.HasValue)
             {
-                StreamGroupInfo[] groups = multiplexer.GetDatabase().StreamGroupInfo(key);
-                entriesRemaining = groups.Where(group => group.Name == name).First().Lag ?? 0;
+                // Redis 7: Scaler gets number of unacked stream entries for the consumer group from XINFO GROUPS.
+                entriesRemaining = lag.Value;
             }
-            // Redis 6/6.2: Trigger uses a key to count the number of acked stream entries for the consumer group.
-            // Defaults to the length of the stream if that count does not exist.
             else
             {
-                long length = await multiplexer.GetDatabase().StreamLengthAsync(key);
-                long processed = (long) await multiplexer.GetDatabase().StringGetAsync(RedisScalerProvider.GetFunctionScalerId(name, "RedisStreamTrigger", key));
-                entriesRemaining = length - processed;
+                /* Redis 6/6.2 does not have an internal counter for the number of remaining entries for the consumer group to read
+                 * We estimate number of remaining entries in the stream, assuming the following:
+                 * - default ID structure ("unixtime-counter")
+                 * - entries are added at a constant rate over time
+                 */
+                StreamInfo info = await multiplexer.GetDatabase().StreamInfoAsync(key);
+                string firstId = (string)info.FirstEntry.Id;
+                string lastId = (string)info.LastEntry.Id;
+                string lastDeliveredId = group.LastDeliveredId;
+
+                long firstTimestamp = long.Parse(firstId.Split('-')[0]);
+                long lastTimestamp = long.Parse(lastId.Split('-')[0]);
+                long lastDeliveredTimestamp = long.Parse(lastDeliveredId.Split('-')[0]);
+
+                decimal timeRemaining = lastTimestamp - lastDeliveredTimestamp;
+                decimal timeTotal = lastTimestamp - firstTimestamp;
+                decimal percentageRemaining = timeRemaining / timeTotal;
+
+                entriesRemaining = (long) Math.Ceiling(percentageRemaining * streamLength);
             }
 
             RedisPollingTriggerBaseMetrics metrics = new RedisPollingTriggerBaseMetrics
