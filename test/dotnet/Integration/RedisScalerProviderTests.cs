@@ -80,7 +80,6 @@ $@"{{
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
 
-
                 // add some messages
                 if (triggerMetadata.Type.Equals("redisListTrigger"))
                 {
@@ -97,14 +96,12 @@ $@"{{
 
                 IScaleStatusProvider scaleStatusProvider = scaleHost.Services.GetService<IScaleStatusProvider>();
                 scaleStatus = await scaleStatusProvider.GetScaleStatusAsync(new ScaleStatusContext());
-
                 await scaleHost.StopAsync();
                 IntegrationTestHelpers.StopRedis(redisProcess);
                 multiplexer.Close();
             }
             Assert.Equal(expectedTarget, scaleStatus.TargetWorkerCount);
         }
-
 
         [Theory]
         [InlineData(IntegrationTestHelpers.Redis60, 100, 0)]
