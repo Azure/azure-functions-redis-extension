@@ -20,27 +20,47 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            long entriesRemaining = 0;
             long streamLength = await multiplexer.GetDatabase().StreamLengthAsync(key);
-            StreamGroupInfo group = multiplexer.GetDatabase().StreamGroupInfo(key).Where(g => g.Name == name).First();
-            long? lag = group.Lag;
+            if (streamLength == 0)
+            {
+                return new RedisPollingTriggerBaseMetrics
+                {
+                    Remaining = 0,
+                    Timestamp = DateTime.UtcNow,
+                };
+            }
 
-            if (lag.HasValue)
+            StreamGroupInfo[] groups = multiplexer.GetDatabase().StreamGroupInfo(key);
+            if (!groups.Any(g => g.Name == name))
+            {
+                // group doesn't exist, assume all entries in stream have not been processed
+                return new RedisPollingTriggerBaseMetrics
+                {
+                    Remaining = streamLength,
+                    Timestamp = DateTime.UtcNow,
+                };
+            }
+
+            StreamGroupInfo group = groups.First(g => g.Name == name);
+            long entriesRemaining = 0;
+
+            if (multiplexer.GetServers()[0].Version >= RedisUtilities.Version70 && group.Lag.HasValue)
             {
                 // Redis 7: Scaler gets number of unacked stream entries for the consumer group from XINFO GROUPS.
-                entriesRemaining = lag.Value;
+                entriesRemaining = group.Lag.Value;
             }
             else
             {
-                /* Redis 6/6.2 does not have an internal counter for the number of remaining entries for the consumer group to read
-                 * We estimate number of remaining entries in the stream, assuming the following:
+                /*
+                 * Redis 6/6.2 does not have an internal counter for the number of remaining entries for the consumer group to read
+                 * Estimate number of remaining entries in the stream using the unixtime field from the entry IDs:
                  * - default ID structure ("unixtime-counter")
                  * - entries are added at a constant rate over time
                  */
                 StreamInfo info = await multiplexer.GetDatabase().StreamInfoAsync(key);
                 string firstId = (string)info.FirstEntry.Id;
                 string lastId = (string)info.LastEntry.Id;
-                string lastDeliveredId = group.LastDeliveredId;
+                string lastDeliveredId = group.LastDeliveredId ?? firstId;
 
                 long firstTimestamp = long.Parse(firstId.Split('-')[0]);
                 long lastTimestamp = long.Parse(lastId.Split('-')[0]);
@@ -50,7 +70,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 decimal timeTotal = lastTimestamp - firstTimestamp;
                 decimal percentageRemaining = timeRemaining / timeTotal;
 
-                entriesRemaining = (long) Math.Ceiling(percentageRemaining * streamLength);
+                entriesRemaining = Math.Min(streamLength, (long) Math.Ceiling(percentageRemaining * streamLength));
             }
 
             RedisPollingTriggerBaseMetrics metrics = new RedisPollingTriggerBaseMetrics
