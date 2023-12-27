@@ -122,7 +122,7 @@ $@"{{
 
             AggregateScaleStatus scaleStatus;
             long streamLength;
-            //using (Process redisProcess = IntegrationTestHelpers.StartRedis(redisVersion))
+            using (Process redisProcess = IntegrationTestHelpers.StartRedis(redisVersion))
             using (IHost scaleHost = await CreateScaleHostAsync(triggerMetadata))
             using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             {
@@ -146,7 +146,7 @@ $@"{{
                 IScaleStatusProvider scaleStatusProvider = scaleHost.Services.GetService<IScaleStatusProvider>();
                 scaleStatus = await scaleStatusProvider.GetScaleStatusAsync(new ScaleStatusContext());
                 await scaleHost.StopAsync();
-                //IntegrationTestHelpers.StopRedis(redisProcess);
+                IntegrationTestHelpers.StopRedis(redisProcess);
             }
             Assert.Equal(processed + unprocessed, streamLength);
             Assert.Equal(unprocessed / RedisStreamTriggerTestFunctions.batchSize, scaleStatus.TargetWorkerCount);
