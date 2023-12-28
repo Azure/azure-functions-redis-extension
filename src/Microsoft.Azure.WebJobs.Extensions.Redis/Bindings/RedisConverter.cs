@@ -27,7 +27,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string fullCommand = RedisUtilities.ResolveString(nameResolver, input.Command, nameof(input.Command));
             IDatabase db = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, input.ConnectionStringSetting).GetDatabase();
 
-            string[] splitCommand = fullCommand.Split(' ');
+            string[] splitCommand = fullCommand.Split(RedisUtilities.BindingDelimiter);
             string command = splitCommand[0];
             if (!SingleOutputReadCommands.Contains(command))
             {
@@ -36,7 +36,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             string[] arguments = splitCommand.Skip(1).ToArray();
 
-            logger?.LogDebug($"Executing command '{command}'");
+            logger?.LogDebug($"Executing '{fullCommand}'.");
             RedisResult result = await db.ExecuteAsync(command, arguments);
             return (T)RedisResultTypeConverter(result, typeof(T));
         }
