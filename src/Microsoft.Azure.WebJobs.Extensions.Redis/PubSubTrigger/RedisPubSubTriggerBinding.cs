@@ -2,6 +2,7 @@
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -15,14 +16,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     internal class RedisPubSubTriggerBinding : ITriggerBinding
     {
-        private readonly IConnectionMultiplexer multiplexer;
+        private readonly IConfiguration configuration;
+        private readonly string connectionStringSetting;
         private readonly string channel;
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisPubSubTriggerBinding(IConnectionMultiplexer multiplexer, string channel, Type parameterType, ILogger logger)
+        public RedisPubSubTriggerBinding(IConfiguration configuration, string connectionStringSetting, string channel, Type parameterType, ILogger logger)
         {
-            this.multiplexer = multiplexer;
+            this.configuration = configuration;
+            this.connectionStringSetting = connectionStringSetting;
             this.channel = channel;
             this.parameterType = parameterType;
             this.logger = logger;
@@ -45,6 +48,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
+            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting, context.Descriptor.ShortName);
             return Task.FromResult<IListener>(new RedisPubSubListener(context.Descriptor.LogName, multiplexer, channel, context.Executor, logger));
         }
 

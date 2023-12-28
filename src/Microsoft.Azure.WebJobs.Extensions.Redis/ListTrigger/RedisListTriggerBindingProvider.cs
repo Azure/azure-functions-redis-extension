@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Triggers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -41,13 +40,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 return Task.FromResult<ITriggerBinding>(null);
             }
 
-            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, attribute.ConnectionStringSetting);
             string key = RedisUtilities.ResolveString(nameResolver, attribute.Key, nameof(attribute.Key));
-            int maxBatchSize = attribute.MaxBatchSize;
             TimeSpan pollingInterval = TimeSpan.FromMilliseconds(attribute.PollingIntervalInMs);
-            bool listPopFromBeginning = attribute.ListPopFromBeginning;
 
-            return Task.FromResult<ITriggerBinding>(new RedisListTriggerBinding(multiplexer, key, pollingInterval, maxBatchSize, listPopFromBeginning, parameter.ParameterType, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisListTriggerBinding(configuration, attribute.ConnectionStringSetting, key, pollingInterval, attribute.MaxBatchSize, attribute.ListPopFromBeginning, parameter.ParameterType, logger));
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisStreamT
 
         [Function(nameof(CustomTypeStreamTrigger))]
         public void Run(
-            [RedisStreamTrigger(Common.localhostSetting, "streamKey")] Common.CustomType entry)
+            [RedisStreamTrigger(Common.connectionStringSetting, "streamKey")] Common.CustomType entry)
         {
             logger.LogInformation(JsonConvert.SerializeObject(entry));
         }

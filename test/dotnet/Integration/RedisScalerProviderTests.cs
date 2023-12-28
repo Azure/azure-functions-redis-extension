@@ -5,7 +5,6 @@ using Microsoft.Azure.WebJobs.Host.Scale;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
-using Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +13,7 @@ using StackExchange.Redis;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Azure;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     [Collection("RedisTriggerTests")]
     public class RedisScalerProviderTests
@@ -25,7 +24,7 @@ $@"{{
     ""type"": ""redisListTrigger"",
     ""direction"": ""in"",
     ""functionName"": ""listTestName"",
-    ""connectionStringSetting"": ""redisLocalhost"",
+    ""connectionStringSetting"": ""redisConnectionString"",
     ""key"": ""listScaleTestKey"",
     ""maxBatchSize"": ""16"",
 }}";
@@ -36,7 +35,7 @@ $@"{{
     ""type"": ""redisStreamTrigger"",
     ""direction"": ""in"",
     ""functionName"": ""streamTestName"",
-    ""connectionStringSetting"": ""redisLocalhost"",
+    ""connectionStringSetting"": ""redisConnectionString"",
     ""key"": ""streamScaleTestKey"",
     ""maxBatchSize"": ""16"",
 }}";
@@ -89,7 +88,7 @@ $@"{{
                 scaleOptions.ScaleMetricsSampleInterval = TimeSpan.FromSeconds(1);
             });
 
-            ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, "redisLocalHost"));
+            ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, "redisConnectionString"));
             await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
 
             IHost scaleHost = hostBuilder.Build();

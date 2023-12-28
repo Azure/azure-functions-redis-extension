@@ -13,8 +13,8 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisInputBi
 
         [Function(nameof(SetGetter))]
         public void Run(
-            [RedisPubSubTrigger(Common.localhostSetting, "__keyevent@0__:set")] string key,
-            [RedisInput(Common.localhostSetting, "GET {Message}")] string value)
+            [RedisPubSubTrigger(Common.connectionStringSetting, "__keyevent@0__:set")] string key,
+            [RedisInput(Common.connectionStringSetting, "GET {Message}")] string value)
         {
             logger.LogInformation($"Key '{key}' was set to value '{value}'");
         }

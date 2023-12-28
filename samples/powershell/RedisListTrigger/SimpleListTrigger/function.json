@@ -3,7 +3,7 @@
         {
             "type": "redisListTrigger",
             "listPopFromBeginning": true,
-            "connectionStringSetting": "redisLocalhost",
+            "connectionStringSetting": "redisConnectionString",
             "key": "listTest",
             "pollingIntervalInMs": 1000,
             "maxBatchSize": 16,

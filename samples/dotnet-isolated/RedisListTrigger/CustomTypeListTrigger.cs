@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisListTri
 
         [Function(nameof(CustomTypeListTrigger))]
         public void Run(
-            [RedisListTrigger(Common.localhostSetting, "listKey")] Common.CustomType entry)
+            [RedisListTrigger(Common.connectionStringSetting, "listKey")] Common.CustomType entry)
         {
             logger.LogInformation(JsonConvert.SerializeObject(entry));
         }

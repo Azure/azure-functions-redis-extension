@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisPubSubTrigger
     {
         [FunctionName(nameof(SimplePubSubTrigger))]
         public static void Run(
-            [RedisPubSubTrigger(Common.localhostSetting, "pubsubTest")] string message,
+            [RedisPubSubTrigger(Common.connectionStringSetting, "pubsubTest")] string message,
             ILogger logger)
         {
             logger.LogInformation(message);

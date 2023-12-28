@@ -2,6 +2,7 @@
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -15,16 +16,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     internal class RedisStreamTriggerBinding : ITriggerBinding
     {
-        private readonly IConnectionMultiplexer multiplexer;
+        private readonly IConfiguration configuration;
+        private readonly string connectionStringSetting;
         private readonly TimeSpan pollingInterval;
         private readonly string key;
         private readonly int maxBatchSize;
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisStreamTriggerBinding(IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, Type parameterType, ILogger logger)
+        public RedisStreamTriggerBinding(IConfiguration configuration, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, Type parameterType, ILogger logger)
         {
-            this.multiplexer = multiplexer;
+            this.configuration = configuration;
+            this.connectionStringSetting = connectionStringSetting;
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
@@ -59,6 +62,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
+            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting, context.Descriptor.ShortName);
             return Task.FromResult<IListener>(new RedisStreamListener(
                 context.Descriptor.LogName,
                 multiplexer,

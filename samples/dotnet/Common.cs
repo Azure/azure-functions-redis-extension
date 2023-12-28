@@ -2,7 +2,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
 {
     public static class Common
     {
-        public const string localhostSetting = "redisLocalhost";
+        public const string connectionStringSetting = "redisConnectionString";
 
         public class CustomType
         {

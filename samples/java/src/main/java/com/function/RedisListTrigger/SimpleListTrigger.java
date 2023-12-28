@@ -9,7 +9,7 @@ public class SimpleListTrigger {
     public void run(
             @RedisListTrigger(
                 name = "req",
-                connectionStringSetting = "redisLocalhost",
+                connectionStringSetting = "redisConnectionString",
                 key = "listTest",
                 pollingIntervalInMs = 1000,
                 maxBatchSize = 1)

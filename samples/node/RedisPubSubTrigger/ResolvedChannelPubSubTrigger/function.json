@@ -2,7 +2,7 @@
   "bindings": [
     {
       "type": "redisPubSubTrigger",
-      "connectionStringSetting": "redisLocalhost",
+      "connectionStringSetting": "redisConnectionString",
       "channel": "%pubsubChannel%",
       "name": "message",
       "direction": "in"

@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisListTrigger
     {
         [FunctionName(nameof(FastPollingListTrigger))]
         public static void Run(
-            [RedisListTrigger(Common.localhostSetting, "listKey", pollingIntervalInMs: 100)] string entry,
+            [RedisListTrigger(Common.connectionStringSetting, "listKey", pollingIntervalInMs: 100)] string entry,
             ILogger logger)
         {
             logger.LogInformation(entry);
