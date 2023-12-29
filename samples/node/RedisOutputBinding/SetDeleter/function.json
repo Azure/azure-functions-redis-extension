@@ -1,0 +1,19 @@
+{
+    "bindings": [
+        {
+            "type": "redisPubSubTrigger",
+            "connectionStringSetting": "redisConnectionString",
+            "channel": "__keyevent@0__:set",
+            "name": "key",
+            "direction": "in"
+        },
+        {
+            "type": "redis",
+            "connectionStringSetting": "redisConnectionString",
+            "command": "DEL",
+            "name": "$return",
+            "direction": "out"
+        }
+    ],
+    "scriptFile": "index.js"
+}
