@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public Task AddAsync(string argument, CancellationToken cancellationToken = default)
         {
-            logger?.LogDebug($"Batching '{command} {argument}'.");
+            logger?.LogDebug($"Adding {command} command to batch with input string argument '{argument}'.");
             _ = batch.ExecuteAsync(command, argument.Split(RedisUtilities.BindingDelimiter), CommandFlags.FireAndForget);
             return Task.CompletedTask;
         }

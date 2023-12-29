@@ -25,7 +25,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         public string ConnectionStringSetting { get; }
 
         /// <summary>
-        /// The command to be executed on the cache.
+        /// The full command to be executed on the cache, with space-delimited arguments.
         /// </summary>
         public string Command { get; }
     }
