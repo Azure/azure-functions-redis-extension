@@ -160,7 +160,7 @@ public static void SetGetter(
 > All commands are supported for this binding.
 
 #### Function Return type
-- `string[]`: Arguments for the redis command.
+- `string`: Space-delimited arguments for the redis command.
 
 #### Sample
 The following deletes any key that was recently set.
@@ -168,11 +168,11 @@ The following deletes any key that was recently set.
 [FunctionName(nameof(SetDeleter))]
 public static void SetDeleter(
     [RedisPubSubTrigger("Redis", "__keyevent@0__:set")] string key,
-    [Redis("Redis", "DEL")] out string[] arguments,
+    [Redis("Redis", "DEL")] out string arguments,
     ILogger logger)
 {
     logger.LogInformation($"Deleting recently SET key '{key}'");
-    arguments = new string[] { key };
+    arguments = key;
 }
 ```
 
