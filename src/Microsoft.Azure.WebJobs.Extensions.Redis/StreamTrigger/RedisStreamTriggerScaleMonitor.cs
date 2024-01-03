@@ -52,17 +52,26 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 };
             }
 
+            StreamInfo info = await multiplexer.GetDatabase().StreamInfoAsync(key);
+            string firstId = (string)info.FirstEntry.Id;
+            string lastId = (string)info.LastEntry.Id;
+            string lastDeliveredId = group.LastDeliveredId ?? firstId;
+            if (lastId == lastDeliveredId)
+            {
+                // processed all entries in the stream
+                return new RedisPollingTriggerBaseMetrics
+                {
+                    Remaining = 0,
+                    Timestamp = DateTime.UtcNow,
+                };
+            }
+
             /*
              * Redis 6/6.2 does not have an internal counter for the number of remaining entries for the consumer group to read
              * Estimate number of remaining entries in the stream using the unixtime field from the entry IDs:
              * - default ID structure ("unixtime-counter")
              * - entries are added at a constant rate over time
             */
-            StreamInfo info = await multiplexer.GetDatabase().StreamInfoAsync(key);
-            string firstId = (string)info.FirstEntry.Id;
-            string lastId = (string)info.LastEntry.Id;
-            string lastDeliveredId = group.LastDeliveredId ?? firstId;
-
             long firstTimestamp = long.Parse(firstId.Split('-')[0]);
             long lastTimestamp = long.Parse(lastId.Split('-')[0]);
             long lastDeliveredTimestamp = long.Parse(lastDeliveredId.Split('-')[0]);
@@ -70,7 +79,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             decimal timeRemaining = lastTimestamp - lastDeliveredTimestamp;
             decimal timeTotal = lastTimestamp - firstTimestamp;
             decimal percentageRemaining = timeRemaining / timeTotal;
-            long estimatedRemaining = Math.Min(streamLength, (long)Math.Ceiling(percentageRemaining * streamLength));
+            long estimatedRemaining = (long) Math.Min(streamLength, Math.Max(1, percentageRemaining * streamLength));
 
             return new RedisPollingTriggerBaseMetrics
             {
