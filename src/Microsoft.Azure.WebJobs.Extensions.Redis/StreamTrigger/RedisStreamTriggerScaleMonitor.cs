@@ -66,21 +66,32 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 };
             }
 
-            /*
-             * Redis 6/6.2 does not have an internal counter for the number of remaining entries for the consumer group to read
-             * Estimate number of remaining entries in the stream using the unixtime field from the entry IDs:
-             * - default ID structure ("unixtime-counter")
-             * - entries are added at a constant rate over time
-            */
-            long firstTimestamp = long.Parse(firstId.Split('-')[0]);
-            long lastTimestamp = long.Parse(lastId.Split('-')[0]);
-            long lastDeliveredTimestamp = long.Parse(lastDeliveredId.Split('-')[0]);
+            // Redis 6/6.2 does not have an internal counter for remaining entries for the consumer group
+            // Estimate remaining entries using the time field from the entry ID (assuming ID="time-counter")
+            string[] firstIdSplit = firstId.Split('-');
+            string[] lastIdSplit = lastId.Split('-');
+            string[] lastDeliveredIdSplit = lastDeliveredId.Split('-');
+            long firstTimestamp = long.Parse(firstIdSplit[0]);
+            long lastTimestamp = long.Parse(lastIdSplit[0]);
+            long lastDeliveredTimestamp = long.Parse(lastDeliveredIdSplit[0]);
 
-            decimal timeRemaining = lastTimestamp - lastDeliveredTimestamp;
-            decimal timeTotal = lastTimestamp - firstTimestamp;
+            if (lastTimestamp == lastDeliveredTimestamp)
+            {
+                // If timestamp is the same, return counter difference
+                long lastCounter = long.Parse(lastIdSplit[1]);
+                long lastDelieveredCoutner = long.Parse(lastDeliveredIdSplit[1]);
+                return new RedisPollingTriggerBaseMetrics
+                {
+                    Remaining = Math.Min(streamLength, Math.Max(1, lastCounter - lastDelieveredCoutner)),
+                    Timestamp = DateTime.UtcNow,
+                };
+            }
+
+            // Assume percentage of time processsed as percentage of entries processed
+            decimal timeRemaining = Math.Max(1, lastTimestamp - lastDeliveredTimestamp);
+            decimal timeTotal = Math.Max(1, lastTimestamp - firstTimestamp);
             decimal percentageRemaining = timeRemaining / timeTotal;
             long estimatedRemaining = (long) Math.Min(streamLength, Math.Max(1, percentageRemaining * streamLength));
-
             return new RedisPollingTriggerBaseMetrics
             {
                 Remaining = estimatedRemaining,
