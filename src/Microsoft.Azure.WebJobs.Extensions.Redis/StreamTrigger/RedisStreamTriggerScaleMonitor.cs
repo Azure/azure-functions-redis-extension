@@ -71,18 +71,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string[] firstIdSplit = firstId.Split('-');
             string[] lastIdSplit = lastId.Split('-');
             string[] lastDeliveredIdSplit = lastDeliveredId.Split('-');
-            long firstTimestamp = long.Parse(firstIdSplit[0]);
-            long lastTimestamp = long.Parse(lastIdSplit[0]);
-            long lastDeliveredTimestamp = long.Parse(lastDeliveredIdSplit[0]);
+            ulong firstTimestamp = ulong.Parse(firstIdSplit[0]);
+            ulong lastTimestamp = ulong.Parse(lastIdSplit[0]);
+            ulong lastDeliveredTimestamp = ulong.Parse(lastDeliveredIdSplit[0]);
 
             if (lastTimestamp == lastDeliveredTimestamp)
             {
                 // If timestamp is the same, return counter difference
-                long lastCounter = long.Parse(lastIdSplit[1]);
-                long lastDelieveredCoutner = long.Parse(lastDeliveredIdSplit[1]);
+                ulong lastCounter = ulong.Parse(lastIdSplit[1]);
+                ulong lastDelieveredCoutner = ulong.Parse(lastDeliveredIdSplit[1]);
                 return new RedisPollingTriggerBaseMetrics
                 {
-                    Remaining = Math.Min(streamLength, Math.Max(1, lastCounter - lastDelieveredCoutner)),
+                    Remaining = Math.Min(streamLength, (long)Math.Max(1, lastCounter - lastDelieveredCoutner)),
                     Timestamp = DateTime.UtcNow,
                 };
             }
