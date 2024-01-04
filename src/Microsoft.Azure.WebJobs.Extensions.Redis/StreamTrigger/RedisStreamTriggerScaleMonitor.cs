@@ -88,9 +88,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             // Assume percentage of time processsed as percentage of entries processed
-            decimal timeRemaining = Math.Max(1, lastTimestamp - lastDeliveredTimestamp);
-            decimal timeTotal = Math.Max(1, lastTimestamp - firstTimestamp);
-            decimal percentageRemaining = timeRemaining / timeTotal;
+            double timeRemaining = Math.Max(1, lastTimestamp - lastDeliveredTimestamp);
+            double timeTotal = Math.Max(1, lastTimestamp - firstTimestamp);
+            double percentageRemaining = timeRemaining / timeTotal;
             long estimatedRemaining = (long) Math.Min(streamLength, Math.Max(1, percentageRemaining * streamLength));
             return new RedisPollingTriggerBaseMetrics
             {
