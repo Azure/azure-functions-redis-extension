@@ -14,6 +14,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     internal static class IntegrationTestHelpers
     {
         internal const string connectionStringSetting = "redisConnectionString";
+        internal static string Redis60 = "/redis/redis-6.0.20";
+        internal static string Redis62 = "/redis/redis-6.2.14";
+        internal static string Redis70 = "/redis/redis-7.0.14";
 
         internal static Process StartFunction(string functionName, int port)
         {
@@ -80,6 +83,64 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
 
             return functionsProcess;
+        }
+
+        internal static Process StartRedis(string versionPath)
+        {
+            ProcessStartInfo info = new ProcessStartInfo
+            {
+                FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"C:\Windows\System32\wsl.exe" : $"{versionPath}/src/redis-server",
+                Arguments = $"{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"{versionPath}/src/redis-server " : "")}--port 6379 --notify-keyspace-events AKE",
+                WindowStyle = ProcessWindowStyle.Hidden,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
+            };
+
+            Process redisProcess = new Process() { StartInfo = info };
+
+            TaskCompletionSource<bool> hostStarted = new TaskCompletionSource<bool>();
+            void hostStartupHandler(object sender, DataReceivedEventArgs e)
+            {
+                if (e.Data?.Contains("* Ready to accept connections") ?? false)
+                {
+                    hostStarted.SetResult(true);
+                }
+            }
+            redisProcess.OutputDataReceived += hostStartupHandler;
+
+            redisProcess.Start();
+            redisProcess.BeginOutputReadLine();
+            redisProcess.BeginErrorReadLine();
+            if (!hostStarted.Task.Wait(TimeSpan.FromMinutes(1)))
+            {
+                StopRedis(redisProcess);
+                throw new Exception("Redis did not start");
+            }
+            return redisProcess;
+        }
+
+        internal static void StopRedis(Process redis)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                redis.Kill();
+            }
+            else
+            {
+                ProcessStartInfo info = new ProcessStartInfo
+                {
+                    FileName = @"C:\Windows\System32\wsl.exe",
+                    Arguments = "pkill redis-server",
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false
+                };
+                Process redisKillProcess = new Process() { StartInfo = info };
+                redisKillProcess.Start();
+                redisKillProcess.WaitForExit();
+            }
         }
 
         internal static DataReceivedEventHandler CounterHandlerCreator(IDictionary<string, int> counts)
