@@ -46,6 +46,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
         }
 
+        public static string GetFunctionScalerId(string name, string type, string key) => $"{name}-{type}-{key}";
+
         public class RedisPollingTriggerMetadata
         {
             [JsonProperty]

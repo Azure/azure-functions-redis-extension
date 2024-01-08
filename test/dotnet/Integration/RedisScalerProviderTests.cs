@@ -13,7 +13,6 @@ using StackExchange.Redis;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Azure;
 using System.Diagnostics;
-using Microsoft.Identity.Client;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
@@ -22,24 +21,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         private const string listTrigger =
 $@"{{
-    ""name"": ""listTest"",
+    ""name"": ""{nameof(RedisListTriggerTestFunctions.ListTrigger_Batch_String)}"",
     ""type"": ""redisListTrigger"",
     ""direction"": ""in"",
-    ""functionName"": ""listTestName"",
-    ""connectionStringSetting"": ""redisConnectionString"",
-    ""key"": ""listScaleTestKey"",
-    ""maxBatchSize"": ""16"",
+    ""functionName"": ""{nameof(RedisListTriggerTestFunctions.ListTrigger_Batch_String)}"",
+    ""connectionStringSetting"": ""{IntegrationTestHelpers.connectionStringSetting}"",
+    ""key"": ""{nameof(RedisListTriggerTestFunctions.ListTrigger_Batch_String)}"",
+    ""maxBatchSize"": ""10"",
 }}";
 
         private const string streamTrigger =
 $@"{{
-    ""name"": ""streamTest"",
+    ""name"": ""{nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_String)}"",
     ""type"": ""redisStreamTrigger"",
     ""direction"": ""in"",
-    ""functionName"": ""streamTestName"",
-    ""connectionStringSetting"": ""redisConnectionString"",
-    ""key"": ""streamScaleTestKey"",
-    ""maxBatchSize"": ""16"",
+    ""functionName"": ""{nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_String)}"",
+    ""connectionStringSetting"": ""{IntegrationTestHelpers.connectionStringSetting}"",
+    ""key"": ""{nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_String)}"",
+    ""maxBatchSize"": ""10"",
 }}";
 
         [Theory]
@@ -63,14 +62,143 @@ $@"{{
         }
 
         [Theory]
-        [InlineData(listTrigger, 127, 8)]
-        [InlineData(streamTrigger, 127, 8)]
+        [InlineData(listTrigger, 0, 0)]
+        [InlineData(listTrigger, 1, 1)]
+        [InlineData(listTrigger, 100, 10)]
+        [InlineData(streamTrigger, 0, 0)]
+        [InlineData(streamTrigger, 1, 1)]
+        [InlineData(streamTrigger, 100, 10)]
         public async Task ScaleHostEndToEndTest(string triggerJson, int elements, int expectedTarget)
+        {
+            TriggerMetadata triggerMetadata = new TriggerMetadata(JObject.Parse(triggerJson));
+            RedisScalerProvider.RedisPollingTriggerMetadata redisMetadata = JsonConvert.DeserializeObject<RedisScalerProvider.RedisPollingTriggerMetadata>(triggerMetadata.Metadata.ToString());
+
+            AggregateScaleStatus scaleStatus;
+            using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
+            using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (IHost scaleHost = await CreateScaleHostAsync(triggerMetadata))
+            {
+                await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
+
+                // add some messages
+                if (triggerMetadata.Type.Equals("redisListTrigger"))
+                {
+                    RedisValue[] values = Enumerable.Range(0, elements).Select(x => new RedisValue(x.ToString())).ToArray();
+                    await multiplexer.GetDatabase().ListLeftPushAsync(redisMetadata.key, values);
+                }
+                if (triggerMetadata.Type.Equals("redisStreamTrigger"))
+                {
+                    foreach (int value in Enumerable.Range(0, elements))
+                    {
+                        await multiplexer.GetDatabase().StreamAddAsync(redisMetadata.key, value, value);
+                    }
+                }
+
+                IScaleStatusProvider scaleStatusProvider = scaleHost.Services.GetService<IScaleStatusProvider>();
+                scaleStatus = await scaleStatusProvider.GetScaleStatusAsync(new ScaleStatusContext());
+                await scaleHost.StopAsync();
+                IntegrationTestHelpers.StopRedis(redisProcess);
+                multiplexer.Close();
+            }
+            Assert.Equal(expectedTarget, scaleStatus.TargetWorkerCount);
+        }
+
+        [Theory]
+        [InlineData(IntegrationTestHelpers.Redis60, 100, 0)]
+        [InlineData(IntegrationTestHelpers.Redis60, 0, 100)]
+        [InlineData(IntegrationTestHelpers.Redis62, 100, 0)]
+        [InlineData(IntegrationTestHelpers.Redis62, 0, 100)]
+        [InlineData(IntegrationTestHelpers.Redis70, 100, 0)]
+        [InlineData(IntegrationTestHelpers.Redis70, 50, 50)]
+        [InlineData(IntegrationTestHelpers.Redis70, 0, 100)]
+        public async Task RedisStreamTrigger_SomeElementsProcessed_CalculatesUnprocessedExactly(string redisVersion, int processed, int unprocessed)
+        {
+            string functionName = nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_String);
+            TriggerMetadata triggerMetadata = new TriggerMetadata(JObject.Parse(streamTrigger));
+            RedisScalerProvider.RedisPollingTriggerMetadata redisMetadata = JsonConvert.DeserializeObject<RedisScalerProvider.RedisPollingTriggerMetadata>(triggerMetadata.Metadata.ToString());
+
+            AggregateScaleStatus scaleStatus;
+            long streamLength;
+            using (Process redisProcess = IntegrationTestHelpers.StartRedis(redisVersion))
+            using (IHost scaleHost = await CreateScaleHostAsync(triggerMetadata))
+            using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            {
+                await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
+                foreach (int value in Enumerable.Range(0, processed))
+                {
+                    await multiplexer.GetDatabase().StreamAddAsync(redisMetadata.key, value, value);
+                }
+
+                Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071);
+                await Task.Delay(TimeSpan.FromMilliseconds(2 * processed / RedisStreamTriggerTestFunctions.batchSize * RedisStreamTriggerTestFunctions.pollingIntervalShort));
+                functionsProcess.Kill();
+
+                foreach (int value in Enumerable.Range(processed, unprocessed))
+                {
+                    await multiplexer.GetDatabase().StreamAddAsync(redisMetadata.key, value, value);
+                }
+                streamLength = multiplexer.GetDatabase().StreamLength(redisMetadata.key);
+                multiplexer.Close();
+
+                IScaleStatusProvider scaleStatusProvider = scaleHost.Services.GetService<IScaleStatusProvider>();
+                scaleStatus = await scaleStatusProvider.GetScaleStatusAsync(new ScaleStatusContext());
+                await scaleHost.StopAsync();
+                IntegrationTestHelpers.StopRedis(redisProcess);
+            }
+            Assert.Equal(processed + unprocessed, streamLength);
+            Assert.Equal(unprocessed / RedisStreamTriggerTestFunctions.batchSize, scaleStatus.TargetWorkerCount);
+        }
+
+        [Theory]
+        [InlineData(IntegrationTestHelpers.Redis60, 75, 25)]
+        [InlineData(IntegrationTestHelpers.Redis60, 50, 50)]
+        [InlineData(IntegrationTestHelpers.Redis60, 25, 75)]
+        [InlineData(IntegrationTestHelpers.Redis62, 75, 25)]
+        [InlineData(IntegrationTestHelpers.Redis62, 50, 50)]
+        [InlineData(IntegrationTestHelpers.Redis62, 25, 75)]
+        public async Task RedisStreamTrigger_CustomIdCounter_ReturnsValidScaleStatus(string redisVersion, int processed, int unprocessed)
+        {
+            string functionName = nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_String);
+            TriggerMetadata triggerMetadata = new TriggerMetadata(JObject.Parse(streamTrigger));
+            RedisScalerProvider.RedisPollingTriggerMetadata redisMetadata = JsonConvert.DeserializeObject<RedisScalerProvider.RedisPollingTriggerMetadata>(triggerMetadata.Metadata.ToString());
+
+            AggregateScaleStatus scaleStatus;
+            long streamLength;
+            using (Process redisProcess = IntegrationTestHelpers.StartRedis(redisVersion))
+            using (IHost scaleHost = await CreateScaleHostAsync(triggerMetadata))
+            using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            {
+                await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
+                foreach (int value in Enumerable.Range(0, processed))
+                {
+                    await multiplexer.GetDatabase().StreamAddAsync(redisMetadata.key, value, value, $"1-{value}");
+                }
+
+                Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071);
+                await Task.Delay(TimeSpan.FromMilliseconds(2 * processed / RedisStreamTriggerTestFunctions.batchSize * RedisStreamTriggerTestFunctions.pollingIntervalShort));
+                functionsProcess.Kill();
+
+                foreach (int value in Enumerable.Range(processed, unprocessed))
+                {
+                    await multiplexer.GetDatabase().StreamAddAsync(redisMetadata.key, value, value, $"1-{2 * value}");
+                }
+                streamLength = multiplexer.GetDatabase().StreamLength(redisMetadata.key);
+                multiplexer.Close();
+
+                IScaleStatusProvider scaleStatusProvider = scaleHost.Services.GetService<IScaleStatusProvider>();
+                scaleStatus = await scaleStatusProvider.GetScaleStatusAsync(new ScaleStatusContext());
+                await scaleHost.StopAsync();
+                IntegrationTestHelpers.StopRedis(redisProcess);
+            }
+            Assert.Equal(processed + unprocessed, streamLength);
+            Assert.True(scaleStatus.TargetWorkerCount > 0);
+            Assert.True(scaleStatus.TargetWorkerCount <= streamLength / RedisStreamTriggerTestFunctions.batchSize);
+        }
+
+        private async Task<IHost> CreateScaleHostAsync(TriggerMetadata triggerMetadata)
         {
             string hostId = "test-host";
             IHostBuilder hostBuilder = new HostBuilder();
-            TriggerMetadata triggerMetadata = new TriggerMetadata(JObject.Parse(triggerJson));
-            RedisScalerProvider.RedisPollingTriggerMetadata redisMetadata = JsonConvert.DeserializeObject<RedisScalerProvider.RedisPollingTriggerMetadata>(triggerMetadata.Metadata.ToString());
             hostBuilder.ConfigureAppConfiguration((hostBuilderContext, config) =>
             {
                 config.AddConfiguration(IntegrationTestHelpers.hostsettings);
@@ -97,38 +225,9 @@ $@"{{
                 scaleOptions.ScaleMetricsSampleInterval = TimeSpan.FromSeconds(1);
             });
 
-            AggregateScaleStatus scaleStatus;
-            using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            {
-                ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, "redisConnectionString"));
-                await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
-
-                IHost scaleHost = hostBuilder.Build();
-                await scaleHost.StartAsync();
-
-                // add some messages
-                if (triggerMetadata.Type.Equals("redisListTrigger"))
-                {
-                    RedisValue[] values = Enumerable.Range(0, elements).Select(x => new RedisValue(x.ToString())).ToArray();
-                    await multiplexer.GetDatabase().ListLeftPushAsync(redisMetadata.key, values);
-                }
-                if (triggerMetadata.Type.Equals("redisStreamTrigger"))
-                {
-                    foreach (int value in Enumerable.Range(0, elements))
-                    {
-                        await multiplexer.GetDatabase().StreamAddAsync(redisMetadata.key, value, value);
-                    }
-                }
-
-                IScaleStatusProvider scaleStatusProvider = scaleHost.Services.GetService<IScaleStatusProvider>();
-                scaleStatus = await scaleStatusProvider.GetScaleStatusAsync(new ScaleStatusContext());
-
-                await scaleHost.StopAsync();
-                IntegrationTestHelpers.StopRedis(redisProcess);
-            }
-
-            Assert.Equal(ScaleVote.ScaleOut, scaleStatus.Vote);
-            Assert.Equal(expectedTarget, scaleStatus.TargetWorkerCount);
+            IHost scaleHost = hostBuilder.Build();
+            await scaleHost.StartAsync();
+            return scaleHost;
         }
     }
 }
