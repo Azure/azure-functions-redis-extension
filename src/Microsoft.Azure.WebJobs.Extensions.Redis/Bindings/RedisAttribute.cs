@@ -30,7 +30,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         /// <summary>
         /// For an input binding, this is the redis command with space-delimited arguments.
-        /// For an output binding, this is redis command without any arguments.
+        /// For an output binding, this is the redis command without any arguments.
         /// </summary>
         [AutoResolve]
         public string Command { get; }
