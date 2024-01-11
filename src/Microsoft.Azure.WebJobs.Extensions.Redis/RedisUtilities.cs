@@ -11,7 +11,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal static class RedisUtilities
     {
-        public const string RedisSreamTrigger = "RedisStreamTrigger";
+        public const string RedisStreamTrigger = "RedisStreamTrigger";
         public const string RedisListTrigger = "RedisListTrigger";
         public const string RedisPubSubTrigger = "RedisPubSubTrigger";
         public const string RedisInputBinding = "RedisInputBinding";

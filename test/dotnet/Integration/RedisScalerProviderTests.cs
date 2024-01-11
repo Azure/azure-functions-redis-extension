@@ -86,7 +86,7 @@ $@"{{
                     RedisValue[] values = Enumerable.Range(0, elements).Select(x => new RedisValue(x.ToString())).ToArray();
                     await multiplexer.GetDatabase().ListLeftPushAsync(redisMetadata.key, values);
                 }
-                if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisSreamTrigger, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisStreamTrigger, StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (int value in Enumerable.Range(0, elements))
                     {

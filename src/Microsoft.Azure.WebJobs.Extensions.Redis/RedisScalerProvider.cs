@@ -36,7 +36,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 scaleMonitor = new RedisListTriggerScaleMonitor(multiplexer, triggerMetadata.FunctionName, maxBatchSize, key);
             }
-            else if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisSreamTrigger, StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisStreamTrigger, StringComparison.OrdinalIgnoreCase))
             {
                 scaleMonitor = new RedisStreamTriggerScaleMonitor(multiplexer, triggerMetadata.FunctionName, maxBatchSize, key);
             }
