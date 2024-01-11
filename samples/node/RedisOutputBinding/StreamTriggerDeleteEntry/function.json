@@ -1,0 +1,21 @@
+{
+    "bindings": [
+        {
+            "type": "redisStreamTrigger",
+            "connectionStringSetting": "redisConnectionString",
+            "key": "streamTest2",
+            "pollingIntervalInMs": 1000,
+            "maxBatchSize": 16,
+            "name": "entry",
+            "direction": "in"
+          },
+          {
+            "type": "redis",
+            "connectionStringSetting": "redisConnectionString",
+            "command": "XDEL",
+            "name": "$return",
+            "direction": "out"
+          }
+    ],
+    "scriptFile": "index.js"
+}

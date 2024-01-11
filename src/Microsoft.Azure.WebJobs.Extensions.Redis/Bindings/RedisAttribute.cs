@@ -29,7 +29,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public string ConnectionStringSetting { get; }
 
         /// <summary>
-        /// The command to be executed on the cache.
+        /// For an input binding, this is the redis command with space-delimited arguments.
+        /// For an output binding, this is the redis command without any arguments.
         /// </summary>
         [AutoResolve]
         public string Command { get; }

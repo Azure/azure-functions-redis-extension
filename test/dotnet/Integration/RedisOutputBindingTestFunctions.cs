@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
@@ -13,34 +14,33 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [FunctionName(nameof(SetDeleter))]
         public static void SetDeleter(
             [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, keyeventChannelSet)] string key,
-            [Redis(IntegrationTestHelpers.connectionStringSetting, "DEL")] out string[] arguments,
+            [Redis(IntegrationTestHelpers.connectionStringSetting, "DEL")] out string arguments,
             ILogger logger)
         {
             logger.LogInformation($"Deleting recently SET key '{key}'");
-            arguments = new string[] { key };
+            arguments = key;
         }
 
         [FunctionName(nameof(StreamTriggerDeleter))]
         public static void StreamTriggerDeleter(
             [RedisStreamTrigger(IntegrationTestHelpers.connectionStringSetting, nameof(StreamTriggerDeleter), pollingIntervalInMs: pollingInterval)] StreamEntry entry,
-            [Redis(IntegrationTestHelpers.connectionStringSetting, "XDEL")] out string[] arguments,
+            [Redis(IntegrationTestHelpers.connectionStringSetting, "XDEL")] out string arguments,
             ILogger logger)
         {
             logger.LogInformation($"Stream entry from key '{nameof(StreamTriggerDeleter)}' with Id '{entry.Id}' and values '{JsonConvert.SerializeObject(entry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString()))}");
-            arguments = new string[] { nameof(StreamTriggerDeleter), entry.Id.ToString() };
+            arguments = $"{nameof(StreamTriggerDeleter)} {entry.Id}";
         }
 
-
         [FunctionName(nameof(MultipleAddAsyncCalls))]
-        public static void MultipleAddAsyncCalls(
+        public static async Task MultipleAddAsyncCalls(
             [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, nameof(MultipleAddAsyncCalls))] string entry,
-            [Redis(IntegrationTestHelpers.connectionStringSetting, "SET")] IAsyncCollector<string[]> collector,
+            [Redis(IntegrationTestHelpers.connectionStringSetting, "SET")] IAsyncCollector<string> collector,
             ILogger logger)
         {
             string[] keys = entry.Split(',');
             foreach (string key in keys)
             {
-                collector.AddAsync(new string[] { key, nameof(MultipleAddAsyncCalls) }).Wait();
+                await collector.AddAsync($"{key} {nameof(MultipleAddAsyncCalls)}");
             }
         }
     }

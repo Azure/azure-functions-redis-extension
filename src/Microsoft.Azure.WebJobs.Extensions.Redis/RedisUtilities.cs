@@ -11,6 +11,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal static class RedisUtilities
     {
+        public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
         public static Version Version70 = new Version("7.0");
 

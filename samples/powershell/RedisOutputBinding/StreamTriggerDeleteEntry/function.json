@@ -1,0 +1,21 @@
+{
+    "bindings": [
+        {
+            "type": "redisStreamTrigger",
+            "connectionStringSetting": "redisLocalhost",
+            "key": "streamTest2",
+            "pollingIntervalInMs": 1000,
+            "maxBatchSize": 16,
+            "name": "entry",
+            "direction": "in"
+          },
+          {
+            "type": "redis",
+            "connectionStringSetting": "redisLocalhost",
+            "command": "XDEL",
+            "name": "retVal",
+            "direction": "out"
+          }
+    ],
+    "scriptFile": "run.ps1"
+}

@@ -1,19 +1,21 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisOutputBinding
 {
     internal class BatchedCollector
     {
         [FunctionName(nameof(BatchedCollector))]
-        public static void Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, nameof(BatchedCollector))] string entry,
-            [Redis(Common.connectionStringSetting, "SET")] IAsyncCollector<string[]> collector,
+        public static async Task Run(
+            [RedisPubSubTrigger(Common.connectionStringSetting, nameof(BatchedCollector))] string message,
+            [Redis(Common.connectionStringSetting, "SET")] IAsyncCollector<string> collector,
             ILogger logger)
         {
-            string[] keys = entry.Split(',');
+            logger.LogInformation(message);
+            string[] keys = message.Split(',');
             foreach (string key in keys)
             {
-                collector.AddAsync(new string[] { key, nameof(BatchedCollector) }).Wait();
+                await collector.AddAsync(key + ' ' + nameof(BatchedCollector));
             }
         }
     }

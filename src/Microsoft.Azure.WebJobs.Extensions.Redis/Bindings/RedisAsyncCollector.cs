@@ -5,7 +5,7 @@ using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    internal class RedisAsyncCollector : IAsyncCollector<string[]>
+    internal class RedisAsyncCollector : IAsyncCollector<string>
     {
         private readonly string command;
         private readonly ILogger logger;
@@ -18,10 +18,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.batch = multiplexer.GetDatabase().CreateBatch();
         }
 
-        public Task AddAsync(string[] arguments, CancellationToken cancellationToken = default)
+        public Task AddAsync(string argument, CancellationToken cancellationToken = default)
         {
-            logger?.LogDebug($"Adding {command} command to batch with input string[] arguments.");
-            _ = batch.ExecuteAsync(command, arguments, CommandFlags.FireAndForget);
+            logger?.LogDebug($"Adding {command} command to batch with input string argument '{argument}'.");
+            _ = batch.ExecuteAsync(command, argument.Split(RedisUtilities.BindingDelimiter), CommandFlags.FireAndForget);
             return Task.CompletedTask;
         }
 
@@ -33,3 +33,4 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
     }
 }
+ 
