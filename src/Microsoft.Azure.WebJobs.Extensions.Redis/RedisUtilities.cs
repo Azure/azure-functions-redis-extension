@@ -11,13 +11,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal static class RedisUtilities
     {
-        public const string REDIS_STREAM_TRIGGER = "RedisStreamTrigger";
-        public const string REDIS_LIST_TRIGGER = "RedisListTrigger";
-        public const string REDIS_PUBSUB_TRIGGER = "RedisPubSubTrigger";
-        public const string REDIS_INPUT_BINDING = "RedisInputBinding";
-        public const string REDIS_OUTPUT_BINDING = "RedisOutputBinding";
-        public const string REDIS_CLIENT_NAME_FORMAT = "AzureFunctionsRedisExtension.{0}";
-
+        public const string RedisSreamTrigger = "RedisStreamTrigger";
+        public const string RedisListTrigger = "RedisListTrigger";
+        public const string RedisPubSubTrigger = "RedisPubSubTrigger";
+        public const string RedisInputBinding = "RedisInputBinding";
+        public const string RedisOutputBinding = "RedisOutputBinding";
+        public const string RedisClientNameFormat = "AzureFunctionsRedisExtension.{0}";
         public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
         public static Version Version70 = new Version("7.0");

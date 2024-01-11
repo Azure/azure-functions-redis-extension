@@ -46,17 +46,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
 #pragma warning disable CS0618
             FluentBindingRule<RedisPubSubTriggerAttribute> pubsubTriggerRule = context.AddBindingRule<RedisPubSubTriggerAttribute>();
-            pubsubTriggerRule.BindToTrigger(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger(RedisUtilities.REDIS_PUBSUB_TRIGGER)));
+            pubsubTriggerRule.BindToTrigger(new RedisPubSubTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger(RedisUtilities.RedisPubSubTrigger)));
 
             FluentBindingRule<RedisListTriggerAttribute> listsTriggerRule = context.AddBindingRule<RedisListTriggerAttribute>();
-            listsTriggerRule.BindToTrigger(new RedisListTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger(RedisUtilities.REDIS_LIST_TRIGGER)));
+            listsTriggerRule.BindToTrigger(new RedisListTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger(RedisUtilities.RedisListTrigger)));
 
             FluentBindingRule<RedisStreamTriggerAttribute> streamTriggerRule = context.AddBindingRule<RedisStreamTriggerAttribute>();
-            streamTriggerRule.BindToTrigger(new RedisStreamTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger(RedisUtilities.REDIS_STREAM_TRIGGER)));
+            streamTriggerRule.BindToTrigger(new RedisStreamTriggerBindingProvider(configuration, nameResolver, loggerFactory.CreateLogger(RedisUtilities.RedisSreamTrigger)));
 
             FluentBindingRule<RedisAttribute> bindingRule = context.AddBindingRule<RedisAttribute>();
-            bindingRule.BindToCollector((attr) => new RedisAsyncCollector(GetOrCreateConnectionMultiplexer(configuration, attr.ConnectionStringSetting), attr.Command, loggerFactory.CreateLogger(RedisUtilities.REDIS_OUTPUT_BINDING)));
-            bindingRule.BindToInput<OpenType>(typeof(RedisConverter<>), configuration, nameResolver, loggerFactory.CreateLogger(RedisUtilities.REDIS_INPUT_BINDING));
+            bindingRule.BindToCollector((attr) => new RedisAsyncCollector(GetOrCreateConnectionMultiplexer(configuration, attr.ConnectionStringSetting), attr.Command, loggerFactory.CreateLogger(RedisUtilities.RedisOutputBinding)));
+            bindingRule.BindToInput<OpenType>(typeof(RedisConverter<>), configuration, nameResolver, loggerFactory.CreateLogger(RedisUtilities.RedisInputBinding));
 #pragma warning restore CS0618
         }
 
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal static IConnectionMultiplexer CreateConnectionMultiplexer(string connectionString, string clientName)
         {
             ConfigurationOptions options = ConfigurationOptions.Parse(connectionString);
-            options.ClientName = string.Format(RedisUtilities.REDIS_CLIENT_NAME_FORMAT, clientName);
+            options.ClientName = string.Format(RedisUtilities.RedisClientNameFormat, clientName);
             return ConnectionMultiplexer.Connect(options);
         }
     }

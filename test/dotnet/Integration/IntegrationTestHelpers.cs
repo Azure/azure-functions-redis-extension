@@ -76,7 +76,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             options.ClientName = nameof(IntegrationTestHelpers);
             IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(options);
             ClientInfo[] clients = multiplexer.GetServers()[0].ClientList();
-            if (!clients.Any(client => client.Name == string.Format(RedisUtilities.REDIS_CLIENT_NAME_FORMAT, functionName)))
+            if (!clients.Any(client => client.Name == string.Format(RedisUtilities.RedisClientNameFormat, functionName)))
             {
                 functionsProcess.Kill();
                 throw new Exception("Function client not found on redis server.");

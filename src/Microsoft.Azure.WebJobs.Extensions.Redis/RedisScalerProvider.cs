@@ -32,11 +32,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             int maxBatchSize = metadata.maxBatchSize;
             string key = RedisUtilities.ResolveString(nameResolver, metadata.key, nameof(metadata.key));
 
-            if (string.Equals(triggerMetadata.Type, RedisUtilities.REDIS_LIST_TRIGGER, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisListTrigger, StringComparison.OrdinalIgnoreCase))
             {
                 scaleMonitor = new RedisListTriggerScaleMonitor(multiplexer, triggerMetadata.FunctionName, maxBatchSize, key);
             }
-            else if (string.Equals(triggerMetadata.Type, RedisUtilities.REDIS_STREAM_TRIGGER, StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisSreamTrigger, StringComparison.OrdinalIgnoreCase))
             {
                 scaleMonitor = new RedisStreamTriggerScaleMonitor(multiplexer, triggerMetadata.FunctionName, maxBatchSize, key);
             }
