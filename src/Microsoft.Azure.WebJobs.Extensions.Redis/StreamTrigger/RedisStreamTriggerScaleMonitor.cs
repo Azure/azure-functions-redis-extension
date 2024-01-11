@@ -14,8 +14,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string key) 
             : base(name, multiplexer, maxBatchSize, key)
         {
-            this.Descriptor = new ScaleMonitorDescriptor(name, RedisScalerProvider.GetFunctionScalerId(name, "RedisStreamTrigger", key));
-            this.TargetScalerDescriptor = new TargetScalerDescriptor(RedisScalerProvider.GetFunctionScalerId(name, "RedisStreamTrigger", key));
+            this.Descriptor = new ScaleMonitorDescriptor(name, RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.REDIS_STREAM_TRIGGER, key));
+            this.TargetScalerDescriptor = new TargetScalerDescriptor(RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.REDIS_STREAM_TRIGGER, key));
         }
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()

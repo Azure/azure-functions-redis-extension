@@ -28,7 +28,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         async Task<ScaleMetrics> IScaleMonitor.GetMetricsAsync()
         {
-            return await this.GetMetricsAsync().ConfigureAwait(false);
+            return await GetMetricsAsync().ConfigureAwait(false);
         }
 
         public abstract Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync();
