@@ -81,12 +81,12 @@ $@"{{
                 await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
 
                 // add some messages
-                if (triggerMetadata.Type.Equals("redisListTrigger"))
+                if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisListTrigger, StringComparison.OrdinalIgnoreCase))
                 {
                     RedisValue[] values = Enumerable.Range(0, elements).Select(x => new RedisValue(x.ToString())).ToArray();
                     await multiplexer.GetDatabase().ListLeftPushAsync(redisMetadata.key, values);
                 }
-                if (triggerMetadata.Type.Equals("redisStreamTrigger"))
+                if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisStreamTrigger, StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (int value in Enumerable.Range(0, elements))
                     {

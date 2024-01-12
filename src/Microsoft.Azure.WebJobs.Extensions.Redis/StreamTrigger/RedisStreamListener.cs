@@ -20,9 +20,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             : base(name, multiplexer, key, pollingInterval, maxBatchSize, batch, executor, logger)
         {
             this.consumerName = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? Guid.NewGuid().ToString();
-            this.logPrefix = $"[Name:{name}][Trigger:RedisStreamTrigger][ConsumerGroup:{this.name}][Key:{key}][Consumer:{consumerName}]";
+            this.logPrefix = $"[Name:{name}][Trigger:{RedisUtilities.RedisStreamTrigger}][ConsumerGroup:{name}][Key:{key}][Consumer:{consumerName}]";
             this.scaleMonitor = new RedisStreamTriggerScaleMonitor(multiplexer, name, maxBatchSize, key);
-            this.entriesReadKey = RedisScalerProvider.GetFunctionScalerId(name, "RedisStreamTrigger", key);
+            this.entriesReadKey = RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.RedisStreamTrigger, key);
         }
 
         public override async void BeforePolling()

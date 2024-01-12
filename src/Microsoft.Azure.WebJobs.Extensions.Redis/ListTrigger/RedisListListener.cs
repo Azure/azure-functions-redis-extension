@@ -19,7 +19,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             : base(name, multiplexer, key, pollingInterval, maxBatchSize, batch, executor, logger)
         {
             this.listPopFromBeginning = listPopFromBeginning;
-            this.logPrefix = $"[Name:{name}][Trigger:RedisListTrigger][Key:{key}]";
+            this.logPrefix = $"[Name:{name}][Trigger:{RedisUtilities.RedisListTrigger}][Key:{key}]";
             this.scaleMonitor = new RedisListTriggerScaleMonitor(multiplexer, name, maxBatchSize, key);
         }
 
