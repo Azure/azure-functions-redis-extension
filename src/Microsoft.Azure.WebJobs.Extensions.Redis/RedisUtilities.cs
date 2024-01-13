@@ -57,7 +57,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(connectionStringSetting));
             }
 
-            string connectionString = configuration.GetConnectionStringOrSetting(connectionStringSetting);
+            IConfigurationSection section = configuration.GetWebJobsConnectionSection(connectionStringSetting);
+            string connectionString = section.Value;
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new ArgumentOutOfRangeException($"Could not find {nameof(connectionStringSetting)}='{connectionStringSetting}' in provided configuration.");
