@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -62,13 +63,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         internal static IConnectionMultiplexer GetOrCreateConnectionMultiplexer(IConfiguration configuration, string connectionStringSetting, string clientName = "")
         {
-            string connectionString = RedisUtilities.ResolveConnectionString(configuration, connectionStringSetting);
-            return connectionMultiplexerCache.GetOrAdd(connectionString, (string cs) => CreateConnectionMultiplexer(cs, clientName));
+            return connectionMultiplexerCache.GetOrAdd(connectionStringSetting, (string css) => CreateConnectionMultiplexer(configuration, css, clientName));
         }
 
-        internal static IConnectionMultiplexer CreateConnectionMultiplexer(string connectionString, string clientName)
+        internal static IConnectionMultiplexer CreateConnectionMultiplexer(IConfiguration configuration, string connectionStringSetting, string clientName)
         {
-            ConfigurationOptions options = ConfigurationOptions.Parse(connectionString);
+            Task<ConfigurationOptions> optionsTask = RedisUtilities.ResolveConfigurationOptionsAsync(configuration, connectionStringSetting);
+            optionsTask.Wait();
+            ConfigurationOptions options = optionsTask.Result;
             options.ClientName = string.Format(RedisUtilities.RedisClientNameFormat, clientName);
             return ConnectionMultiplexer.Connect(options);
         }

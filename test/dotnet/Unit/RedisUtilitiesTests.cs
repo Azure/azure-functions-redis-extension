@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
@@ -10,7 +12,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
     {
         private static IConfiguration testConfig = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
         {
-            { "CacheConnection", "testCacheString" },
+            { "CacheConnection", "0.0.0.0:6379" },
             { "ChannelName", "testChannelName" },
             { "pubsubkey", "PubSub" },
             { "keyspacekey", "KeySpace" },
@@ -26,30 +28,35 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         private static IConfiguration localsettings = new ConfigurationBuilder().AddJsonFile(Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, "local.settings.json")).Build();
 
         [Fact]
-        public void ResolveConnectionString_ValidConnectionStringSetting_ReturnsResolvedString()
+        public async void ResolveConfigurationOptionsAsync_ValidConnectionStringSetting_ReturnsResolvedString()
         {
-            Assert.Equal("127.0.0.1:6379", RedisUtilities.ResolveConnectionString(localsettings, "redisConnectionString"));
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, "redisConnectionString");
+            Assert.Single(options.EndPoints);
+            Assert.Equal("127.0.0.1:6379", options.EndPoints[0].ToString());
         }
 
         [Fact]
-        public void ResolveConnectionString_ValidSetting_ReturnsResolvedString()
+        public async void ResolveConfigurationOptionsAsync_ValidSetting_ReturnsResolvedString()
         {
-            Assert.Equal("testCacheString", RedisUtilities.ResolveConnectionString(testConfig, "CacheConnection"));
+
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, "CacheConnection");
+            Assert.Single(options.EndPoints);
+            Assert.Equal("0.0.0.0:6379", options.EndPoints[0].ToString());
         }
 
         [Theory]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
-        public void ResolveConnectionString_EmptyConnectionStringSetting_ThrowsArgumentNullException(string connectionStringSetting)
+        public async Task ResolveConfigurationOptionsAsync_EmptyConnectionStringSetting_ThrowsArgumentNullException(string connectionStringSetting)
         {
-            Assert.Throws<ArgumentNullException>(() => RedisUtilities.ResolveConnectionString(testConfig, connectionStringSetting));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, connectionStringSetting));
         }
 
         [Fact]
-        public void ResolveConnectionString_InvalidSetting_ThrowsArgumentOutOfRangeException()
+        public async Task ResolveConfigurationOptionsAsync_InvalidSetting_ThrowsArgumentOutOfRangeException()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => RedisUtilities.ResolveConnectionString(testConfig, "invalidSetting"));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, "invalidSetting"));
         }
 
         [Fact]

@@ -6,6 +6,7 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -17,6 +18,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public const string RedisInputBinding = "RedisInputBinding";
         public const string RedisOutputBinding = "RedisOutputBinding";
         public const string RedisClientNameFormat = "AzureFunctionsRedisExtension.{0}";
+
+        public const string EntraFullyQualifiedCacheHostName = "{0}__fullyQualifiedCacheHostName";
+        public const string EntraPrincipalId = "{0}__principalId";
+        public const string EntraTenantId = "{0}__tenantId";
+        public const string EntraClientId = "{0}__clientId";
+        public const string EntraClientSecret = "{0}__clientSecret";
+
         public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
         public static Version Version70 = new Version("7.0");
@@ -41,8 +49,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return setting;
         }
 
-        public static string ResolveConnectionString(IConfiguration configuration, string connectionStringSetting)
+        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting)
         {
+            
             if (configuration is null)
             {
                 throw new ArgumentNullException(nameof(configuration));
@@ -54,12 +63,48 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             string connectionString = configuration.GetConnectionStringOrSetting(connectionStringSetting);
-            if (string.IsNullOrWhiteSpace(connectionString))
+            if (!string.IsNullOrWhiteSpace(connectionString))
             {
-                throw new ArgumentOutOfRangeException($"Could not find {nameof(connectionStringSetting)}='{connectionStringSetting}' in provided configuration.");
+                return ConfigurationOptions.Parse(connectionString);
             }
 
-            return connectionString;
+            string cacheHostName = configuration.GetConnectionStringOrSetting(string.Format(EntraFullyQualifiedCacheHostName, connectionStringSetting));
+            if (!string.IsNullOrWhiteSpace(cacheHostName))
+            {
+                // Entra Id Connections
+                string principalId = configuration.GetConnectionStringOrSetting(string.Format(EntraPrincipalId, connectionStringSetting));
+                string clientId = configuration.GetConnectionStringOrSetting(string.Format(EntraClientId, connectionStringSetting));
+                string tenantId = configuration.GetConnectionStringOrSetting(string.Format(EntraTenantId, connectionStringSetting));
+                string clientSecret = configuration.GetConnectionStringOrSetting(string.Format(EntraClientSecret, connectionStringSetting));
+
+                if (string.IsNullOrWhiteSpace(principalId))
+                {
+                    throw new ArgumentOutOfRangeException($"Could not find {string.Format(EntraPrincipalId, connectionStringSetting)} in provided configuration.");
+                }
+
+                ConfigurationOptions configurationOptions = ConfigurationOptions.Parse(cacheHostName);
+                if (string.IsNullOrWhiteSpace(clientId) && string.IsNullOrWhiteSpace(tenantId) && string.IsNullOrWhiteSpace(clientSecret))
+                {
+                    // System-Assigned Managed Identity
+                    return await configurationOptions.ConfigureForAzureWithSystemAssignedManagedIdentityAsync(principalId); 
+                }
+
+                if (!string.IsNullOrWhiteSpace(clientId) && string.IsNullOrWhiteSpace(tenantId) && string.IsNullOrWhiteSpace(clientSecret))
+                {
+                    // User-Assigned Managed Identity
+                    return await configurationOptions.ConfigureForAzureWithUserAssignedManagedIdentityAsync(clientId, principalId);
+                }
+
+                if (!string.IsNullOrWhiteSpace(clientId) && !string.IsNullOrWhiteSpace(tenantId) && !string.IsNullOrWhiteSpace(clientSecret))
+                {
+                    // Service Principal
+                    return await configurationOptions.ConfigureForAzureWithServicePrincipalAsync(clientId, principalId, tenantId, clientSecret);
+                }
+
+                throw new ArgumentOutOfRangeException($"Managed Identity configuration error. {nameof(EntraFullyQualifiedCacheHostName)}={cacheHostName}, {nameof(EntraPrincipalId)}={principalId}, {nameof(EntraClientId)}={clientId}, {nameof(EntraTenantId)}={tenantId}, {nameof(EntraClientSecret)}={clientSecret}.");
+            }
+
+            throw new ArgumentOutOfRangeException($"Could not find {nameof(connectionStringSetting)}='{connectionStringSetting}' or '{string.Format(EntraFullyQualifiedCacheHostName, connectionStringSetting)}' in provided configuration.");
         }
 
         public static object RedisValueTypeConverter(RedisValue value, Type destinationType)
