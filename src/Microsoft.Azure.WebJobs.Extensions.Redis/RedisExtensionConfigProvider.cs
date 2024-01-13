@@ -68,10 +68,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         internal static IConnectionMultiplexer CreateConnectionMultiplexer(IConfiguration configuration, string connectionStringSetting, string clientName)
         {
-            Task<ConfigurationOptions> optionsTask = RedisUtilities.ResolveConfigurationOptionsAsync(configuration, connectionStringSetting);
+            Task<ConfigurationOptions> optionsTask = RedisUtilities.ResolveConfigurationOptionsAsync(configuration, connectionStringSetting, clientName);
             optionsTask.Wait();
             ConfigurationOptions options = optionsTask.Result;
-            options.ClientName = string.Format(RedisUtilities.RedisClientNameFormat, clientName);
             return ConnectionMultiplexer.Connect(options);
         }
     }

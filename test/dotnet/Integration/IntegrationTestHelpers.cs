@@ -70,9 +70,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.OutputDataReceived -= functionLoadedHandler;
 
             // Ensure that the client name is correctly set
-            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, connectionStringSetting);
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, connectionStringSetting, nameof(IntegrationTestHelpers));
             options.AllowAdmin = true;
-            options.ClientName = nameof(IntegrationTestHelpers);
             IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(options);
             ClientInfo[] clients = multiplexer.GetServers()[0].ClientList();
             if (!clients.Any(client => client.Name == string.Format(RedisUtilities.RedisClientNameFormat, functionName)))

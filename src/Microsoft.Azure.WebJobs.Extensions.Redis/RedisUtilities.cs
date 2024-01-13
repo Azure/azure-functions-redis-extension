@@ -43,9 +43,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return setting;
         }
 
-        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting)
+        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting, string clientName = "")
         {
-            
+            ConfigurationOptions options;
+
             if (configuration is null)
             {
                 throw new ArgumentNullException(nameof(configuration));
@@ -57,12 +58,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             string connectionString = configuration.GetConnectionStringOrSetting(connectionStringSetting);
-            if (!string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrWhiteSpace(connectionString))
             {
-                return ConfigurationOptions.Parse(connectionString);
+                throw new ArgumentOutOfRangeException($"Could not find {nameof(connectionStringSetting)}='{connectionStringSetting}' in provided configuration.");
             }
 
-            throw new ArgumentOutOfRangeException($"Could not find {nameof(connectionStringSetting)}='{connectionStringSetting}' in provided configuration.");
+            options = ConfigurationOptions.Parse(connectionString);
+            options.ClientName = string.Format(RedisClientNameFormat, clientName);
+            return options;
         }
 
         public static object RedisValueTypeConverter(RedisValue value, Type destinationType)
