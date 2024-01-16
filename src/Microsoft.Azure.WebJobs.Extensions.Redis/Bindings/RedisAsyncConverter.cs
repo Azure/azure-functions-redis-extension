@@ -9,13 +9,13 @@ using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
-    internal class RedisConverter<T> : IAsyncConverter<RedisAttribute, T>
+    internal class RedisAsyncConverter<T> : IAsyncConverter<RedisAttribute, T>
     {
         private readonly IConfiguration configuration;
         private readonly INameResolver nameResolver;
         private readonly ILogger logger;
 
-        public RedisConverter(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
+        public RedisAsyncConverter(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
             this.nameResolver = nameResolver;
