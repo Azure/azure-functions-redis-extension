@@ -62,10 +62,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting, context.Descriptor.ShortName);
             return Task.FromResult<IListener>(new RedisStreamListener(
-                context.Descriptor.LogName,
-                multiplexer,
+                context.Descriptor.ShortName,
+                configuration,
+                connectionStringSetting,
                 key,
                 pollingInterval,
                 maxBatchSize,

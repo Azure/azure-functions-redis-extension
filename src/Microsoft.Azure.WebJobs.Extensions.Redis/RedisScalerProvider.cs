@@ -1,9 +1,7 @@
-﻿using Microsoft.Azure.WebJobs.Description;
-using Microsoft.Azure.WebJobs.Host.Scale;
+﻿using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 using System;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -28,17 +26,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             INameResolver nameResolver = serviceProvider.GetService<INameResolver>();
 
             RedisPollingTriggerMetadata metadata = JsonConvert.DeserializeObject<RedisPollingTriggerMetadata>(triggerMetadata.Metadata.ToString());
-            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, metadata.connectionStringSetting);
-            int maxBatchSize = metadata.maxBatchSize;
             string key = RedisUtilities.ResolveString(nameResolver, metadata.key, nameof(metadata.key));
 
             if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisListTrigger, StringComparison.OrdinalIgnoreCase))
             {
-                scaleMonitor = new RedisListTriggerScaleMonitor(multiplexer, triggerMetadata.FunctionName, maxBatchSize, key);
+                scaleMonitor = new RedisListTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, metadata.connectionStringSetting, metadata.maxBatchSize, key);
             }
             else if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisStreamTrigger, StringComparison.OrdinalIgnoreCase))
             {
-                scaleMonitor = new RedisStreamTriggerScaleMonitor(multiplexer, triggerMetadata.FunctionName, maxBatchSize, key);
+                scaleMonitor = new RedisStreamTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, metadata.connectionStringSetting, metadata.maxBatchSize, key);
             }
             else
             {

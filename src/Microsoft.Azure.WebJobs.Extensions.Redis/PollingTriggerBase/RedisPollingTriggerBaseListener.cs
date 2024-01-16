@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
@@ -16,7 +17,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal abstract class RedisPollingTriggerBaseListener : IListener, IScaleMonitorProvider, ITargetScalerProvider
     {
         internal string name;
-        internal IConnectionMultiplexer multiplexer;
+        internal IConfiguration configuration;
+        internal string connectionStringSetting;
         internal string key;
         internal TimeSpan pollingInterval;
         internal int maxBatchSize;
@@ -24,14 +26,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal ITriggeredFunctionExecutor executor;
         internal ILogger logger;
 
+        internal IConnectionMultiplexer multiplexer;
         internal string logPrefix;
         internal Version serverVersion;
         internal RedisPollingTriggerBaseScaleMonitor scaleMonitor;
 
-        public RedisPollingTriggerBaseListener(string name, IConnectionMultiplexer multiplexer, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPollingTriggerBaseListener(string name, IConfiguration configuration, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.name = name;
-            this.multiplexer = multiplexer;
+            this.configuration = configuration;
+            this.connectionStringSetting = connectionStringSetting;
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
@@ -45,6 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         public virtual Task StartAsync(CancellationToken cancellationToken)
         {
+            multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting, name);
             logger?.LogInformation($"{logPrefix} Connecting to Redis.");
             serverVersion = multiplexer.GetServers()[0].Version;
             BeforePolling();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System;
 using System.Linq;
@@ -12,8 +13,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         internal string name;
         internal IConnectionMultiplexer multiplexer;
+        internal IConfiguration configuration;
+        internal string connectionStringSetting;
         internal int maxBatchSize;
         internal string key;
+
+        public RedisPollingTriggerBaseScaleMonitor(string name, IConfiguration configuration, string connectionStringSetting, int maxBatchSize, string key)
+        {
+            this.name = name;
+            this.configuration = configuration;
+            this.connectionStringSetting = connectionStringSetting;
+            this.maxBatchSize = maxBatchSize;
+            this.key = key;
+        }
 
         public RedisPollingTriggerBaseScaleMonitor(string name, IConnectionMultiplexer multiplexer, int maxBatchSize, string key)
         {
@@ -22,7 +34,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.maxBatchSize = maxBatchSize;
             this.key = key;
         }
-        
+
         public ScaleMonitorDescriptor Descriptor { get; internal set; }
         public TargetScalerDescriptor TargetScalerDescriptor { get; internal set; }
 

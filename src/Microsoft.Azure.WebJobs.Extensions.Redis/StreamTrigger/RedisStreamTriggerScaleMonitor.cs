@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System;
 using System.Linq;
@@ -8,11 +9,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
     internal class RedisStreamTriggerScaleMonitor : RedisPollingTriggerBaseScaleMonitor
     {
-        public RedisStreamTriggerScaleMonitor(IConnectionMultiplexer multiplexer,
+        public RedisStreamTriggerScaleMonitor(
             string name,
+            IConfiguration configuration,
+            string connectionStringSetting,
             int maxBatchSize,
-            string key) 
-            : base(name, multiplexer, maxBatchSize, key)
+            string key)
+            : base(name, configuration, connectionStringSetting, maxBatchSize, key)
         {
             this.Descriptor = new ScaleMonitorDescriptor(name, RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.RedisStreamTrigger, key));
             this.TargetScalerDescriptor = new TargetScalerDescriptor(RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.RedisStreamTrigger, key));
@@ -20,6 +23,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
+            if (multiplexer is null)
+            {
+                multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting);
+            }
+
             long streamLength = await multiplexer.GetDatabase().StreamLengthAsync(key);
             if (streamLength == 0)
             {
