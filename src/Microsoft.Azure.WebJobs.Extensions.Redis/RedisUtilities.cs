@@ -17,7 +17,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public const string RedisPubSubTrigger = "RedisPubSubTrigger";
         public const string RedisInputBinding = "RedisInputBinding";
         public const string RedisOutputBinding = "RedisOutputBinding";
-        public const string RedisClientNameFormat = "AzureFunctionsRedisExtension.{0}";
 
         public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
@@ -65,7 +64,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             options = ConfigurationOptions.Parse(connectionString);
-            options.ClientName = string.Format(RedisClientNameFormat, clientName);
+            options.ClientName = GetRedisClientName(clientName);
             return options;
         }
 
@@ -113,5 +112,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             };
             return obj.ToString(Formatting.None);
         }
+
+        public static string GetRedisClientName(string clientName) => $"AzureFunctionsRedisExtension.{clientName}";
     }
 }
