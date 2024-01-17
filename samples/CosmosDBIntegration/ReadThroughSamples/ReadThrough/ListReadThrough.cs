@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
 {
-    public static class ListSample
+    public static class ListReadThrough
     {
         //Redis Cache primary connection string from local.settings.json
         public const string RedisConnectionString = "RedisConnectionString";
@@ -22,28 +22,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
         public const string ListKey = "userListName";
 
         /// <summary>
-        /// Adds a CosmosDBListData item to a Redis list with a specific key.
-        /// </summary>
-        /// <param name="response"> The response object returned by a Cosmos DB query. </param>
-        /// <param name="item"> The item to be added to the Redis cache. </param>
-        /// <param name="listEntry">The key for the Redis list to which the item will be added. </param>
-        /// <returns> None </returns>
-        public static async Task ToCacheAsync(FeedResponse<CosmosDBListData> response, CosmosDBListData item, string listEntry)
-        {
-            //Retrieve the values in cosmos associated with the list name, so you can access each item
-            var fullEntry = response.Take(response.Count);
-
-            if (fullEntry == null) return;
-
-            //Accessing each value from the entry 
-            foreach (CosmosDBListData inputValues in fullEntry)
-            {
-                RedisValue[] redisValues = Array.ConvertAll(inputValues.value.ToArray(), item => (RedisValue)item);
-                await s_redisDb.Value.ListRightPushAsync(listEntry, redisValues);
-            }
-        }
-
-        /// <summary>
         /// Function that retrieves a list from CosmosDB based on a Redis key miss event, and stores it in Redis cache using read-through caching. 
         /// The function takes a RedisPubSubTrigger attribute, which listens for key miss events on the Redis cache
         /// </summary>
@@ -51,8 +29,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
         /// <param name="client">A Cosmos DB client object used to connect to the database.</param>
         /// <param name="logger">An ILogger object used for logging purposes.</param>
         /// <returns></returns>
-        [FunctionName(nameof(ListTriggerReadThroughFunc))]
-        public static async Task ListTriggerReadThroughFunc(
+        [FunctionName(nameof(ListReadThrough))]
+        public static async Task Run(
             [RedisPubSubTrigger(RedisConnectionString, "__keyevent@0__:keymiss")] string listEntry, [CosmosDB(
             Connection = "CosmosDBConnectionString" )]CosmosClient client,
             ILogger logger)
@@ -86,6 +64,28 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
                 logger.LogInformation("Found key: " + listEntry);
 
                 await ToCacheAsync(response, item, listEntry);
+            }
+        }
+
+        /// <summary>
+        /// Adds a CosmosDBListData item to a Redis list with a specific key.
+        /// </summary>
+        /// <param name="response"> The response object returned by a Cosmos DB query. </param>
+        /// <param name="item"> The item to be added to the Redis cache. </param>
+        /// <param name="listEntry">The key for the Redis list to which the item will be added. </param>
+        /// <returns> None </returns>
+        private static async Task ToCacheAsync(FeedResponse<CosmosDBListData> response, CosmosDBListData item, string listEntry)
+        {
+            //Retrieve the values in cosmos associated with the list name, so you can access each item
+            var fullEntry = response.Take(response.Count);
+
+            if (fullEntry == null) return;
+
+            //Accessing each value from the entry
+            foreach (CosmosDBListData inputValues in fullEntry)
+            {
+                RedisValue[] redisValues = Array.ConvertAll(inputValues.value.ToArray(), item => (RedisValue)item);
+                await s_redisDb.Value.ListRightPushAsync(listEntry, redisValues);
             }
         }
     }

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteThrough
 {
-    internal class StreamSample
+    internal class StreamTriggerSingleDocumentWriteThrough
     {
         // Redis connection string and stream names stored in local.settings.json
         public const string RedisConnectionSetting = "RedisConnectionString";
@@ -18,26 +18,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteThrough
             connectionString: Environment.GetEnvironmentVariable(CosmosDbConnectionSetting)!);
         public const string DatabaseSetting = "%CosmosDbDatabaseId%";
         public const string ContainerSetting = "%StreamCosmosDbContainerId%";
-
-        /// <summary>
-        /// Write through: Write messages to CosmosDB synchronously whenever a new value is added to the Redis Stream. Each message will get it's own document.
-        /// </summary>
-        /// <param name="entry"> The message which has gone through the stream. Includes message id alongside the key/value pairs </param>
-        /// <param name="items"> Container for where the CosmosDB items are stored </param>
-        /// <param name="logger"> ILogger used to write key information </param>
-        [FunctionName(nameof(WriteThroughForStream))]
-        public static void WriteThroughForStream(
-                [RedisStreamTrigger(RedisConnectionSetting, StreamName)] StreamEntry entry,
-                [CosmosDB(
-                    databaseName: DatabaseSetting,
-                    containerName: ContainerSetting,
-                    Connection = CosmosDbConnectionSetting)] ICollector<StreamData> items,
-                ILogger logger)
-        {
-            // Insert data into CosmosDB synchronously
-            items.Add(StreamData.Format(entry, logger));
-        }
-
         public const string ContainerSettingSingleDocument = "%StreamCosmosDbContainerIdSingleDocument%";
 
         /// <summary>
@@ -46,8 +26,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteThrough
         /// <param name="entry"> The message which has gone through the stream. Includes message id alongside the key/value pairs </param>
         /// <param name="items"> Container for where the CosmosDB items are stored </param>
         /// <param name="logger"> ILogger used to write key information </param>
-        [FunctionName(nameof(WriteThroughForStreamSingleDocument))]
-        public static void WriteThroughForStreamSingleDocument(
+        [FunctionName(nameof(StreamTriggerSingleDocumentWriteThrough))]
+        public static void Run(
                 [RedisStreamTrigger(RedisConnectionSetting, StreamName)] StreamEntry entry,
                 [CosmosDB(
                     databaseName: DatabaseSetting,

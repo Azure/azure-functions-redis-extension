@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteAround
 {
-    public static class ListSample
+    public static class ListWriteAround
     {
         //Redis Cache primary connection string from local.settings.json
         public const string RedisConnectionString = "RedisConnectionString";
@@ -23,8 +23,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteAround
         /// </summary>
         /// <param name="readOnlyList">An IReadOnlyList of ListData objects representing the items that have been modified or added to the CosmosDB container.</param>
         /// <param name="log">An ILogger object used for logging purposes.</param>
-        [FunctionName("WriteAroundListTrigger")]
-        public static void WriteAroundListTrigger([CosmosDBTrigger(
+        [FunctionName(nameof(ListWriteAround))]
+        public static void Run([CosmosDBTrigger(
             databaseName: "%CosmosDbDatabaseId%",
             containerName: "%ListCosmosDbContainerId%",
             Connection = "CosmosDBConnectionString",

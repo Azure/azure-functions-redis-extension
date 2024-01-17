@@ -8,7 +8,7 @@ using Microsoft.Azure.Cosmos.Linq;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteBehind
 {
-    public static class ListSample
+    public static class ListTriggerWriteBehind
     {
         //Redis Cache primary connection string from local.settings.json
         public const string RedisConnectionString = "RedisConnectionString";
@@ -31,7 +31,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteBehind
         /// <param name="logger">An ILogger object used for logging purposes.</param>
         /// <returns></returns>
         [FunctionName(nameof(ListTriggerWriteBehind))]
-        public static async Task ListTriggerWriteBehind(
+        public static async Task Run(
             [RedisListTrigger(RedisConnectionString, ListKey)] string listEntry, [CosmosDB(
             Connection = "CosmosDBConnectionString")]CosmosClient client,
             ILogger logger)

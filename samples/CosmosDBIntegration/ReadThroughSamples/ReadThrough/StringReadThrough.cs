@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
 {
-    public static class PubSubSample
+    public static class StringReadThrough
     {
         //Connection string settings that will be resolved from local.settings.json file
         public const string RedisConnectionSetting = "RedisConnectionString";
@@ -31,8 +31,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
         /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
         /// <returns></returns>
         /// <exception cref="Exception"> Thrown when the requested key is not found in Redis or Cosmos DB</exception>
-        [FunctionName(nameof(PubsubReadThroughAsync))]
-        public static async Task PubsubReadThroughAsync(
+        [FunctionName(nameof(StringReadThrough))]
+        public static async Task Run(
             [RedisPubSubTrigger(RedisConnectionSetting, "__keyevent@0__:keymiss")] string missedKey,
             [CosmosDB(
                 databaseName: DatabaseSetting,
@@ -40,7 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
                 Connection = CosmosDbConnectionSetting)]CosmosClient cosmosDB,
             ILogger logger)
         {
-            if (missedKey == StreamSample.StreamNameSingleDocument || missedKey == ListSample.ListKey) return;
+            if (missedKey == StreamSingleDocumentReadThrough.StreamNameSingleDocument || missedKey == ListReadThrough.ListKey) return;
 
             //get the Cosmos DB database and the container to read from
             Container cosmosDBContainer = cosmosDB.GetContainer(Environment.GetEnvironmentVariable(DatabaseSetting.Replace("%", "")), Environment.GetEnvironmentVariable(ContainerSetting.Replace("%", "")));
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
             //get all entries in the container that contain the missed key
             using FeedIterator<RedisData> feed = queryable
                 .Where(p => p.key == missedKey)
-                .OrderByDescending(p => p.timestamp)
+                .OrderByDescending((RedisData p) => p.timestamp)
                 .ToFeedIterator();
             FeedResponse<RedisData> response = await feed.ReadNextAsync();
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteBehind
 {
-    public static class PubSubSample
+    public static class PubsubTriggerWriteBehind
     {
         //Connection string settings that will be resolved from local.settings.json file
         public const string RedisConnectionSetting = "RedisConnectionString";
@@ -28,8 +28,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteBehind
          /// <param name="cosmosDBOut"> An IAsyncCollector that is used to write RedisData to Cosmos DB.</param>
          /// <param name="logger"> An ILogger that is used to write informational log messages.</param>
          /// <returns></returns>
-        [FunctionName(nameof(PubsubWriteBehindAsync))]
-        public static async Task PubsubWriteBehindAsync(
+        [FunctionName(nameof(PubsubTriggerWriteBehind))]
+        public static async Task Run(
             [RedisPubSubTrigger(RedisConnectionSetting, "__keyevent@0__:set")] string newKey,
             [CosmosDB(
                 databaseName: DatabaseSetting,

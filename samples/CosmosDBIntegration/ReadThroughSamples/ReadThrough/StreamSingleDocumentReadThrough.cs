@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
 {
-    internal class StreamSample
+    internal class StreamSingleDocumentReadThrough
     {
         // Redis connection string and stream names stored in local.settings.json
         public const string RedisConnectionSetting = "RedisConnectionString";
@@ -28,8 +28,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
         /// <param name="items"> Container for where the CosmosDB items are stored </param>
         /// <param name="logger"> ILogger used to write key information </param>
         /// <returns></returns>
-        [FunctionName(nameof(ReadThroughForStreamSingleDocumentAsync))]
-        public static async Task ReadThroughForStreamSingleDocumentAsync(
+        [FunctionName(nameof(StreamSingleDocumentReadThrough))]
+        public static async Task Run(
                [RedisPubSubTrigger(RedisConnectionSetting, "__keyevent@0__:keymiss")] string entry,
                [CosmosDB(
                     databaseName: DatabaseSetting,
