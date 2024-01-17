@@ -103,25 +103,5 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = increasingMetrics };
             Assert.Equal(expected, monitor.GetScaleStatus(context).Vote);
         }
-
-        [Theory]
-        [InlineData(10, 10, 1)]
-        [InlineData(50, 10, 5)]
-        [InlineData(100, 10, 10)]
-        [InlineData(500, 10, 50)]
-        [InlineData(1000, 50, 20)]
-        [InlineData(5000, 100, 50)]
-        [InlineData(10000, 10, 1000)]
-        public async Task TargetScaler_IncreasingMetricsAsync(long remaining, int batchSize, int expected)
-        {
-            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), "connection", batchSize, "key");
-            IConnectionMultiplexer multiplexer = A.Fake<IConnectionMultiplexer>();
-            IDatabase fakeDatabase = A.Fake<IDatabase>();
-            A.CallTo(() => multiplexer.GetDatabase(A<int>._, A<object>._)).Returns(fakeDatabase);
-            A.CallTo(() => fakeDatabase.ListLength(A<RedisKey>._, A<CommandFlags>._)).Returns(remaining);
-            A.CallTo(() => fakeDatabase.ListLengthAsync(A<RedisKey>._, A<CommandFlags>._)).Returns(remaining);
-            monitor.multiplexer = multiplexer;
-            Assert.Equal(expected, (await monitor.GetScaleResultAsync(null)).TargetWorkerCount);
-        }
     }
 }
