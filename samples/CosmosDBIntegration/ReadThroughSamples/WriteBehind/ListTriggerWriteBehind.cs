@@ -5,6 +5,7 @@ using Microsoft.Azure.Cosmos;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Azure.Cosmos.Linq;
+using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.Models;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteBehind
 {

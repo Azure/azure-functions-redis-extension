@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.Models;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;

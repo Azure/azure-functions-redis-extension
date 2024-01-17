@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
+using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.Models;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.WriteThrough
 {
