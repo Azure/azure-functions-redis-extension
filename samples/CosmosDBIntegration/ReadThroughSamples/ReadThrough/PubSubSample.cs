@@ -1,13 +1,12 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
-using Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.ReadThrough
 {
     public static class PubSubSample
     {

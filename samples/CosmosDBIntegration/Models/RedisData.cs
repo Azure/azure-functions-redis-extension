@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB
 {
     public class StreamData
     {
@@ -17,7 +17,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
             logger.LogInformation("ID: {val}", entry.Id.ToString());
 
             // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
+            Dictionary<string, string> dict = entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
 
             StreamData sampleItem = new StreamData { id = entry.Id, values = dict };
             return sampleItem;
@@ -35,7 +35,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
             logger.LogInformation("Creating a new document for {val}. Inserting ID: {val} as the first entry", streamName, entry.Id.ToString());
 
             // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
+            Dictionary<string, string> dict = entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
 
             // Create a new list of messages
             var list = new Dictionary<string, Dictionary<string, string>>();
@@ -50,7 +50,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
             logger.LogInformation("Adding to {val} document. Inserting ID: {val} ", results.id, entry.Id.ToString());
 
             // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
+            Dictionary<string, string> dict = entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
 
             // Update list of messages
             var list = results.messages;
