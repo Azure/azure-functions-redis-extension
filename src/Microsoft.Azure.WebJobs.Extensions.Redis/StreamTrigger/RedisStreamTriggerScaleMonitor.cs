@@ -23,11 +23,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            if (multiplexer is null)
-            {
-                multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting);
-            }
-
+            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting);
             long streamLength = await multiplexer.GetDatabase().StreamLengthAsync(key);
             if (streamLength == 0)
             {

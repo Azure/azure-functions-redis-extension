@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 using System;
 using System.Threading.Tasks;
 
@@ -21,11 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            if (multiplexer is null)
-            {
-                multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting);
-            }
-
+            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting);
             var metrics = new RedisPollingTriggerBaseMetrics
             {
                 Remaining = await multiplexer.GetDatabase().ListLengthAsync(key),
