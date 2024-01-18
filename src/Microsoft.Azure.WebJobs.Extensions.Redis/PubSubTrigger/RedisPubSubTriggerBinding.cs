@@ -40,7 +40,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return Task.FromResult<ITriggerData>(new TriggerData(new ChannelMessageValueProvider(message, parameterType), bindingData));
         }
 
-        public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
+        public async Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
         {
             if (context is null)
             {
@@ -48,8 +48,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting, context.Descriptor.ShortName);
-            return Task.FromResult<IListener>(new RedisPubSubListener(context.Descriptor.LogName, multiplexer, channel, context.Executor, logger));
+            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, connectionStringSetting, context.Descriptor.ShortName);
+            return new RedisPubSubListener(context.Descriptor.LogName, multiplexer, channel, context.Executor, logger);
         }
 
         public ParameterDescriptor ToParameterDescriptor()

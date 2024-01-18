@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public async Task<IAsyncCollector<string>> ConvertAsync(RedisAttribute input, CancellationToken cancellationToken)
         {
-            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, input.ConnectionStringSetting);
+            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, input.ConnectionStringSetting);
             return new RedisAsyncCollector(multiplexer, input.Command, logger);
         }
     }

@@ -61,17 +61,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 #pragma warning restore CS0618
         }
 
-        internal static IConnectionMultiplexer GetOrCreateConnectionMultiplexer(IConfiguration configuration, string connectionStringSetting, string clientName = "")
+        internal static async Task<IConnectionMultiplexer> GetOrCreateConnectionMultiplexerAsync(IConfiguration configuration, string connectionStringSetting, string clientName = "")
         {
-            return connectionMultiplexerCache.GetOrAdd(connectionStringSetting, (string css) => CreateConnectionMultiplexer(configuration, css, clientName));
+            if (connectionMultiplexerCache.ContainsKey(connectionStringSetting))
+            {
+                connectionMultiplexerCache.TryGetValue(connectionStringSetting, out IConnectionMultiplexer connectionMultiplexer);
+                return connectionMultiplexer;
+            }
+            else
+            {
+                IConnectionMultiplexer connectionMultiplexer = await CreateConnectionMultiplexerAsync(configuration, connectionStringSetting, clientName);
+                return connectionMultiplexerCache.GetOrAdd(connectionStringSetting, connectionMultiplexer);
+            }
         }
 
-        internal static IConnectionMultiplexer CreateConnectionMultiplexer(IConfiguration configuration, string connectionStringSetting, string clientName)
+        internal static async Task<IConnectionMultiplexer> CreateConnectionMultiplexerAsync(IConfiguration configuration, string connectionStringSetting, string clientName)
         {
-            Task<ConfigurationOptions> optionsTask = RedisUtilities.ResolveConfigurationOptionsAsync(configuration, connectionStringSetting, clientName);
-            optionsTask.Wait();
-            ConfigurationOptions options = optionsTask.Result;
-            return ConnectionMultiplexer.Connect(options);
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(configuration, connectionStringSetting, clientName);
+            return await ConnectionMultiplexer.ConnectAsync(options);
         }
     }
 }

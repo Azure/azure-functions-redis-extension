@@ -47,14 +47,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Executes enabled functions, primary listener method.
         /// </summary>
-        public virtual Task StartAsync(CancellationToken cancellationToken)
+        public virtual async Task StartAsync(CancellationToken cancellationToken)
         {
-            multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting, name);
+            multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, connectionStringSetting, name);
             logger?.LogInformation($"{logPrefix} Connecting to Redis.");
             serverVersion = multiplexer.GetServers()[0].Version;
             BeforePolling();
             _ = Task.Run(() => Loop(cancellationToken));
-            return Task.CompletedTask;
         }
 
         /// <summary>

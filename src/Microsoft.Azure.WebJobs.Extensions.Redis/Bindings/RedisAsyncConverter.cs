@@ -25,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public async Task<T> ConvertAsync(RedisAttribute input, CancellationToken cancellationToken)
         {
             string fullCommand = RedisUtilities.ResolveString(nameResolver, input.Command, nameof(input.Command));
-            IDatabase db = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, input.ConnectionStringSetting).GetDatabase();
+            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, input.ConnectionStringSetting);
 
             string[] splitCommand = fullCommand.Split(RedisUtilities.BindingDelimiter);
             string command = splitCommand[0];
@@ -37,7 +37,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string[] arguments = splitCommand.Skip(1).ToArray();
 
             logger?.LogDebug($"Executing '{fullCommand}'.");
-            RedisResult result = await db.ExecuteAsync(command, arguments);
+            RedisResult result = await multiplexer.GetDatabase().ExecuteAsync(command, arguments);
             return (T)RedisResultTypeConverter(result, typeof(T));
         }
 
