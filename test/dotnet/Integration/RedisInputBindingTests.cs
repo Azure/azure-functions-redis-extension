@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void Get_SuccessfullyGets()
         {
-            string functionName = nameof(RedisInputBindingTestFunctions.GetTester);
+            string functionName = nameof(GetTester);
             string value = "value";
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
@@ -46,7 +46,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void Hget_SuccessfullyGets()
         {
-            string functionName = nameof(RedisInputBindingTestFunctions.HgetTester);
+            string functionName = nameof(HgetTester);
             string value = "value";
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
@@ -77,7 +77,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void GetCustom_SuccessfullyConvertsType()
         {
-            string functionName = nameof(RedisInputBindingTestFunctions.GetTester_Custom);
+            string functionName = nameof(GetTester_Custom);
             CustomType value = new CustomType { Field = "a", Name = "b", Random = "c" };
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);

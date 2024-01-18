@@ -17,7 +17,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void ListsTrigger_SuccessfullyTriggers()
         {
-            string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_String);
+            string functionName = nameof(ListTrigger_String);
             RedisValue[] valuesArray = new RedisValue[] { "a", "b" };
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents()
         {
-            string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_String);
+            string functionName = nameof(ListTrigger_String);
             int count = 100;
             RedisValue[] valuesArray = Enumerable.Range(0, count).Select(x => new RedisValue(x.ToString())).ToArray();
 
@@ -84,10 +84,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_String), typeof(string))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue), typeof(RedisValue))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_ByteArray), typeof(byte[]))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_CustomType), typeof(CustomType))]
+        [InlineData(nameof(ListTrigger_String), typeof(string))]
+        [InlineData(nameof(ListTrigger_RedisValue), typeof(RedisValue))]
+        [InlineData(nameof(ListTrigger_ByteArray), typeof(byte[]))]
+        [InlineData(nameof(ListTrigger_CustomType), typeof(CustomType))]
         public async void ListTrigger_TypeConversions_WorkCorrectly(string functionName, Type destinationType)
         {
 
@@ -113,15 +113,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_Batch_String), typeof(string[]))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_Batch_RedisValue), typeof(RedisValue[]))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_Batch_ByteArray), typeof(byte[][]))]
+        [InlineData(nameof(ListTrigger_Batch_String), typeof(string[]))]
+        [InlineData(nameof(ListTrigger_Batch_RedisValue), typeof(RedisValue[]))]
+        [InlineData(nameof(ListTrigger_Batch_ByteArray), typeof(byte[][]))]
         public async void ListTrigger_Batch_ExecutesFewerTimes(string functionName, Type destinationType)
         {
             int elements = 1000;
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
-            counts.TryAdd($"Executed '{functionName}' (Succeeded", elements / RedisListTriggerTestFunctions.batchSize);
-            counts.TryAdd(destinationType.FullName, elements / RedisListTriggerTestFunctions.batchSize);
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", elements / IntegrationTestHelpers.batchSize);
+            counts.TryAdd(destinationType.FullName, elements / IntegrationTestHelpers.batchSize);
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis62))
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
@@ -133,7 +133,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                    await Task.Delay(TimeSpan.FromMilliseconds(elements / RedisListTriggerTestFunctions.batchSize * RedisListTriggerTestFunctions.pollingIntervalShort * 2));
+                    await Task.Delay(TimeSpan.FromMilliseconds(elements / IntegrationTestHelpers.batchSize * IntegrationTestHelpers.pollingIntervalShort * 2));
 
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();
@@ -149,7 +149,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         //[Fact]
         //public async void ListTrigger_TargetBasedScaling_E2EValidation()
         //{
-        //    string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue_LongPollingInterval);
+        //    string functionName = nameof(ListTrigger_RedisValue_LongPollingInterval);
         //    int port = 7071;
         //    int elements = 10000;
         //    RedisValue[] valuesArray = Enumerable.Range(0, elements).Select(x => new RedisValue(x.ToString())).ToArray();

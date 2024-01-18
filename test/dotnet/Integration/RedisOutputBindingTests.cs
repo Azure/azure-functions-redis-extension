@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void SetDeleter_SuccessfullyDeletes()
         {
-            string functionName = nameof(RedisOutputBindingTestFunctions.SetDeleter);
+            string functionName = nameof(SetDeleter);
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void StreamTriggerDeleter_SuccessfullyDeletes()
         {
-            string functionName = nameof(RedisOutputBindingTestFunctions.StreamTriggerDeleter);
+            string functionName = nameof(StreamTriggerDeleter);
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
 
             long length = 1;
-            using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
+            //using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
             {
                 using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
@@ -73,7 +73,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                     length = await multiplexer.GetDatabase().StreamLengthAsync(functionName);
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();
-                    IntegrationTestHelpers.StopRedis(redisProcess);
+                    //IntegrationTestHelpers.StopRedis(redisProcess);
                 };
                 var incorrect = counts.Where(pair => pair.Value != 0);
                 Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void MultipleAddAsyncCalls_SuccessfullyFlushes()
         {
-            string functionName = nameof(RedisOutputBindingTestFunctions.MultipleAddAsyncCalls);
+            string functionName = nameof(MultipleAddAsyncCalls);
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
