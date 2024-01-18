@@ -13,11 +13,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public class RedisPubSubTriggerTests
     {
         [Theory]
-        [InlineData(nameof(SingleChannel), IntegrationTestHelpers.pubsubChannel, "testValue")]
-        [InlineData(nameof(MultipleChannels), IntegrationTestHelpers.pubsubChannel, "testValue")]
-        [InlineData(nameof(MultipleChannels), IntegrationTestHelpers.pubsubChannel + "suffix", "testSuffix")]
-        [InlineData(nameof(AllChannels), IntegrationTestHelpers.pubsubChannel + "suffix", "testSuffix")]
-        [InlineData(nameof(AllChannels), "prefix" + IntegrationTestHelpers.pubsubChannel, "testPrefix")]
+        [InlineData(nameof(SingleChannel), IntegrationTestHelpers.PubSubChannel, "testValue")]
+        [InlineData(nameof(MultipleChannels), IntegrationTestHelpers.PubSubChannel, "testValue")]
+        [InlineData(nameof(MultipleChannels), IntegrationTestHelpers.PubSubChannel + "suffix", "testSuffix")]
+        [InlineData(nameof(AllChannels), IntegrationTestHelpers.PubSubChannel + "suffix", "testSuffix")]
+        [InlineData(nameof(AllChannels), "prefix" + IntegrationTestHelpers.PubSubChannel, "testPrefix")]
         [InlineData(nameof(AllChannels), "separate", "testSeparate")]
         public async void PubSubTrigger_SuccessfullyTriggers(string functionName, string channel, string message)
         {
@@ -28,7 +28,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -46,11 +46,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(SingleKey), IntegrationTestHelpers.keyspaceChannel)]
-        [InlineData(nameof(MultipleKeys), IntegrationTestHelpers.keyspaceChannel)]
-        [InlineData(nameof(MultipleKeys), IntegrationTestHelpers.keyspaceChannel + "suffix")]
-        [InlineData(nameof(AllKeys), IntegrationTestHelpers.keyspaceChannel)]
-        [InlineData(nameof(AllKeys), IntegrationTestHelpers.keyspaceChannel + "suffix")]
+        [InlineData(nameof(SingleKey), IntegrationTestHelpers.KeyspaceChannel)]
+        [InlineData(nameof(MultipleKeys), IntegrationTestHelpers.KeyspaceChannel)]
+        [InlineData(nameof(MultipleKeys), IntegrationTestHelpers.KeyspaceChannel + "suffix")]
+        [InlineData(nameof(AllKeys), IntegrationTestHelpers.KeyspaceChannel)]
+        [InlineData(nameof(AllKeys), IntegrationTestHelpers.KeyspaceChannel + "suffix")]
         public async void KeySpaceTrigger_SuccessfullyTriggers(string functionName, string channel)
         {
             string keyspace = "__keyspace@0__:";
@@ -63,7 +63,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -93,7 +93,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(nameof(SingleEvent), 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -123,7 +123,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(nameof(AllEvents), 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -155,13 +155,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 ISubscriber subscriber = multiplexer.GetSubscriber();
 
-                subscriber.Publish(IntegrationTestHelpers.pubsubChannel, JsonSerializer.Serialize(new CustomType() { Field = "feeld", Name = "naim", Random = "ran" }));
+                subscriber.Publish(IntegrationTestHelpers.PubSubChannel, JsonSerializer.Serialize(new CustomType() { Field = "feeld", Name = "naim", Random = "ran" }));
                 await Task.Delay(TimeSpan.FromSeconds(1));
 
                 await multiplexer.CloseAsync();

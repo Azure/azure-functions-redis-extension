@@ -7,7 +7,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(SingleChannel_ChannelMessage))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, IntegrationTestHelpers.pubsubChannel)] ChannelMessage message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting, IntegrationTestHelpers.PubSubChannel)] ChannelMessage message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));

@@ -9,8 +9,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(StreamTriggerDeleter))]
         public static void Run(
-            [RedisStreamTrigger(IntegrationTestHelpers.connectionStringSetting, nameof(StreamTriggerDeleter), pollingIntervalInMs: IntegrationTestHelpers.pollingIntervalShort)] StreamEntry entry,
-            [Redis(IntegrationTestHelpers.connectionStringSetting, "XDEL")] out string arguments,
+            [RedisStreamTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(StreamTriggerDeleter), pollingIntervalInMs: IntegrationTestHelpers.PollingIntervalShort)] StreamEntry entry,
+            [Redis(IntegrationTestHelpers.ConnectionStringSetting, "XDEL")] out string arguments,
             ILogger logger)
         {
             logger.LogInformation($"Stream entry from key '{nameof(StreamTriggerDeleter)}' with Id '{entry.Id}' and values '{JsonConvert.SerializeObject(entry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString()))}");

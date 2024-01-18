@@ -7,8 +7,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(GetTester_Custom))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting,nameof(GetTester_Custom))] string message,
-            [Redis(IntegrationTestHelpers.connectionStringSetting, $"GET {nameof(GetTester_Custom)}")] CustomType value,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting,nameof(GetTester_Custom))] string message,
+            [Redis(IntegrationTestHelpers.ConnectionStringSetting, $"GET {nameof(GetTester_Custom)}")] CustomType value,
             ILogger logger)
         {
             logger.LogInformation($"Value of key '{nameof(GetTester_Custom)}' is currently a type {value.GetType()}: '{JsonConvert.SerializeObject(value)}'");

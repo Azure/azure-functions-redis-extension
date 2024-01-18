@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(ListTrigger_Batch_String))]
         public static void Run(
-            [RedisListTrigger(IntegrationTestHelpers.connectionStringSetting, nameof(ListTrigger_Batch_String), IntegrationTestHelpers.pollingIntervalShort, IntegrationTestHelpers.batchSize)] string[] entry,
+            [RedisListTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(ListTrigger_Batch_String), IntegrationTestHelpers.PollingIntervalShort, IntegrationTestHelpers.BatchSize)] string[] entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));

@@ -6,8 +6,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(SetDeleter))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, IntegrationTestHelpers.keyeventChannelSet)] string key,
-            [Redis(IntegrationTestHelpers.connectionStringSetting, "DEL")] out string arguments,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting, IntegrationTestHelpers.KeyeventChannelSet)] string key,
+            [Redis(IntegrationTestHelpers.ConnectionStringSetting, "DEL")] out string arguments,
             ILogger logger)
         {
             logger.LogInformation($"Deleting recently SET key '{key}'");

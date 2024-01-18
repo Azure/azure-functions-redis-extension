@@ -6,8 +6,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(HgetTester))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.connectionStringSetting, nameof(HgetTester))] string message,
-            [Redis(IntegrationTestHelpers.connectionStringSetting, $"HGET {nameof(HgetTester)} field")] string value,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(HgetTester))] string message,
+            [Redis(IntegrationTestHelpers.ConnectionStringSetting, $"HGET {nameof(HgetTester)} field")] string value,
             ILogger logger)
         {
             logger.LogInformation($"Value of field 'field' in hash '{nameof(HgetTester)}' is currently '{value}'");
