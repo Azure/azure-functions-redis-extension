@@ -64,11 +64,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 logger?.LogError($"[{nameof(RedisListTriggerBinding)}] Provided {nameof(ListenerFactoryContext)} is null.");
                 throw new ArgumentNullException(nameof(context));
             }
-            IConnectionMultiplexer multiplexer = RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexer(configuration, connectionStringSetting, context.Descriptor.ShortName);
 
             return Task.FromResult<IListener>(new RedisListListener(
                 context.Descriptor.ShortName,
-                multiplexer,
+                configuration,
+                connectionStringSetting,
                 key,
                 pollingInterval,
                 maxBatchSize,

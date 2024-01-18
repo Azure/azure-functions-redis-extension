@@ -33,4 +33,3 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         }
     }
 }
- 

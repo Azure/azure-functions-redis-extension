@@ -18,7 +18,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void StreamTrigger_SuccessfullyTriggers()
         {
-            string functionName = nameof(RedisStreamTriggerTestFunctions.StreamTrigger_StreamEntry);
+            string functionName = nameof(StreamTrigger_StreamEntry);
             string[] namesArray = new string[] { "a", "c" };
             string[] valuesArray = new string[] { "b", "d" };
 
@@ -34,7 +34,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -54,7 +54,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void StreamTrigger_ScaledOutInstances_DoesntDuplicateEvents()
         {
-            string functionName = nameof(RedisStreamTriggerTestFunctions.StreamTrigger_StreamEntry);
+            string functionName = nameof(StreamTrigger_StreamEntry);
             int count = 100;
             string[] namesArray = new string[] { "a", "c" };
             string[] valuesArray = new string[] { "b", "d" };
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", count);
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             using (Process functionsProcess1 = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
             using (Process functionsProcess2 = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7072))
             using (Process functionsProcess3 = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7073))
@@ -96,11 +96,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_StreamEntry), typeof(StreamEntry))]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_NameValueEntryArray), typeof(NameValueEntry[]))]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_ByteArray), typeof(byte[]))]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_String), typeof(string))]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_CustomType), typeof(CustomType))]
+        [InlineData(nameof(StreamTrigger_StreamEntry), typeof(StreamEntry))]
+        [InlineData(nameof(StreamTrigger_NameValueEntryArray), typeof(NameValueEntry[]))]
+        [InlineData(nameof(StreamTrigger_ByteArray), typeof(byte[]))]
+        [InlineData(nameof(StreamTrigger_String), typeof(string))]
+        [InlineData(nameof(StreamTrigger_CustomType), typeof(CustomType))]
         public async void StreamTrigger_TypeConversions_WorkCorrectly(string functionName, Type destinationType)
         {
             string[] namesArray = new string[] { nameof(CustomType.Name), nameof(CustomType.Field)};
@@ -119,7 +119,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -137,21 +137,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_StreamEntry), typeof(StreamEntry[]))]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_NameValueEntryArray), typeof(NameValueEntry[][]))]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_ByteArray), typeof(byte[][]))]
-        [InlineData(nameof(RedisStreamTriggerTestFunctions.StreamTrigger_Batch_String), typeof(string[]))]
+        [InlineData(nameof(StreamTrigger_Batch_StreamEntry), typeof(StreamEntry[]))]
+        [InlineData(nameof(StreamTrigger_Batch_NameValueEntryArray), typeof(NameValueEntry[][]))]
+        [InlineData(nameof(StreamTrigger_Batch_ByteArray), typeof(byte[][]))]
+        [InlineData(nameof(StreamTrigger_Batch_String), typeof(string[]))]
         public async void StreamTrigger_Batch_ExecutesFewerTimes(string functionName, Type destinationType)
         {
             int elements = 1000;
             Dictionary<string, int> counts = new Dictionary<string, int>
             {
-                { $"Executed '{functionName}' (Succeeded",  elements / RedisStreamTriggerTestFunctions.batchSize},
-                { destinationType.FullName, elements / RedisStreamTriggerTestFunctions.batchSize},
+                { $"Executed '{functionName}' (Succeeded",  elements / IntegrationTestHelpers.BatchSize},
+                { destinationType.FullName, elements / IntegrationTestHelpers.BatchSize},
             };
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
                 Task.WaitAll(Enumerable.Range(0, elements).Select(i => multiplexer.GetDatabase().StreamAddAsync(functionName, i, i)).ToArray());
@@ -160,7 +160,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                    await Task.Delay(elements / RedisStreamTriggerTestFunctions.batchSize * RedisStreamTriggerTestFunctions.pollingIntervalShort * 2);
+                    await Task.Delay(elements / IntegrationTestHelpers.BatchSize * IntegrationTestHelpers.PollingIntervalShort * 2);
 
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();

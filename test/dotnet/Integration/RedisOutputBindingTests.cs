@@ -15,13 +15,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void SetDeleter_SuccessfullyDeletes()
         {
-            string functionName = nameof(RedisOutputBindingTestFunctions.SetDeleter);
+            string functionName = nameof(SetDeleter);
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
             bool exists = true;
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             {
                 using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
                 {
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void StreamTriggerDeleter_SuccessfullyDeletes()
         {
-            string functionName = nameof(RedisOutputBindingTestFunctions.StreamTriggerDeleter);
+            string functionName = nameof(StreamTriggerDeleter);
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             long length = 1;
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             {
                 using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
                 {
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void MultipleAddAsyncCalls_SuccessfullyFlushes()
         {
-            string functionName = nameof(RedisOutputBindingTestFunctions.MultipleAddAsyncCalls);
+            string functionName = nameof(MultipleAddAsyncCalls);
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
@@ -95,7 +95,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             long actualKeys = 0;
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(rKeys);
                 using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
