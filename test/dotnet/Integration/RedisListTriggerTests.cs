@@ -17,14 +17,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void ListsTrigger_SuccessfullyTriggers()
         {
-            string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_String);
+            string functionName = nameof(ListTrigger_String);
             RedisValue[] valuesArray = new RedisValue[] { "a", "b" };
 
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", valuesArray.Length);
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
 
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [Fact]
         public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents()
         {
-            string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_String);
+            string functionName = nameof(ListTrigger_String);
             int count = 100;
             RedisValue[] valuesArray = Enumerable.Range(0, count).Select(x => new RedisValue(x.ToString())).ToArray();
 
@@ -56,7 +56,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", valuesArray.Length);
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
 
@@ -84,10 +84,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_String), typeof(string))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue), typeof(RedisValue))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_ByteArray), typeof(byte[]))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_CustomType), typeof(CustomType))]
+        [InlineData(nameof(ListTrigger_String), typeof(string))]
+        [InlineData(nameof(ListTrigger_RedisValue), typeof(RedisValue))]
+        [InlineData(nameof(ListTrigger_ByteArray), typeof(byte[]))]
+        [InlineData(nameof(ListTrigger_CustomType), typeof(CustomType))]
         public async void ListTrigger_TypeConversions_WorkCorrectly(string functionName, Type destinationType)
         {
 
@@ -96,7 +96,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd(destinationType.FullName, 1);
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, 7071))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -113,18 +113,18 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         }
 
         [Theory]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_Batch_String), typeof(string[]))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_Batch_RedisValue), typeof(RedisValue[]))]
-        [InlineData(nameof(RedisListTriggerTestFunctions.ListTrigger_Batch_ByteArray), typeof(byte[][]))]
+        [InlineData(nameof(ListTrigger_Batch_String), typeof(string[]))]
+        [InlineData(nameof(ListTrigger_Batch_RedisValue), typeof(RedisValue[]))]
+        [InlineData(nameof(ListTrigger_Batch_ByteArray), typeof(byte[][]))]
         public async void ListTrigger_Batch_ExecutesFewerTimes(string functionName, Type destinationType)
         {
             int elements = 1000;
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
-            counts.TryAdd($"Executed '{functionName}' (Succeeded", elements / RedisListTriggerTestFunctions.batchSize);
-            counts.TryAdd(destinationType.FullName, elements / RedisListTriggerTestFunctions.batchSize);
+            counts.TryAdd($"Executed '{functionName}' (Succeeded", elements / IntegrationTestHelpers.BatchSize);
+            counts.TryAdd(destinationType.FullName, elements / IntegrationTestHelpers.BatchSize);
 
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis62))
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.ConnectionStringSetting)))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
                 RedisValue[] values = Enumerable.Range(0, elements).Select(n => new RedisValue(JsonConvert.SerializeObject(new CustomType() { Field = n.ToString(), Name = n.ToString(), Random = n.ToString() }))).ToArray();
@@ -133,7 +133,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 
-                    await Task.Delay(TimeSpan.FromMilliseconds(elements / RedisListTriggerTestFunctions.batchSize * RedisListTriggerTestFunctions.pollingIntervalShort * 2));
+                    await Task.Delay(TimeSpan.FromMilliseconds(elements / IntegrationTestHelpers.BatchSize * IntegrationTestHelpers.PollingIntervalShort * 2));
 
                     await multiplexer.CloseAsync();
                     functionsProcess.Kill();
@@ -143,37 +143,5 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             var incorrect = counts.Where(pair => pair.Value != 0);
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
-
-        //Target Scaler Integration Tests not required.
-        // Keeping this as a manual test for local development.
-        //[Fact]
-        //public async void ListTrigger_TargetBasedScaling_E2EValidation()
-        //{
-        //    string functionName = nameof(RedisListTriggerTestFunctions.ListTrigger_RedisValue_LongPollingInterval);
-        //    int port = 7071;
-        //    int elements = 10000;
-        //    RedisValue[] valuesArray = Enumerable.Range(0, elements).Select(x => new RedisValue(x.ToString())).ToArray();
-
-        //    using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(RedisUtilities.ResolveConnectionString(IntegrationTestHelpers.localsettings, IntegrationTestHelpers.connectionStringSetting)))
-        //    {
-        //        await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
-        //        await multiplexer.GetDatabase().ListLeftPushAsync(functionName, valuesArray);
-        //        await multiplexer.CloseAsync();
-        //    };
-
-        //    IntegrationTestHelpers.ScaleStatus status = new IntegrationTestHelpers.ScaleStatus { vote = 0, targetWorkerCount = 0 };
-        //    using (Process functionsProcess = IntegrationTestHelpers.StartFunction(functionName, port))
-        //    using (HttpClient client = new HttpClient())
-        //    using (StringContent jsonContent = new StringContent("{}", Encoding.UTF8, "application/json"))
-        //    {
-        //        StringContent content = new StringContent(JsonConvert.SerializeObject(new { name = functionName, arguments = new string[] { "1" } }));
-        //        HttpResponseMessage response = await client.PostAsync($"http://127.0.0.1:{port}/admin/host/scale/status", jsonContent);
-        //        status = JsonConvert.DeserializeObject<IntegrationTestHelpers.ScaleStatus>(await response.Content.ReadAsStringAsync());
-        //        functionsProcess.Kill();
-        //    };
-
-        //    Assert.Equal(1, status.vote);
-        //    Assert.True(status.targetWorkerCount / (float)elements > 0.999);
-        //}
     }
 }

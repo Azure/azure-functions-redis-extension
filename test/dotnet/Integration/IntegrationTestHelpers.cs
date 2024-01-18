@@ -13,7 +13,20 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
     internal static class IntegrationTestHelpers
     {
-        internal const string connectionStringSetting = "redisConnectionString";
+        internal const int PollingIntervalShort = 100;
+        internal const int PollingIntervalLong = 10000;
+        internal const int BatchSize = 10;
+        internal const string format = "triggerValue:{0}";
+        internal const string PubSubChannel = "testChannel";
+        internal const string PubSubMultiple = "testChannel*";
+        internal const string KeyspaceChannel = "__keyspace@0__:testKey";
+        internal const string KeyspaceMultiple = "__keyspace@0__:testKey*";
+        internal const string KeyeventChannelSet = "__keyevent@0__:set";
+        internal const string KeyeventChannelAll = "__keyevent@0__:*";
+        internal const string KeyspaceChannelAll = "__keyspace@0__:*";
+        internal const string AllChannels = "*";
+
+        internal const string ConnectionStringSetting = "redisConnectionString";
         internal const string Redis60 = "/redis/redis-6.0.20";
         internal const string Redis62 = "/redis/redis-6.2.14";
         internal const string Redis70 = "/redis/redis-7.0.14";
@@ -70,7 +83,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.OutputDataReceived -= functionLoadedHandler;
 
             // Ensure that the client name is correctly set
-            string connectionString = RedisUtilities.ResolveConnectionString(localsettings, connectionStringSetting);
+            string connectionString = RedisUtilities.ResolveConnectionString(localsettings, ConnectionStringSetting);
             ConfigurationOptions options = ConfigurationOptions.Parse(connectionString);
             options.AllowAdmin = true;
             options.ClientName = nameof(IntegrationTestHelpers);
