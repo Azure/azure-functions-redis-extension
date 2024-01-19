@@ -6,6 +6,7 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -16,7 +17,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public const string RedisPubSubTrigger = "RedisPubSubTrigger";
         public const string RedisInputBinding = "RedisInputBinding";
         public const string RedisOutputBinding = "RedisOutputBinding";
-        public const string RedisClientNameFormat = "AzureFunctionsRedisExtension.{0}";
+
         public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
         public static Version Version70 = new Version("7.0");
@@ -41,8 +42,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return setting;
         }
 
-        public static string ResolveConnectionString(IConfiguration configuration, string connectionStringSetting)
+        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting, string clientName = "")
         {
+            ConfigurationOptions options;
+
             if (configuration is null)
             {
                 throw new ArgumentNullException(nameof(configuration));
@@ -53,13 +56,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(connectionStringSetting));
             }
 
-            string connectionString = configuration.GetConnectionStringOrSetting(connectionStringSetting);
+            IConfigurationSection section = configuration.GetWebJobsConnectionSection(connectionStringSetting);
+            string connectionString = section.Value;
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new ArgumentOutOfRangeException($"Could not find {nameof(connectionStringSetting)}='{connectionStringSetting}' in provided configuration.");
             }
 
-            return connectionString;
+            options = ConfigurationOptions.Parse(connectionString);
+            options.ClientName = GetRedisClientName(clientName);
+            return options;
         }
 
         public static object RedisValueTypeConverter(RedisValue value, Type destinationType)
@@ -106,5 +112,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             };
             return obj.ToString(Formatting.None);
         }
+
+        public static string GetRedisClientName(string clientName) => $"AzureFunctionsRedisExtension.{clientName}";
     }
 }

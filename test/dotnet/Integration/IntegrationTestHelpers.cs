@@ -31,7 +31,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         internal const string Redis62 = "/redis/redis-6.2.14";
         internal const string Redis70 = "/redis/redis-7.0.14";
 
-        internal static Process StartFunction(string functionName, int port)
+        internal static async Task<Process> StartFunctionAsync(string functionName, int port)
         {
             ProcessStartInfo info = new ProcessStartInfo
             {
@@ -83,13 +83,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.OutputDataReceived -= functionLoadedHandler;
 
             // Ensure that the client name is correctly set
-            string connectionString = RedisUtilities.ResolveConnectionString(localsettings, ConnectionStringSetting);
-            ConfigurationOptions options = ConfigurationOptions.Parse(connectionString);
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, ConnectionStringSetting, nameof(IntegrationTestHelpers));
             options.AllowAdmin = true;
-            options.ClientName = nameof(IntegrationTestHelpers);
             IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(options);
             ClientInfo[] clients = multiplexer.GetServers()[0].ClientList();
-            if (!clients.Any(client => client.Name == string.Format(RedisUtilities.RedisClientNameFormat, functionName)))
+            if (!clients.Any(client => client.Name == RedisUtilities.GetRedisClientName(functionName)))
             {
                 functionsProcess.Kill();
                 throw new Exception("Function client not found on redis server.");

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
 {
@@ -60,17 +61,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 #pragma warning restore CS0618
         }
 
-        internal static IConnectionMultiplexer GetOrCreateConnectionMultiplexer(IConfiguration configuration, string connectionStringSetting, string clientName = "")
+        internal static async Task<IConnectionMultiplexer> GetOrCreateConnectionMultiplexerAsync(IConfiguration configuration, string connectionStringSetting, string clientName = "")
         {
-            string connectionString = RedisUtilities.ResolveConnectionString(configuration, connectionStringSetting);
-            return connectionMultiplexerCache.GetOrAdd(connectionString, (string cs) => CreateConnectionMultiplexer(cs, clientName));
+            if (connectionMultiplexerCache.ContainsKey(connectionStringSetting))
+            {
+                connectionMultiplexerCache.TryGetValue(connectionStringSetting, out IConnectionMultiplexer connectionMultiplexer);
+                return connectionMultiplexer;
+            }
+            else
+            {
+                IConnectionMultiplexer connectionMultiplexer = await CreateConnectionMultiplexerAsync(configuration, connectionStringSetting, clientName);
+                return connectionMultiplexerCache.GetOrAdd(connectionStringSetting, connectionMultiplexer);
+            }
         }
 
-        internal static IConnectionMultiplexer CreateConnectionMultiplexer(string connectionString, string clientName)
+        internal static async Task<IConnectionMultiplexer> CreateConnectionMultiplexerAsync(IConfiguration configuration, string connectionStringSetting, string clientName)
         {
-            ConfigurationOptions options = ConfigurationOptions.Parse(connectionString);
-            options.ClientName = string.Format(RedisUtilities.RedisClientNameFormat, clientName);
-            return ConnectionMultiplexer.Connect(options);
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(configuration, connectionStringSetting, clientName);
+            return await ConnectionMultiplexer.ConnectAsync(options);
         }
     }
 }
