@@ -18,6 +18,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public const string RedisInputBinding = "RedisInputBinding";
         public const string RedisOutputBinding = "RedisOutputBinding";
 
+        public const string EntraFullyQualifiedCacheHostName = "fullyQualifiedCacheHostName";
+        public const string EntraPrincipalId = "principalId";
+        public const string EntraTenantId = "tenantId";
+        public const string EntraClientId = "clientId";
+        public const string EntraClientSecret = "clientSecret";
+
         public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
         public static Version Version70 = new Version("7.0");
@@ -58,12 +64,56 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             IConfigurationSection section = configuration.GetWebJobsConnectionSection(connectionStringSetting);
             string connectionString = section.Value;
-            if (string.IsNullOrWhiteSpace(connectionString))
+            string cacheHostName = section[EntraFullyQualifiedCacheHostName];
+            if (string.IsNullOrWhiteSpace(connectionString) && string.IsNullOrWhiteSpace(cacheHostName))
             {
-                throw new ArgumentOutOfRangeException($"Could not find {nameof(connectionStringSetting)}='{connectionStringSetting}' in provided configuration.");
+                throw new ArgumentNullException(nameof(connectionStringSetting));
             }
 
-            options = ConfigurationOptions.Parse(connectionString);
+            if (!string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(cacheHostName))
+            {
+                throw new ArgumentException($"Found both {nameof(connectionStringSetting)} '{connectionStringSetting}' and '{connectionStringSetting}__{EntraFullyQualifiedCacheHostName}' in provided configuration. Please choose either connection string or managed identity connection.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(connectionString))
+            {
+                options = ConfigurationOptions.Parse(connectionString);
+            }
+            else
+            {
+                // Entra Id Connections
+                string principalId = section[EntraPrincipalId];
+                string clientId = section[EntraClientId];
+                string tenantId = section[EntraTenantId];
+                string clientSecret = section[EntraClientSecret];
+
+                if (string.IsNullOrWhiteSpace(principalId))
+                {
+                    throw new ArgumentNullException($"{connectionStringSetting}__{EntraPrincipalId}");
+                }
+
+                if (string.IsNullOrWhiteSpace(clientId) && string.IsNullOrWhiteSpace(tenantId) && string.IsNullOrWhiteSpace(clientSecret))
+                {
+                    // System-Assigned Managed Identity
+                    options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithSystemAssignedManagedIdentityAsync(principalId);
+                }
+                else if (!string.IsNullOrWhiteSpace(clientId) && string.IsNullOrWhiteSpace(tenantId) && string.IsNullOrWhiteSpace(clientSecret))
+                {
+                    // User-Assigned Managed Identity
+                    options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithUserAssignedManagedIdentityAsync(clientId, principalId);
+                }
+                else if (!string.IsNullOrWhiteSpace(clientId) && !string.IsNullOrWhiteSpace(tenantId) && !string.IsNullOrWhiteSpace(clientSecret))
+                {
+                    // Service Principal
+                    options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithServicePrincipalAsync(clientId, principalId, tenantId, clientSecret);
+                }
+                else
+                {
+                    throw new ArgumentException("Managed Identity configuration error.");
+                }
+
+            }
+
             options.ClientName = GetRedisClientName(clientName);
             return options;
         }
