@@ -25,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public async Task<T> ConvertAsync(RedisAttribute input, CancellationToken cancellationToken)
         {
             string fullCommand = RedisUtilities.ResolveString(nameResolver, input.Command, nameof(input.Command));
-            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, input.ConnectionStringSetting);
+            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, input.ConnectionStringSetting, RedisUtilities.RedisInputBinding);
 
             string[] splitCommand = fullCommand.Split(RedisUtilities.BindingDelimiter);
             string command = splitCommand[0];

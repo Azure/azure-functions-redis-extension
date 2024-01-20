@@ -42,7 +42,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return setting;
         }
 
-        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting, string clientName = "")
+        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting, string clientName)
         {
             ConfigurationOptions options;
 
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string connectionString = section.Value;
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                throw new ArgumentOutOfRangeException($"Could not find {nameof(connectionStringSetting)}='{connectionStringSetting}' in provided configuration.");
+                throw new ArgumentException($"{nameof(connectionStringSetting)} '{connectionStringSetting}' not found in provided configuration.");
             }
 
             options = ConfigurationOptions.Parse(connectionString);
