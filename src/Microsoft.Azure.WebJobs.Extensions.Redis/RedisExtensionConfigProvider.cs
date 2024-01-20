@@ -61,7 +61,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 #pragma warning restore CS0618
         }
 
-        internal static async Task<IConnectionMultiplexer> GetOrCreateConnectionMultiplexerAsync(IConfiguration configuration, string connectionStringSetting, string clientName = "")
+        internal static async Task<IConnectionMultiplexer> GetOrCreateConnectionMultiplexerAsync(IConfiguration configuration, string connectionStringSetting, string clientName)
         {
             if (connectionMultiplexerCache.ContainsKey(connectionStringSetting))
             {
