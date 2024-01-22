@@ -91,7 +91,7 @@ public static void ListsTrigger(
 ### `RedisStreamTrigger`
 The `RedisStreamTrigger` reads entries from a stream and surfaces those entries to the function.
 The trigger polls Redis at a configurable fixed interval, and uses [`XREADGROUP`](https://redis.io/commands/xreadgroup/) to read entries from the stream.
-The consumer group for all function instances will be the ID of the function (e.g. `Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisSamples.StreamTrigger` for the [StreamTrigger sample](samples/dotnet/RedisSamples.cs)).
+The consumer group for all instances of a function will be the name of the function (e.g. `SimpleStreamTrigger` for the [StreamTrigger sample](samples/dotnet/RedisStreamTrigger/SimpleStreamTrigger.cs)).
 Each functions instance creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
 #### Inputs
