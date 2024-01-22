@@ -18,11 +18,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public const string RedisInputBinding = "RedisInputBinding";
         public const string RedisOutputBinding = "RedisOutputBinding";
 
-        public const string EntraFullyQualifiedCacheHostName = "fullyQualifiedCacheHostName";
+        public const string EntraFullyQualifiedCacheName = "fullyQualifiedCacheName";
         public const string EntraPrincipalId = "principalId";
-        public const string EntraTenantId = "tenantId";
         public const string EntraClientId = "clientId";
-        public const string EntraClientSecret = "clientSecret";
 
         public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
@@ -64,16 +62,15 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             IConfigurationSection section = configuration.GetWebJobsConnectionSection(connectionStringSetting);
             string connectionString = section.Value;
-            string cacheHostName = section[EntraFullyQualifiedCacheHostName];
+            string cacheHostName = section[EntraFullyQualifiedCacheName];
             if (string.IsNullOrWhiteSpace(connectionString) && string.IsNullOrWhiteSpace(cacheHostName))
             {
                 throw new ArgumentException($"{nameof(connectionStringSetting)} '{connectionStringSetting}' not found in provided configuration.");
 
             }
-
             if (!string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(cacheHostName))
             {
-                throw new ArgumentException($"Found both {nameof(connectionStringSetting)} '{connectionStringSetting}' and '{connectionStringSetting}__{EntraFullyQualifiedCacheHostName}' in provided configuration. Please choose either connection string or managed identity connection.");
+                throw new ArgumentException($"Found both {nameof(connectionStringSetting)} '{connectionStringSetting}' and '{connectionStringSetting}__{EntraFullyQualifiedCacheName}' in provided configuration. Please choose either connection string or managed identity connection.");
             }
 
             if (!string.IsNullOrWhiteSpace(connectionString))
@@ -85,32 +82,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 // Entra Id Connections
                 string principalId = section[EntraPrincipalId];
                 string clientId = section[EntraClientId];
-                string tenantId = section[EntraTenantId];
-                string clientSecret = section[EntraClientSecret];
 
                 if (string.IsNullOrWhiteSpace(principalId))
                 {
                     throw new ArgumentNullException($"{connectionStringSetting}__{EntraPrincipalId}");
                 }
 
-                if (string.IsNullOrWhiteSpace(clientId) && string.IsNullOrWhiteSpace(tenantId) && string.IsNullOrWhiteSpace(clientSecret))
+                if (string.IsNullOrWhiteSpace(clientId))
                 {
                     // System-Assigned Managed Identity
                     options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithSystemAssignedManagedIdentityAsync(principalId);
                 }
-                else if (!string.IsNullOrWhiteSpace(clientId) && string.IsNullOrWhiteSpace(tenantId) && string.IsNullOrWhiteSpace(clientSecret))
+                else
                 {
                     // User-Assigned Managed Identity
                     options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithUserAssignedManagedIdentityAsync(clientId, principalId);
-                }
-                else if (!string.IsNullOrWhiteSpace(clientId) && !string.IsNullOrWhiteSpace(tenantId) && !string.IsNullOrWhiteSpace(clientSecret))
-                {
-                    // Service Principal
-                    options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithServicePrincipalAsync(clientId, principalId, tenantId, clientSecret);
-                }
-                else
-                {
-                    throw new ArgumentException("Managed Identity configuration error.");
                 }
             }
 
