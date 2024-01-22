@@ -48,7 +48,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return setting;
         }
 
-        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting, string clientName = "")
+        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting, string clientName)
         {
             ConfigurationOptions options;
 
@@ -67,7 +67,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string cacheHostName = section[EntraFullyQualifiedCacheHostName];
             if (string.IsNullOrWhiteSpace(connectionString) && string.IsNullOrWhiteSpace(cacheHostName))
             {
-                throw new ArgumentNullException(nameof(connectionStringSetting));
+                throw new ArgumentException($"{nameof(connectionStringSetting)} '{connectionStringSetting}' not found in provided configuration.");
+
             }
 
             if (!string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(cacheHostName))
@@ -111,7 +112,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 {
                     throw new ArgumentException("Managed Identity configuration error.");
                 }
-
             }
 
             options.ClientName = GetRedisClientName(clientName);
