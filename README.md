@@ -41,9 +41,15 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
   - Supports channel patterns.
 
 #### Available Parameter Types
-- [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
-- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The message from the channel.
-- `Custom`: The trigger uses Json.NET serialization to map the message from the channel from a `string` into a custom type.
+- `dotnet in-process`
+  - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
+  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The message from the channel.
+  - `Custom`: The trigger uses Json.NET serialization to map the message from the channel from a `string` into a custom type.
+- `dotnet out-of-process`
+  - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
+  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The message from the channel.
+  - `Custom`: The trigger uses Json.NET serialization to map the message from the channel from a `string` into a custom type.
+  
 
 #### Sample
 The following sample listens to the channel `pubsubTest`.
