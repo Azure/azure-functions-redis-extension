@@ -41,15 +41,19 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
   - Supports channel patterns.
 
 #### Available Parameter Types
-- `dotnet in-process`
+- Types exclusive to `dotnet in-process`
   - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
-  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The message from the channel.
-  - `Custom`: The trigger uses Json.NET serialization to map the message from the channel from a `string` into a custom type.
-- `dotnet out-of-process`
-  - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
-  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The message from the channel.
-  - `Custom`: The trigger uses Json.NET serialization to map the message from the channel from a `string` into a custom type.
-  
+  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The message from the channel ([`StackExchange.Redis.ChannelMessage.Message`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs)).
+- Types available to all (`dotnet in-process`, `dotnet out-of-process`, `python`, `node`, `java`, `powershell`, etc)
+  - `string`, `byte[]`/`ReadOnlyMemory<byte>`: The channel message serialized as JSON (UTF-8 encoded for byte types) in the following format:
+    ```json
+    {
+      "SubscriptionChannel":"__keyspace@0__:*",
+      "ChannelMessage":"__keyspace@0__:mykey",
+      "Message":"set"
+    }
+    ```
+  - `Custom`: The trigger uses Json.NET serialization to map the message from the channel from the `string` value into a custom type.
 
 #### Sample
 The following sample listens to the channel `pubsubTest`.
@@ -62,7 +66,6 @@ public static void PubSubTrigger(
     logger.LogInformation($"The message broadcast to channel 'pubsubTest': '{message}'");
 }
 ```
-
 
 ### `RedisListTrigger`
 The `RedisListTrigger` pops entries from a list and surfaces those entries to the function. The trigger polls Redis at a configurable fixed interval, and uses [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/) to pop entries from the lists.
@@ -79,8 +82,11 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
   - Default: `true`
 
 #### Available Parameter Types
-- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The entry from the list.
-- `Custom`: The trigger uses Json.NET serialization to map the entry from the list from a `string` into a custom type.
+- Types exclusive to `dotnet in-process`
+  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The entry from the list.
+- Types available to all (`dotnet in-process`, `dotnet out-of-process`, `python`, `node`, `java`, `powershell`, etc)
+  - `string`, `byte[]`/`ReadOnlyMemory<byte>`: The entry from the list.
+  - `Custom`: The trigger uses Json.NET serialization to map the entry from the list from a `string` into a custom type.
 
 #### Sample
 The following sample polls the key `listTest`.
@@ -109,13 +115,24 @@ Each functions instance will use the `WEBSITE_INSTANCE_ID` ([documented here](ht
   - Default: `16`
 
 #### Available Parameter Types
-- [`StackExchange.Redis.StreamEntry`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs): The value returned by `StackExchange.Redis`.
-- `StackExchange.Redis.NameValueEntry[]`, `Dictionary<string, string>`: The values contained within the entry.
-- `string`, `byte[]`, `ReadOnlyMemory<byte>`: The stream entry serialized as JSON (UTF-8 encoded for byte types) in the following format:
+- Types exclusive to `dotnet in-process`
+  - [`StackExchange.Redis.StreamEntry`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs): The value returned by `StackExchange.Redis`.
+  - `StackExchange.Redis.NameValueEntry[]`: The values contained within the entry ([`StackExchange.Redis.StreamEntry.Values`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs))
+  - `Dictionary<string, string>`: The values contained within the entry ([`StackExchange.Redis.StreamEntry.Values`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs)) converted into a `Dictionary<string, string>`.
+- Types available to all (`dotnet in-process`, `dotnet out-of-process`, `python`, `node`, `java`, `powershell`, etc)
+  - `string`, `byte[]`, `ReadOnlyMemory<byte>`: The stream entry serialized as JSON (UTF-8 encoded for byte types) in the following format:
+    ```json
+    {
+      "Id":"1658354934941-0",
+      "Values":
+      {
+        "field1":"value1",
+        "field2":"value2",
+        "field3":"value3"
+      }
+    }
     ```
-    {"Id":"1658354934941-0","Values":{"field1":"value1","field2":"value2","field3":"value3"}}
-    ```
-- `Custom`: The trigger uses Json.NET serialization to map the values contained within the entry from a `string` into a custom type.
+  - `Custom`: The trigger uses Json.NET serialization to map the values contained within the entry from a `string` into a custom type.
 
 #### Sample
 The following sample polls the key `streamTest`.
@@ -129,7 +146,7 @@ public static void StreamsTrigger(
 }
 ```
 
-### `Redis` Input Binding
+### `RedisInput` Input Binding
 
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
@@ -156,7 +173,7 @@ public static void SetGetter(
 }
 ```
 
-### `Redis` Output Binding
+### `RedisOutput` Output Binding
 
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
