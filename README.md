@@ -49,7 +49,7 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
     ```json
     {
       "SubscriptionChannel":"__keyspace@0__:*",
-      "ChannelMessage":"__keyspace@0__:mykey",
+      "Channel":"__keyspace@0__:mykey",
       "Message":"set"
     }
     ```
