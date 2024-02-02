@@ -49,6 +49,7 @@ $@"{{
             IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
             A.CallTo(() => serviceProvider.GetService(typeof(IConfiguration))).Returns(IntegrationTestHelpers.localsettings);
             A.CallTo(() => serviceProvider.GetService(typeof(INameResolver))).Returns(A.Fake<INameResolver>());
+            A.CallTo(() => serviceProvider.GetService(typeof(AzureComponentFactory))).Returns(A.Fake<AzureComponentFactory>());
             TriggerMetadata metadata = new TriggerMetadata(JObject.Parse(triggerJson));
 
             string actualMonitorType;
