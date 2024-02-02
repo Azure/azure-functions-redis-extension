@@ -21,7 +21,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public const string EntraFullyQualifiedCacheName = "fullyQualifiedCacheName";
         public const string EntraPrincipalId = "principalId";
-        public const string EntraClientId = "clientId";
 
         public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
