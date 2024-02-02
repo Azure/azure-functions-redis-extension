@@ -30,7 +30,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public async void ResolveConfigurationOptionsAsync_ValidConnectionStringSetting_ReturnsResolvedString()
         {
-            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, "redisConnectionString", "test");
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, null, "redisConnectionString", "test");
             Assert.Single(options.EndPoints);
             Assert.Equal("127.0.0.1:6379", options.EndPoints[0].ToString());
         }
@@ -39,7 +39,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         public async void ResolveConfigurationOptionsAsync_ValidSetting_ReturnsResolvedString()
         {
 
-            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, "CacheConnection", "test");
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, null, "CacheConnection", "test");
             Assert.Single(options.EndPoints);
             Assert.Equal("0.0.0.0:6379", options.EndPoints[0].ToString());
         }
@@ -50,13 +50,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(null)]
         public async Task ResolveConfigurationOptionsAsync_EmptyConnectionStringSetting_ThrowsArgumentNullException(string connectionStringSetting)
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, connectionStringSetting, "test"));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, null, connectionStringSetting, "test"));
         }
 
         [Fact]
         public async Task ResolveConfigurationOptionsAsync_InvalidSetting_ThrowsArgumentException()
         {
-            await Assert.ThrowsAsync<ArgumentException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, "invalidSetting", "test"));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, null, "invalidSetting", "test"));
         }
 
         [Fact]

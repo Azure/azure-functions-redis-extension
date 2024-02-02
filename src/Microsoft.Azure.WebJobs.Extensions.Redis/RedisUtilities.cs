@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -46,7 +47,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return setting;
         }
 
-        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting, string clientName)
+        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string clientName)
         {
             ConfigurationOptions options;
 
@@ -81,23 +82,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 // Entra Id Connections
                 string principalId = section[EntraPrincipalId];
-                string clientId = section[EntraClientId];
 
                 if (string.IsNullOrWhiteSpace(principalId))
                 {
                     throw new ArgumentNullException($"{connectionStringSetting}__{EntraPrincipalId}");
                 }
 
-                if (string.IsNullOrWhiteSpace(clientId))
-                {
-                    // System-Assigned Managed Identity
-                    options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithSystemAssignedManagedIdentityAsync(principalId);
-                }
-                else
-                {
-                    // User-Assigned Managed Identity
-                    options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithUserAssignedManagedIdentityAsync(clientId, principalId);
-                }
+                options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithTokenCredentialAsync(principalId, azureComponentFactory.CreateTokenCredential(section));
             }
 
             options.ClientName = GetRedisClientName(clientName);

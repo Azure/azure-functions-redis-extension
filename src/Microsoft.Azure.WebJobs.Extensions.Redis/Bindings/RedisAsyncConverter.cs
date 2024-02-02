@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -12,12 +13,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisAsyncConverter<T> : IAsyncConverter<RedisAttribute, T>
     {
         private readonly IConfiguration configuration;
+        private readonly AzureComponentFactory azureComponentFactory;
         private readonly INameResolver nameResolver;
         private readonly ILogger logger;
 
-        public RedisAsyncConverter(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
+        public RedisAsyncConverter(IConfiguration configuration, AzureComponentFactory azureComponentFactory, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
+            this.azureComponentFactory = azureComponentFactory;
             this.nameResolver = nameResolver;
             this.logger = logger;
         }
@@ -25,7 +28,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public async Task<T> ConvertAsync(RedisAttribute input, CancellationToken cancellationToken)
         {
             string fullCommand = RedisUtilities.ResolveString(nameResolver, input.Command, nameof(input.Command));
-            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, input.ConnectionStringSetting, RedisUtilities.RedisInputBinding);
+            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, input.ConnectionStringSetting, RedisUtilities.RedisInputBinding);
 
             string[] splitCommand = fullCommand.Split(RedisUtilities.BindingDelimiter);
             string command = splitCommand[0];

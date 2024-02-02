@@ -2,6 +2,7 @@
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -17,14 +18,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisPubSubTriggerBinding : ITriggerBinding
     {
         private readonly IConfiguration configuration;
+        private readonly AzureComponentFactory azureComponentFactory;
         private readonly string connectionStringSetting;
         private readonly string channel;
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisPubSubTriggerBinding(IConfiguration configuration, string connectionStringSetting, string channel, Type parameterType, ILogger logger)
+        public RedisPubSubTriggerBinding(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string channel, Type parameterType, ILogger logger)
         {
             this.configuration = configuration;
+            this.azureComponentFactory = azureComponentFactory;
             this.connectionStringSetting = connectionStringSetting;
             this.channel = channel;
             this.parameterType = parameterType;
@@ -48,7 +51,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(context));
             }
 
-            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, connectionStringSetting, context.Descriptor.ShortName);
+            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connectionStringSetting, context.Descriptor.ShortName);
             return new RedisPubSubListener(context.Descriptor.LogName, multiplexer, channel, context.Executor, logger);
         }
 

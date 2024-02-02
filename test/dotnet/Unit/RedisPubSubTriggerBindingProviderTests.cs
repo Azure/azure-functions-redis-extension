@@ -1,4 +1,5 @@
 using FakeItEasy;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,7 +13,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [Fact]
         public async Task Constructor_NullContext_ThrowsExceptionAsync()
         {
-            RedisPubSubTriggerBindingProvider bindingProvider = new RedisPubSubTriggerBindingProvider(A.Fake<IConfiguration>(), A.Fake<INameResolver>(), A.Fake<ILogger>()); ;
+            RedisPubSubTriggerBindingProvider bindingProvider = new RedisPubSubTriggerBindingProvider(A.Fake<IConfiguration>(), A.Fake< AzureComponentFactory>(), A.Fake<INameResolver>(), A.Fake<ILogger>()); ;
             await Assert.ThrowsAsync<ArgumentNullException>(() => bindingProvider.TryCreateAsync(null));
         }
     }

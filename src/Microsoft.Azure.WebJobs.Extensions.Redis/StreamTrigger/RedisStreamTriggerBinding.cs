@@ -2,6 +2,7 @@
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -17,6 +18,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisStreamTriggerBinding : ITriggerBinding
     {
         private readonly IConfiguration configuration;
+        private readonly AzureComponentFactory azureComponentFactory;
         private readonly string connectionStringSetting;
         private readonly TimeSpan pollingInterval;
         private readonly string key;
@@ -24,9 +26,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisStreamTriggerBinding(IConfiguration configuration, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, Type parameterType, ILogger logger)
+        public RedisStreamTriggerBinding(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, Type parameterType, ILogger logger)
         {
             this.configuration = configuration;
+            this.azureComponentFactory = azureComponentFactory;
             this.connectionStringSetting = connectionStringSetting;
             this.key = key;
             this.pollingInterval = pollingInterval;
@@ -65,6 +68,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return Task.FromResult<IListener>(new RedisStreamListener(
                 context.Descriptor.ShortName,
                 configuration,
+                azureComponentFactory,
                 connectionStringSetting,
                 key,
                 pollingInterval,

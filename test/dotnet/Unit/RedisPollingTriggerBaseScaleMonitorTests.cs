@@ -1,5 +1,6 @@
 ﻿using FakeItEasy;
 using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System;
@@ -62,7 +63,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(5, 20, ScaleVote.ScaleIn)]
         public void ScalingLogic_ConstantMetrics(int workerCount, int batchSize, ScaleVote expected)
         {
-            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), "connection", batchSize, "key");
+            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), A.Fake<AzureComponentFactory>(), "connection", batchSize, "key");
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = constantMetrics };
             Assert.Equal(expected, monitor.GetScaleStatus(context).Vote);
         }
@@ -76,7 +77,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(5, 20)]
         public void ScalingLogic_FewMetrics(int workerCount, int batchSize)
         {
-            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), "connection", batchSize, "key");
+            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), A.Fake<AzureComponentFactory>(), "connection", batchSize, "key");
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = fewMetrics };
             Assert.Equal(ScaleVote.None, monitor.GetScaleStatus(context).Vote);
         }
@@ -88,7 +89,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(10, 10, ScaleVote.ScaleIn)]
         public void ScalingLogic_DecreasingMetrics(int workerCount, int batchSize, ScaleVote expected)
         {
-            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), "connection", batchSize, "key");
+            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), A.Fake<AzureComponentFactory>(), "connection", batchSize, "key");
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = decreasingMetrics };
             Assert.Equal(expected, monitor.GetScaleStatus(context).Vote);
         }
@@ -99,7 +100,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData(10, 10, ScaleVote.ScaleIn)]
         public void ScalingLogic_IncreasingMetrics(int workerCount, int batchSize, ScaleVote expected)
         {
-            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), "connection", batchSize, "key");
+            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), A.Fake<AzureComponentFactory>(), "connection", batchSize, "key");
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = increasingMetrics };
             Assert.Equal(expected, monitor.GetScaleStatus(context).Vote);
         }
