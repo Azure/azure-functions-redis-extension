@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.WebJobs.Host;
+﻿using Azure.Core;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -87,7 +88,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                     throw new ArgumentNullException($"{connectionStringSetting}__{EntraPrincipalId}");
                 }
 
-                options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithTokenCredentialAsync(principalId, azureComponentFactory.CreateTokenCredential(section));
+                TokenCredential tokenCredential = azureComponentFactory.CreateTokenCredential(section);
+                options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithTokenCredentialAsync(principalId, tokenCredential);
             }
 
             options.ClientName = GetRedisClientName(clientName);
