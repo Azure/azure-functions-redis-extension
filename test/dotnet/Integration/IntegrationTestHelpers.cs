@@ -30,6 +30,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         internal const string AllChannels = "*";
 
         internal const string ConnectionStringSetting = "redisConnectionString";
+        internal const string ManagedIdentitySetting = "redisManagedIdentity";
         internal const string Redis60 = "/redis/redis-6.0.20";
         internal const string Redis62 = "/redis/redis-6.2.14";
         internal const string Redis70 = "/redis/redis-7.0.14";
