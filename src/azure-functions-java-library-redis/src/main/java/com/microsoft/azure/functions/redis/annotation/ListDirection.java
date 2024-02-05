@@ -11,12 +11,12 @@ package com.microsoft.azure.functions.redis.annotation;
 public enum ListDirection
 {
     /**
-     * Uses <a href="https://redis.io/commands/lmpop/">LPOP</a> or <a href="https://redis.io/commands/lmpop/">LMPOP RIGHT</a>
+     * Uses <a href="https://redis.io/commands/lpop/">LPOP</a>
      */
     LEFT,
 
     /**
-     * Uses <a href="https://redis.io/commands/rpop/">RPOP</a> or <a href="https://redis.io/commands/lmpop/">LMPOP RIGHT</a>
+     * Uses <a href="https://redis.io/commands/rpop/">RPOP</a>
      */
     RIGHT
 }

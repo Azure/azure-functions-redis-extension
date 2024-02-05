@@ -36,12 +36,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     public enum ListDirection
     {
         /// <summary>
-        /// Uses <a href="https://redis.io/commands/lmpop/">LPOP</a> or <a href="https://redis.io/commands/lmpop/">LMPOP RIGHT</a>
+        /// Uses <a href="https://redis.io/commands/lpop/">LPOP</a>
         /// </summary>
         LEFT,
 
         /// <summary>
-        /// Uses <a href="https://redis.io/commands/rpop/">RPOP</a> or <a href="https://redis.io/commands/lmpop/">LMPOP RIGHT</a>
+        /// Uses <a href="https://redis.io/commands/rpop/">RPOP</a>
         /// </summary>
         RIGHT
     }

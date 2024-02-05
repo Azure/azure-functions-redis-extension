@@ -69,8 +69,9 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
 - `MaxBatchSize`: Number of entries to pop from Redis at one time. These are processed in parallel.
   - Only supported on Redis 6.2+ using the `COUNT` argument in [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/).
   - Default: `16`
-- `ListPopFromBeginning`: determines whether to pop entries from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop entries from the end using [`RPOP`](https://redis.io/commands/rpop/).
-  - Default: `true`
+- `ListDirection`: The direction to pop elements from the list: `LEFT` using [`LPOP`](https://redis.io/commands/lpop/) or `RIGHT` using [`RPOP`](https://redis.io/commands/rpop/).
+  - Allowed Values: `LEFT`, `RIGHT`
+  - Default: `LEFT`
 
 #### Available Parameter Types
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The entry from the list.
