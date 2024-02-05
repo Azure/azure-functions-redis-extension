@@ -17,18 +17,32 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in milliseconds. Default: 1000</param>
         /// <param name="maxBatchSize">Number of entries to pull from a Redis list at one time. Default: 16</param>
-        /// <param name="listPopFromBeginning">Decides if the function will pop entries from the front or end of the list. Default: true</param>
-        public RedisListTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, bool listPopFromBeginning = true)
+        /// <param name="listDirection">The direction to pop elements from the list. Default: left</param>
+        public RedisListTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, ListDirection listDirection = ListDirection.LEFT)
             : base(connectionStringSetting, key, pollingIntervalInMs, maxBatchSize)
         {
-            ListPopFromBeginning = listPopFromBeginning;
+            ListDirection = listDirection;
         }
 
         /// <summary>
-        /// Decides if the function will pop entries from the front or end of the list.
-        /// True (default) = pop entries from the front of the list.
-        /// False = pop entries from the end of the list.
+        /// The direction to pop elements from the list.
         /// </summary>
-        public bool ListPopFromBeginning { get; }
+        public ListDirection ListDirection { get; }
+    }
+
+    /// <summary>
+    /// The direction to pop elements from the list.
+    /// </summary>
+    public enum ListDirection
+    {
+        /// <summary>
+        /// Uses <a href="https://redis.io/commands/lmpop/">LPOP</a> or <a href="https://redis.io/commands/lmpop/">LMPOP RIGHT</a>
+        /// </summary>
+        LEFT,
+
+        /// <summary>
+        /// Uses <a href="https://redis.io/commands/rpop/">RPOP</a> or <a href="https://redis.io/commands/lmpop/">LMPOP RIGHT</a>
+        /// </summary>
+        RIGHT
     }
 }
