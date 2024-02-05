@@ -88,7 +88,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             // Ensure that the client name is correctly set
             IConnectionMultiplexer multiplexer;
-            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, new DefaultAzureComponentFactory(), ConnectionStringSetting, nameof(IntegrationTestHelpers));
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, new ClientSecretCredentialComponentFactory(), ConnectionStringSetting, nameof(IntegrationTestHelpers));
             options.AllowAdmin = true;
             multiplexer = await ConnectionMultiplexer.ConnectAsync(options);
             ClientInfo[] clients = multiplexer.GetServers()[0].ClientList();
@@ -230,7 +230,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             public int targetWorkerCount;
         }
 
-        internal class DefaultAzureComponentFactory : AzureComponentFactory
+        internal class ClientSecretCredentialComponentFactory : AzureComponentFactory
         {
             public override object CreateClient(Type clientType, IConfiguration configuration, TokenCredential credential, object clientOptions)
             {
@@ -244,7 +244,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 
             public override TokenCredential CreateTokenCredential(IConfiguration configuration)
             {
-                return new EnvironmentCredential();
+                var clientId = configuration["clientId"];
+                var tenantId = configuration["tenantId"];
+                var clientSecret = configuration["clientSecret"];
+                return new ClientSecretCredential(tenantId, clientId, clientSecret);
             }
         }
     }

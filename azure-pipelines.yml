@@ -76,11 +76,6 @@ jobs:
         inputs:
           command: test
           arguments: $(Build.SourcesDirectory)/test/dotnet/Microsoft.Azure.WebJobs.Extensions.Redis.Tests.csproj --configuration Debug
-          env:
-            AZURE_CLIENT_ID: $(AZURE_CLIENT_ID)
-            AZURE_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
-            AZURE_PRINCIPAL_ID: $(AZURE_PRINCIPAL_ID)
-            AZURE_TENANT_ID: $(AZURE_TENANT_ID)
 
       - task: DotNetCoreCLI@2
         displayName: Build Microsoft.Azure.WebJobs.Extensions.Redis Release
