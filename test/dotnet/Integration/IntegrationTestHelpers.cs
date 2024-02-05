@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Azure.Core;
+using Azure.Identity;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
@@ -83,9 +86,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.OutputDataReceived -= functionLoadedHandler;
 
             // Ensure that the client name is correctly set
-            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, null, ConnectionStringSetting, nameof(IntegrationTestHelpers));
+            IConnectionMultiplexer multiplexer;
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, new DefaultAzureComponentFactory(), ConnectionStringSetting, nameof(IntegrationTestHelpers));
             options.AllowAdmin = true;
-            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(options);
+            multiplexer = await ConnectionMultiplexer.ConnectAsync(options);
             ClientInfo[] clients = multiplexer.GetServers()[0].ClientList();
             if (!clients.Any(client => client.Name == RedisUtilities.GetRedisClientName(functionName)))
             {
@@ -223,6 +227,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             public int vote;
             public int targetWorkerCount;
+        }
+
+        internal class DefaultAzureComponentFactory : AzureComponentFactory
+        {
+            public override object CreateClient(Type clientType, IConfiguration configuration, TokenCredential credential, object clientOptions)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override object CreateClientOptions(Type optionsType, object serviceVersion, IConfiguration configuration)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override TokenCredential CreateTokenCredential(IConfiguration configuration)
+            {
+                return new EnvironmentCredential();
+            }
         }
     }
 }

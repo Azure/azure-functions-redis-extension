@@ -5,6 +5,11 @@
     "FUNCTIONS_WORKER_RUNTIME": "dotnet"
   },
   "ConnectionStrings": {
-    "redisConnectionString": "127.0.0.1:6379"
+    "redisConnectionString": "127.0.0.1:6379",
+    "redisManagedIdentity__fullyQualifiedCacheName": "",
+    "redisManagedIdentity__clientId": "",
+    "redisManagedIdentity__principalId": "",
+    "redisManagedIdentity__tenantId": "",
+    "redisManagedIdentity__clientSecret": ""
   }
 }
