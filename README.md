@@ -184,13 +184,13 @@ In the appsettings, this is how to configure each of the following types of clie
 
 1. System-Assigned Managed Identity
     ```json
-    "Redis__fullyQualifiedCacheName": "<cacheName>.redis.cache.windows.net",
+    "Redis__redisHostName": "<cacheName>.redis.cache.windows.net",
     "Redis__principalId": "<principalId>"
     ```
 
 1. User-Assigned Managed Identity
     ```json
-    "Redis__fullyQualifiedCacheName": "<cacheName>.redis.cache.windows.net",
+    "Redis__redisHostName": "<cacheName>.redis.cache.windows.net",
     "Redis__principalId": "<principalId>",
     "Redis__clientId": "<clientId>"
     ```

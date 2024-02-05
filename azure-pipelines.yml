@@ -14,7 +14,7 @@ trigger:
 
 variables:
   Codeql.Enabled: true
-  ConnectionStrings.redisManagedIdentity__fullyQualifiedCacheName": $(AZURE_CACHE_HOST_NAME)
+  ConnectionStrings.redisManagedIdentity__redisHostName": $(AZURE_CACHE_HOST_NAME)
   ConnectionStrings.redisManagedIdentity__clientId": $(AZURE_CLIENT_ID)
   ConnectionStrings.redisManagedIdentity__principalId": $(AZURE_PRINCIPAL_ID)
   ConnectionStrings.redisManagedIdentity__tenantId": $(AZURE_TENANT_ID)

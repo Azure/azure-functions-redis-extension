@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public const string RedisInputBinding = "RedisInputBinding";
         public const string RedisOutputBinding = "RedisOutputBinding";
 
-        public const string EntraFullyQualifiedCacheName = "fullyQualifiedCacheName";
+        public const string EntraRedisHostName = "RedisHostName";
         public const string EntraPrincipalId = "principalId";
 
         public const char BindingDelimiter = ' ';
@@ -63,7 +63,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             IConfigurationSection section = configuration.GetWebJobsConnectionSection(connectionStringSetting);
             string connectionString = section.Value;
-            string cacheHostName = section[EntraFullyQualifiedCacheName];
+            string cacheHostName = section[EntraRedisHostName];
             if (string.IsNullOrWhiteSpace(connectionString) && string.IsNullOrWhiteSpace(cacheHostName))
             {
                 throw new ArgumentException($"{nameof(connectionStringSetting)} '{connectionStringSetting}' not found in provided configuration.");
@@ -71,7 +71,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             if (!string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(cacheHostName))
             {
-                throw new ArgumentException($"Found both {nameof(connectionStringSetting)} '{connectionStringSetting}' and '{connectionStringSetting}__{EntraFullyQualifiedCacheName}' in provided configuration. Please choose either connection string or managed identity connection.");
+                throw new ArgumentException($"Found both {nameof(connectionStringSetting)} '{connectionStringSetting}' and '{connectionStringSetting}__{EntraRedisHostName}' in provided configuration. Please choose either connection string or managed identity connection.");
             }
 
             if (!string.IsNullOrWhiteSpace(connectionString))
