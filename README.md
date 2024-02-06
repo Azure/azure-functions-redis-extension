@@ -43,8 +43,8 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
 
 #### Available Parameter Types
 - Types exclusive to `dotnet in-process`
-  - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
-  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The message from the channel.
+  - [`ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
+  - [`RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The message from the channel [`ChannelMessage.Message`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs)
 - Types available to all (`dotnet in-process`, `dotnet out-of-process`, `python`, `node`, `java`, `powershell`, etc)
   - `string`, `byte[]`/`ReadOnlyMemory<byte>`: The channel message serialized as JSON (UTF-8 encoded for byte types) in the following format:
     ```json
@@ -76,7 +76,9 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
 - `Key`: Key to read from.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
-- `MaxBatchSize`: Number of entries to pop from Redis at one time. These are processed in parallel.
+- `MaxBatchSize`: Number of entries to pop from the Redis list at one time.
+These are usually processed in parallel, with each entry from the list triggering its own function invocation.
+If a `dotnet in-process` function defines the parameter type as [`RedisValue[]`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string[]`, or `byte[][]`, there will only be one function invocation with all entries returned as this array type.
   - Only supported on Redis 6.2+ using the `COUNT` argument in [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/).
   - Default: `16`
 - `ListPopFromBeginning`: determines whether to pop entries from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop entries from the end using [`RPOP`](https://redis.io/commands/rpop/).
@@ -84,7 +86,8 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
 
 #### Available Parameter Types
 - Types exclusive to `dotnet in-process`
-  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The entry from the list.
+  - [`RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The entry from the list.
+  - Single-invocation batch types: [`RedisValue[]`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string[]`, `byte[][]` -  The full batch of list entries given to the function in one invocation.
 - Types available to all (`dotnet in-process`, `dotnet out-of-process`, `python`, `node`, `java`, `powershell`, etc)
   - `string`, `byte[]`/`ReadOnlyMemory<byte>`: The entry from the list.
   - `Custom`: The trigger uses Json.NET serialization to map `string` value into the given custom type.
@@ -112,14 +115,17 @@ Each functions instance will use the `WEBSITE_INSTANCE_ID` ([documented here](ht
 - `Key`: Key to read from.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
-- `MaxBatchSize`: Number of entries to read from Redis at one time. These are processed in parallel.
+- `MaxBatchSize`: Number of entries to read from Redis at one time.
+These are usually processed in parallel, with each entry from the list triggering its own function invocation.
+If a `dotnet in-process` function defines the parameter type as [`StreamEntry[]`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs), [`NameValueEntry[][]`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/NameValueEntry.cs), `Dictionary<string, string>[]`, `string[]`, or `byte[][]`, there will only be one function invocation with all entries returned as this array type.
   - Default: `16`
 
 #### Available Parameter Types
 - Types exclusive to `dotnet in-process`
-  - [`StackExchange.Redis.StreamEntry`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs): The value returned by `StackExchange.Redis`.
-  - `StackExchange.Redis.NameValueEntry[]`: The values contained within the entry ([`StackExchange.Redis.StreamEntry.Values`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs))
-  - `Dictionary<string, string>`: The values contained within the entry ([`StackExchange.Redis.StreamEntry.Values`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs)) converted into a `Dictionary<string, string>`.
+  - [`StreamEntry`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs): The value returned by `StackExchange.Redis`.
+  - [`NameValueEntry[]`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/NameValueEntry.cs): The values contained within the entry ([`StreamEntry.Values`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs))
+  - `Dictionary<string, string>`: The values contained within the entry ([`StreamEntry.Values`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs)) converted into a `Dictionary<string, string>`.
+    - Single-invocation batch types: [`StreamEntry[]`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/StreamEntry.cs), [`NameValueEntry[][]`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/APITypes/NameValueEntry.cs), `Dictionary<string, string>[]`, `string[]`, `byte[][]` -  The full batch of list entries given to the function in one invocation.
 - Types available to all (`dotnet in-process`, `dotnet out-of-process`, `python`, `node`, `java`, `powershell`, etc)
   - `string`, `byte[]`, `ReadOnlyMemory<byte>`: The stream entry serialized as JSON (UTF-8 encoded for byte types) in the following format:
     ```json
@@ -158,7 +164,7 @@ public static void StreamsTrigger(
 > The full list can be found [here](./src/Microsoft.Azure.WebJobs.Extensions.Redis/Bindings/RedisConverter.cs#L61)
 
 #### Available Parameter Types
-- [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The value returned by the command.
+- [`RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The value returned by the command.
 - `Custom`: The trigger uses Json.NET serialization to map the value returned by the command from a `string` into a custom type.
 
 #### Sample
