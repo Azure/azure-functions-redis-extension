@@ -14,11 +14,6 @@ trigger:
 
 variables:
   Codeql.Enabled: true
-  ConnectionStrings.redisManagedIdentity__redisHostName": $(AZURE_CACHE_HOST_NAME)
-  ConnectionStrings.redisManagedIdentity__clientId": $(AZURE_CLIENT_ID)
-  ConnectionStrings.redisManagedIdentity__principalId": $(AZURE_PRINCIPAL_ID)
-  ConnectionStrings.redisManagedIdentity__tenantId": $(AZURE_TENANT_ID)
-  ConnectionStrings.redisManagedIdentity__clientSecret": $(AZURE_CLIENT_SECRET)
   # It is a release build if it is triggered by the main branch.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
   majorVersion: 0
@@ -65,11 +60,11 @@ jobs:
           targetType: 'inline'
           script: 'sudo wget -P /redis https://download.redis.io/releases/redis-7.0.14.tar.gz; cd /redis; sudo tar -xzvf redis-7.0.14.tar.gz; cd redis-7.0.14; sudo make'
 
-      - task: FileTransform@2
-        displayName: Set local.settings.json values to build secrets
+      - task: Bash@3
+        displayName: Set local.settings.json secret values to environment variables
         inputs:
-          folderPath: $(Build.SourcesDirectory)/test/dotnet
-          jsonTargetFiles: local.settings.json
+          targetType: 'inline'
+          script: 'sed -i "s/{{AZURE_CACHE_HOST_NAME}}/$(AZURE_CACHE_HOST_NAME)/g; s/{{AZURE_CLIENT_ID}}/$(AZURE_CLIENT_ID)/g; s/{{AZURE_PRINCIPAL_ID}}/$(AZURE_PRINCIPAL_ID)/g; s/{{AZURE_TENANT_ID}}/$(AZURE_TENANT_ID)/g; s/{{AZURE_CLIENT_SECRET}}/$(AZURE_CLIENT_SECRET)/g" $(Build.SourcesDirectory)/test/dotnet/local.settings.json'
 
       - task: DotNetCoreCLI@2
         displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug

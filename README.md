@@ -195,6 +195,17 @@ In the appsettings, this is how to configure each of the following types of clie
     "Redis__clientId": "<clientId>"
     ```
 
+1. Service Principal Secret
+    > **Note**
+    > Connections using Service Principal Secrets are only available during local development.
+    ```json
+    "Redis__redisHostName": "<cacheName>.redis.cache.windows.net",
+    "Redis__principalId": "<principalId>",
+    "Redis__clientId": "<clientId>"
+    "Redis__tenantId": "<tenantId>"
+    "Redis__clientSecret": "<clientSecret>"
+    ```
+
 ## Contributing
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
