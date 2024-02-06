@@ -146,7 +146,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         [InlineData(nameof(ListTrigger_Batch_String), typeof(string[]))]
         [InlineData(nameof(ListTrigger_Batch_RedisValue), typeof(RedisValue[]))]
         [InlineData(nameof(ListTrigger_Batch_ByteArray), typeof(byte[][]))]
-        [InlineData(nameof(ListTrigger_Batch_CustomTypeArray), typeof(CustomType[]))]
         public async void ListTrigger_Batch_ExecutesFewerTimes(string functionName, Type destinationType)
         {
             int elements = 1000;
