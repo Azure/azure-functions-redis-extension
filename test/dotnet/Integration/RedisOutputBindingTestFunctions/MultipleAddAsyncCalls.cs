@@ -1,3 +1,4 @@
+using StackExchange.Redis;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
@@ -6,10 +7,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(MultipleAddAsyncCalls))]
         public static async Task Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(MultipleAddAsyncCalls))] string entry,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(MultipleAddAsyncCalls))] ChannelMessage entry,
             [Redis(IntegrationTestHelpers.ConnectionStringSetting, "SET")] IAsyncCollector<string> collector)
         {
-            string[] keys = entry.Split(',');
+            string[] keys = entry.Message.ToString().Split(',');
             foreach (string key in keys)
             {
                 await collector.AddAsync($"{key} {nameof(MultipleAddAsyncCalls)}");

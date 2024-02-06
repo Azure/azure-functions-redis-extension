@@ -44,7 +44,7 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
 #### Available Parameter Types
 - Types exclusive to `dotnet in-process`
   - [`StackExchange.Redis.ChannelMessage`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs): The value returned by `StackExchange.Redis`.
-  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The message from the channel ([`StackExchange.Redis.ChannelMessage.Message`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/ChannelMessageQueue.cs)).
+  - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The message from the channel.
 - Types available to all (`dotnet in-process`, `dotnet out-of-process`, `python`, `node`, `java`, `powershell`, etc)
   - `string`, `byte[]`/`ReadOnlyMemory<byte>`: The channel message serialized as JSON (UTF-8 encoded for byte types) in the following format:
     ```json

@@ -39,10 +39,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <exception cref="InvalidOperationException"></exception>
         public Task<object> GetValueAsync()
         {
-            //if (Type.Equals(typeof(ChannelMessage)))
-            //{
-            //    return Task.FromResult<object>(message);
-            //}
+            if (Type.Equals(typeof(ChannelMessage)))
+            {
+                return Task.FromResult<object>(message);
+            }
+            if (Type.Equals(typeof(RedisValue)))
+            {
+                return Task.FromResult<object>(message.Message);
+            }
             if (Type.Equals(typeof(string)))
             {
                 return Task.FromResult<object>(ToInvokeString());
