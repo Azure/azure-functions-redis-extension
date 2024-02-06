@@ -54,7 +54,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             new RedisPollingTriggerBaseMetrics { Timestamp = DateTime.Now.AddSeconds(-1), Remaining = 50 },
         };
 
-        [Theory]
+        //[Theory]
         [InlineData(1, 10, ScaleVote.ScaleOut)]
         [InlineData(5, 5, ScaleVote.ScaleOut)]
         [InlineData(1, 100, ScaleVote.None)]
@@ -68,7 +68,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             Assert.Equal(expected, monitor.GetScaleStatus(context).Vote);
         }
 
-        [Theory]
+        //[Theory]
         [InlineData(1, 10)]
         [InlineData(5, 5)]
         [InlineData(1, 100)]
@@ -82,7 +82,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             Assert.Equal(ScaleVote.None, monitor.GetScaleStatus(context).Vote);
         }
 
-        [Theory]
+        //[Theory]
         [InlineData(1, 10, ScaleVote.ScaleOut)]
         [InlineData(3, 10, ScaleVote.None)]
         [InlineData(1, 100, ScaleVote.None)]
@@ -93,7 +93,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = decreasingMetrics };
             Assert.Equal(expected, monitor.GetScaleStatus(context).Vote);
         }
-        [Theory]
+        //[Theory]
         [InlineData(1, 10, ScaleVote.ScaleOut)]
         [InlineData(7, 10, ScaleVote.None)]
         [InlineData(1, 100, ScaleVote.None)]

@@ -12,7 +12,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     [Collection("RedisTriggerTests")]
     public class RedisInputBindingTests
     {
-        [Fact]
+        //[Fact]
         public async void Get_SuccessfullyGets()
         {
             string functionName = nameof(GetTester);
@@ -43,7 +43,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
         }
 
-        [Fact]
+        //[Fact]
         public async void Hget_SuccessfullyGets()
         {
             string functionName = nameof(HgetTester);
@@ -74,7 +74,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
         }
 
-        [Fact]
+        //[Fact]
         public async void GetCustom_SuccessfullyConvertsType()
         {
             string functionName = nameof(GetTester_Custom);

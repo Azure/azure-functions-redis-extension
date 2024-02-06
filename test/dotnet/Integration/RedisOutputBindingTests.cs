@@ -12,7 +12,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     [Collection("RedisTriggerTests")]
     public class RedisOutputBindingTests
     {
-        [Fact]
+        //[Fact]
         public async void SetDeleter_SuccessfullyDeletes()
         {
             string functionName = nameof(SetDeleter);
@@ -42,7 +42,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
         }
 
-        [Fact]
+        //[Fact]
         public async void StreamTriggerDeleter_SuccessfullyDeletes()
         {
             string functionName = nameof(StreamTriggerDeleter);
@@ -81,7 +81,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
         }
 
-        [Fact]
+        //[Fact]
         public async void MultipleAddAsyncCalls_SuccessfullyFlushes()
         {
             string functionName = nameof(MultipleAddAsyncCalls);

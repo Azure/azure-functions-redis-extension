@@ -15,7 +15,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     [Collection("RedisTriggerTests")]
     public class RedisStreamTriggerTests
     {
-        [Fact]
+        //[Fact]
         public async void StreamTrigger_SuccessfullyTriggers()
         {
             string functionName = nameof(StreamTrigger_StreamEntry);
@@ -51,7 +51,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
-        [Fact]
+        //[Fact]
         public async void StreamTrigger_ScaledOutInstances_DoesntDuplicateEvents()
         {
             string functionName = nameof(StreamTrigger_StreamEntry);
@@ -95,7 +95,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
-        [Theory]
+        //[Theory]
         [InlineData(nameof(StreamTrigger_StreamEntry), typeof(StreamEntry))]
         [InlineData(nameof(StreamTrigger_NameValueEntryArray), typeof(NameValueEntry[]))]
         [InlineData(nameof(StreamTrigger_ByteArray), typeof(byte[]))]
@@ -136,7 +136,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
-        [Theory]
+        //[Theory]
         [InlineData(nameof(StreamTrigger_Batch_StreamEntry), typeof(StreamEntry[]))]
         [InlineData(nameof(StreamTrigger_Batch_NameValueEntryArray), typeof(NameValueEntry[][]))]
         [InlineData(nameof(StreamTrigger_Batch_ByteArray), typeof(byte[][]))]

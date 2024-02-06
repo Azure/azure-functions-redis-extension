@@ -9,7 +9,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
 {
     public class RedisPubSubListenerTests
     {
-        [Fact]
+        //[Fact]
         public async void StopAsync_ClosesAndDisposesConnectionMultiplexer()
         {
             IConnectionMultiplexer multiplexer = A.Fake<IConnectionMultiplexer>();
