@@ -37,8 +37,9 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
 
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
-- `Channel`: pubsub channel that the trigger should listen to.
-  - Supports channel patterns.
+- `Channel`: Redis pubsub channel that the trigger will listen to.
+- `Pattern`: If the channel is a pattern.
+  - Default: `false`
 
 #### Available Parameter Types
 - Types exclusive to `dotnet in-process`
@@ -53,7 +54,7 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
       "Message":"set"
     }
     ```
-  - `Custom`: The trigger uses Json.NET serialization to map the message from the channel from the `string` value into a custom type.
+  - `Custom`: The trigger uses Json.NET serialization to map `string` value into the given custom type.
 
 #### Sample
 The following sample listens to the channel `pubsubTest`.
@@ -86,7 +87,7 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
   - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs): The entry from the list.
 - Types available to all (`dotnet in-process`, `dotnet out-of-process`, `python`, `node`, `java`, `powershell`, etc)
   - `string`, `byte[]`/`ReadOnlyMemory<byte>`: The entry from the list.
-  - `Custom`: The trigger uses Json.NET serialization to map the entry from the list from a `string` into a custom type.
+  - `Custom`: The trigger uses Json.NET serialization to map `string` value into the given custom type.
 
 #### Sample
 The following sample polls the key `listTest`.
@@ -96,7 +97,7 @@ public static void ListsTrigger(
     [RedisListTrigger("Redis", "listTest")] string entry,
     ILogger logger)
 {
-    logger.LogInformation($"The entry pushed to the list listTest: '{entry}'");
+    logger.LogInformation($"The entry pushed to the list 'listTest': '{entry}'");
 }
 ```
 
@@ -132,7 +133,7 @@ Each functions instance will use the `WEBSITE_INSTANCE_ID` ([documented here](ht
       }
     }
     ```
-  - `Custom`: The trigger uses Json.NET serialization to map the values contained within the entry from a `string` into a custom type.
+  - `Custom`: The trigger uses Json.NET serialization to map `string` value into the given custom type.
 
 #### Sample
 The following sample polls the key `streamTest`.
@@ -142,7 +143,7 @@ public static void StreamsTrigger(
     [RedisStreamTrigger("Redis", "streamTest")] string entry,
     ILogger logger)
 {
-    logger.LogInformation($"The entry pushed to the list listTest: '{entry}'");
+    logger.LogInformation($"The entry pushed to the stream 'streamTest': '{entry}'");
 }
 ```
 

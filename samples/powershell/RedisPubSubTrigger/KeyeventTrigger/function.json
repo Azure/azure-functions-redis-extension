@@ -4,6 +4,7 @@
       "type": "redisPubSubTrigger",
       "connectionStringSetting": "redisConnectionString",
       "channel": "__keyevent@0__:del",
+      "pattern": false,
       "name": "message",
       "direction": "in"
     }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Description;
+using StackExchange.Redis;
 using System;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -15,10 +16,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="channel">Redis pubsub channel name.</param>
-        public RedisPubSubTriggerAttribute(string connectionStringSetting, string channel)
+        /// <param name="pattern">If the given channel is a pattern. Default: false</param>
+        public RedisPubSubTriggerAttribute(string connectionStringSetting, string channel, bool pattern = false)
         {
             ConnectionStringSetting = connectionStringSetting;
             Channel = channel;
+            Pattern = pattern;
         }
 
         /// <summary>
@@ -33,5 +36,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         [AutoResolve]
         public string Channel { get; }
+
+        /// <summary>
+        /// If the given channel is a pattern.
+        /// Uses <a href="https://redis.io/commands/psubscribe/">PSUBSCRIBE</a> if so.
+        /// </summary>
+        [AutoResolve]
+        public bool Pattern { get; }
     }
 }
