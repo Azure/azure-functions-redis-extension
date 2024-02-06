@@ -6,8 +6,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(SetDeleter_ManagedIdentity))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.redisManagedIdentity, IntegrationTestHelpers.KeyeventChannelSet)] string key,
-            [Redis(IntegrationTestHelpers.redisManagedIdentity, "DEL")] out string arguments,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ManagedIdentitySetting, IntegrationTestHelpers.KeyeventChannelSet)] string key,
+            [Redis(IntegrationTestHelpers.ManagedIdentitySetting, "DEL")] out string arguments,
             ILogger logger)
         {
             logger.LogInformation($"Deleting recently SET key '{key}'");
