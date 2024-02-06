@@ -14,12 +14,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     /// </summary>
     internal sealed class RedisListListener : RedisPollingTriggerBaseListener
     {
-        internal bool listPopFromBeginning;
+        internal ListDirection listDirection;
 
-        public RedisListListener(string name, IConfiguration configuration, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisListListener(string name, IConfiguration configuration, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, ListDirection listDirection, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
             : base(name, configuration, connectionStringSetting, key, pollingInterval, maxBatchSize, batch, executor, logger)
         {
-            this.listPopFromBeginning = listPopFromBeginning;
+            this.listDirection = listDirection;
             this.logPrefix = $"[Name:{name}][Trigger:{RedisUtilities.RedisListTrigger}][Key:{key}]";
             this.scaleMonitor = new RedisListTriggerScaleMonitor(name, configuration, connectionStringSetting, maxBatchSize, key);
         }
@@ -37,7 +37,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             IDatabase db = multiplexer.GetDatabase();
             if (serverVersion >= RedisUtilities.Version62)
             {
-                RedisValue[] result = listPopFromBeginning ? await db.ListLeftPopAsync(key, maxBatchSize) : await db.ListRightPopAsync(key, maxBatchSize);
+                RedisValue[] result = listDirection == ListDirection.LEFT ? await db.ListLeftPopAsync(key, maxBatchSize) : await db.ListRightPopAsync(key, maxBatchSize);
                 if (result is null)
                 {
                     logger?.LogDebug($"Key '{key}' does not exist.");
@@ -57,7 +57,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             else
             {
-                RedisValue value = listPopFromBeginning ? await db.ListLeftPopAsync(key) : await db.ListRightPopAsync(key);
+                RedisValue value = listDirection == ListDirection.LEFT ? await db.ListLeftPopAsync(key) : await db.ListRightPopAsync(key);
                 if (value.IsNullOrEmpty)
                 {
                     logger?.LogDebug($"Key '{key}' does not exist.");

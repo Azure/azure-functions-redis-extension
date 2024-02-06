@@ -76,8 +76,8 @@ public @interface RedisListTrigger {
     int maxBatchSize() default 16;
 
     /**
-     * Determines whether to pop entries from the beginning using LPOP or to pop entries from the end using RPOP.
-     * @return Whether to pop entries from the beginning or end of the list.
+     * The direction to pop elements from the list..
+     * @return The direction to pop elements from the list.
      */
-    boolean listPopFromBeginning() default true;
+    ListDirection listDirection() default ListDirection.LEFT;
 }
