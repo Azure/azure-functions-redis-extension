@@ -39,7 +39,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         /// <summary>
         /// If the given channel is a pattern.
-        /// Uses <a href="https://redis.io/commands/psubscribe/">PSUBSCRIBE</a> if so.
         /// </summary>
         [AutoResolve]
         public bool Pattern { get; }

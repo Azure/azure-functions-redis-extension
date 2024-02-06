@@ -33,7 +33,6 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
 
         /// <summary>
         /// If the given channel is a pattern.
-        /// Uses <a href="https://redis.io/commands/psubscribe/">PSUBSCRIBE</a> if so.
         /// </summary>
         public bool Pattern { get; }
     }
