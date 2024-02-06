@@ -6,7 +6,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Xunit;
-using static Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration.IntegrationTestHelpers;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
@@ -14,14 +13,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     public class RedisManagedIdentityTests
     {
         [Fact]
-        public async void SetDeleter_SuccessfullyDeletes()
+        public async void SetDeleter_ManagedIdentity_SuccessfullyDeletes()
         {
             string functionName = nameof(SetDeleter_ManagedIdentity);
             ConcurrentDictionary<string, int> counts = new ConcurrentDictionary<string, int>();
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
             bool exists = true;
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentitySetting, "test")))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentitySetting, "test")))
             {
                 using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
                 {

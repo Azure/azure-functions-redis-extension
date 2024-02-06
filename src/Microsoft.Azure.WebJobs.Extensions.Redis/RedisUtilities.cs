@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public const string RedisInputBinding = "RedisInputBinding";
         public const string RedisOutputBinding = "RedisOutputBinding";
 
-        public const string EntraRedisHostName = "RedisHostName";
+        public const string EntraRedisHostName = "redisHostName";
         public const string EntraPrincipalId = "principalId";
 
         public const char BindingDelimiter = ' ';
