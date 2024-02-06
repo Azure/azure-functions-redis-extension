@@ -6,10 +6,10 @@
   },
   "ConnectionStrings": {
     "redisConnectionString": "127.0.0.1:6379",
-    "redisManagedIdentity__redisHostName": "{{AZURE_CACHE_HOST_NAME}}",
-    "redisManagedIdentity__clientId": "{{AZURE_CLIENT_ID}}",
-    "redisManagedIdentity__principalId": "{{AZURE_PRINCIPAL_ID}}",
-    "redisManagedIdentity__tenantId": "{{AZURE_TENANT_ID}}",
-    "redisManagedIdentity__clientSecret": "{{AZURE_CLIENT_SECRET}}"
+    "redisManagedIdentity:redisHostName": "{{AZURE_CACHE_HOST_NAME}}",
+    "redisManagedIdentity:clientId": "{{AZURE_CLIENT_ID}}",
+    "redisManagedIdentity:principalId": "{{AZURE_PRINCIPAL_ID}}",
+    "redisManagedIdentity:tenantId": "{{AZURE_TENANT_ID}}",
+    "redisManagedIdentity:clientSecret": "{{AZURE_CLIENT_SECRET}}"
   }
 }
