@@ -27,7 +27,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
                 await multiplexer.GetDatabase().StringSetAsync(functionName, value);
 
-                using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
+                using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071, true))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                     await multiplexer.GetSubscriber().PublishAsync(functionName, "start");
@@ -79,7 +79,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd(destinationType.FullName, 1);
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentitySetting, "test")))
-            using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
+            using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071, true))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
@@ -114,7 +114,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             };
 
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentitySetting, "test")))
-            using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
+            using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071, true))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
                 ISubscriber subscriber = multiplexer.GetSubscriber();
