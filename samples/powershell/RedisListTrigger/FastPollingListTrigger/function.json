@@ -2,7 +2,7 @@
     "bindings": [
         {
             "type": "redisListTrigger",
-            "listPopFromBeginning": true,
+            "listDirection": "left",
             "connectionStringSetting": "redisConnectionString",
             "key": "listTest",
             "pollingIntervalInMs": 100,

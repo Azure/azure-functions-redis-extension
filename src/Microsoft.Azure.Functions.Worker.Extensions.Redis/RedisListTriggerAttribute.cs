@@ -14,14 +14,14 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in ms.</param>
         /// <param name="maxBatchSize">Number of entries to pull from Redis at one time.</param>
-        /// <param name="listPopFromBeginning">Decides if the function will pop entries from the front or end of the list. Default: true</param>
-        public RedisListTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, bool listPopFromBeginning = true)
+        /// <param name="listDirection">The direction to pop elements from the list. Default: left</param>
+        public RedisListTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, ListDirection listDirection = ListDirection.LEFT)
         {
             ConnectionStringSetting = connectionStringSetting;
             Key = key;
             PollingIntervalInMs = pollingIntervalInMs;
             MaxBatchSize = maxBatchSize;
-            ListPopFromBeginning = listPopFromBeginning;
+            ListDirection = listDirection;
         }
 
         /// <summary>
@@ -46,10 +46,25 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         public int MaxBatchSize { get; }
 
         /// <summary>
-        /// Decides if the function will pop entries from the front or end of the list.
-        /// True (default) = pop entries from the front of the list.
-        /// False = pop entries from the end of the list.
+        /// The direction to pop elements from the list.
         /// </summary>
-        public bool ListPopFromBeginning { get; }
+        public ListDirection ListDirection  { get; }
+    }
+
+
+    /// <summary>
+    /// The direction to pop elements from the list.
+    /// </summary>
+    public enum ListDirection
+    {
+        /// <summary>
+        /// Uses <a href="https://redis.io/commands/lpop/">LPOP</a>
+        /// </summary>
+        LEFT,
+
+        /// <summary>
+        /// Uses <a href="https://redis.io/commands/rpop/">RPOP</a>
+        /// </summary>
+        RIGHT
     }
 }

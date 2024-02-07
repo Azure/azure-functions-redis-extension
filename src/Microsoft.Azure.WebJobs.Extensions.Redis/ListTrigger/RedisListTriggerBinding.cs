@@ -23,11 +23,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly TimeSpan pollingInterval;
         private readonly string key;
         private readonly int maxBatchSize;
-        private readonly bool listPopFromBeginning;
+        private readonly ListDirection listDirection;
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisListTriggerBinding(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, bool listPopFromBeginning, Type parameterType, ILogger logger)
+        public RedisListTriggerBinding(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, ListDirection listDirection, Type parameterType, ILogger logger)
         {
             this.configuration = configuration;
             this.azureComponentFactory = azureComponentFactory;
@@ -35,7 +35,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
-            this.listPopFromBeginning = listPopFromBeginning;
+            this.listDirection = listDirection;
             this.parameterType = parameterType;
             this.logger = logger;
         }
@@ -76,7 +76,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 key,
                 pollingInterval,
                 maxBatchSize,
-                listPopFromBeginning,
+                listDirection,
                 IsBatchParameter(),
                 context.Executor,
                 logger));

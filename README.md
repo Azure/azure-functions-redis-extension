@@ -69,8 +69,9 @@ The `RedisListTrigger` pops entries from a list and surfaces those entries to th
 - `MaxBatchSize`: Number of entries to pop from Redis at one time. These are processed in parallel.
   - Only supported on Redis 6.2+ using the `COUNT` argument in [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/).
   - Default: `16`
-- `ListPopFromBeginning`: determines whether to pop entries from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop entries from the end using [`RPOP`](https://redis.io/commands/rpop/).
-  - Default: `true`
+- `ListDirection`: The direction to pop elements from the list: `LEFT` using [`LPOP`](https://redis.io/commands/lpop/) or `RIGHT` using [`RPOP`](https://redis.io/commands/rpop/).
+  - Allowed Values: `LEFT`, `RIGHT`
+  - Default: `LEFT`
 
 #### Available Parameter Types
 - [`StackExchange.Redis.RedisValue`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string`, `byte[]`, `ReadOnlyMemory<byte>`: The entry from the list.
@@ -91,8 +92,8 @@ public static void ListsTrigger(
 ### `RedisStreamTrigger`
 The `RedisStreamTrigger` reads entries from a stream and surfaces those entries to the function.
 The trigger polls Redis at a configurable fixed interval, and uses [`XREADGROUP`](https://redis.io/commands/xreadgroup/) to read entries from the stream.
-The consumer group for all function instances will be the ID of the function (e.g. `Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisSamples.StreamTrigger` for the [StreamTrigger sample](samples/dotnet/RedisSamples.cs)).
-Each functions instance creates a new random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
+The consumer group for all instances of a function will be the name of the function (e.g. `SimpleStreamTrigger` for [this sample](samples/dotnet/RedisStreamTrigger/SimpleStreamTrigger.cs)).
+Each functions instance will use the `WEBSITE_INSTANCE_ID` ([documented here](https://learn.microsoft.com/azure/app-service/reference-app-settings?tabs=kudu%2Cdotnet#scaling)) or generate a random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
 #### Inputs
 - `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
