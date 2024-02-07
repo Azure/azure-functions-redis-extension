@@ -66,12 +66,6 @@ jobs:
           targetType: 'inline'
           script: 'sed -i "s/{{AZURE_CACHE_HOST_NAME}}/$(AZURE_CACHE_HOST_NAME)/g; s/{{AZURE_CLIENT_ID}}/$(AZURE_CLIENT_ID)/g; s/{{AZURE_PRINCIPAL_ID}}/$(AZURE_PRINCIPAL_ID)/g; s/{{AZURE_TENANT_ID}}/$(AZURE_TENANT_ID)/g; s/{{AZURE_CLIENT_SECRET}}/$(AZURE_CLIENT_SECRET)/g" $(Build.SourcesDirectory)/test/dotnet/local.settings.json'
       
-      - task: Bash@3
-        displayName: cat local.settings.json
-        inputs:
-          targetType: 'inline'
-          script: 'cat $(Build.SourcesDirectory)/test/dotnet/local.settings.json'
-
       - task: DotNetCoreCLI@2
         displayName: Test Microsoft.Azure.WebJobs.Extensions.Redis Debug
         inputs:

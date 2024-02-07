@@ -184,26 +184,26 @@ In the appsettings, this is how to configure each of the following types of clie
 
 1. System-Assigned Managed Identity
     ```json
-    "Redis__redisHostName": "<cacheName>.redis.cache.windows.net",
-    "Redis__principalId": "<principalId>"
+    "Redis:redisHostName": "<cacheName>.redis.cache.windows.net",
+    "Redis:principalId": "<principalId>"
     ```
 
 1. User-Assigned Managed Identity
     ```json
-    "Redis__redisHostName": "<cacheName>.redis.cache.windows.net",
-    "Redis__principalId": "<principalId>",
-    "Redis__clientId": "<clientId>"
+    "Redis:redisHostName": "<cacheName>.redis.cache.windows.net",
+    "Redis:principalId": "<principalId>",
+    "Redis:clientId": "<clientId>"
     ```
 
 1. Service Principal Secret
     > **Note**
     > Connections using Service Principal Secrets are only available during local development.
     ```json
-    "Redis__redisHostName": "<cacheName>.redis.cache.windows.net",
-    "Redis__principalId": "<principalId>",
-    "Redis__clientId": "<clientId>"
-    "Redis__tenantId": "<tenantId>"
-    "Redis__clientSecret": "<clientSecret>"
+    "Redis:redisHostName": "<cacheName>.redis.cache.windows.net",
+    "Redis:principalId": "<principalId>",
+    "Redis:clientId": "<clientId>"
+    "Redis:tenantId": "<tenantId>"
+    "Redis:clientSecret": "<clientSecret>"
     ```
 
 ## Contributing
