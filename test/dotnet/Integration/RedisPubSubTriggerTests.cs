@@ -12,7 +12,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     [Collection("RedisTriggerTests")]
     public class RedisPubSubTriggerTests
     {
-        //[Theory]
+        [Theory]
         [InlineData(nameof(SingleChannel), IntegrationTestHelpers.PubSubChannel, "testValue")]
         [InlineData(nameof(MultipleChannels), IntegrationTestHelpers.PubSubChannel, "testValue")]
         [InlineData(nameof(MultipleChannels), IntegrationTestHelpers.PubSubChannel + "suffix", "testSuffix")]
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
-        //[Theory]
+        [Theory]
         [InlineData(nameof(SingleKey), IntegrationTestHelpers.KeyspaceChannel)]
         [InlineData(nameof(MultipleKeys), IntegrationTestHelpers.KeyspaceChannel)]
         [InlineData(nameof(MultipleKeys), IntegrationTestHelpers.KeyspaceChannel + "suffix")]
@@ -81,7 +81,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
-        //[Fact]
+        [Fact]
         public async void KeyEventTrigger_SingleEvent_SuccessfullyTriggers()
         {
             string key = "keyTrigger";
@@ -110,7 +110,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
-        //[Fact]
+        [Fact]
         public async void KeyEventTrigger_AllEvents_SuccessfullyTriggers()
         {
             string key = "keyTrigger";
@@ -141,7 +141,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonSerializer.Serialize(incorrect));
         }
 
-        //[Theory]
+        [Theory]
         [InlineData(nameof(SingleChannel_ChannelMessage), typeof(ChannelMessage))]
         [InlineData(nameof(SingleChannel_RedisValue), typeof(RedisValue))]
         [InlineData(nameof(SingleChannel_String), typeof(string))]

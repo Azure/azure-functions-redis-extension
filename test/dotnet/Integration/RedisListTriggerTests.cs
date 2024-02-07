@@ -14,7 +14,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     [Collection("RedisTriggerTests")]
     public class RedisListTriggerTests
     {
-        //[Fact]
+        [Fact]
         public async void ListsTrigger_SuccessfullyTriggers()
         {
             string functionName = nameof(ListTrigger_String);
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             }
         }
 
-        //[Fact]
+        [Fact]
         public async void ListsTrigger_ScaledOutInstances_DoesntDuplicateEvents()
         {
             string functionName = nameof(ListTrigger_String);
@@ -83,7 +83,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
-        //[Theory]
+        [Theory]
         [InlineData(nameof(ListTrigger_String), typeof(string))]
         [InlineData(nameof(ListTrigger_RedisValue), typeof(RedisValue))]
         [InlineData(nameof(ListTrigger_ByteArray), typeof(byte[]))]
@@ -112,7 +112,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             Assert.False(incorrect.Any(), JsonConvert.SerializeObject(incorrect));
         }
 
-        //[Theory]
+        [Theory]
         [InlineData(nameof(ListTrigger_Batch_String), typeof(string[]))]
         [InlineData(nameof(ListTrigger_Batch_RedisValue), typeof(RedisValue[]))]
         [InlineData(nameof(ListTrigger_Batch_ByteArray), typeof(byte[][]))]

@@ -41,7 +41,7 @@ $@"{{
     ""maxBatchSize"": ""10"",
 }}";
 
-        //[Theory]
+        [Theory]
         [InlineData(listTrigger, nameof(RedisListTriggerScaleMonitor))]
         [InlineData(streamTrigger, nameof(RedisStreamTriggerScaleMonitor))]
         public void ReturnsCorrectMonitorType(string triggerJson, string expectedMonitorType)
@@ -62,7 +62,7 @@ $@"{{
             Assert.Equal(expectedMonitorType, actualMonitorType);
         }
 
-        //[Theory]
+        [Theory]
         [InlineData(listTrigger, 0, 0)]
         [InlineData(listTrigger, 1, 1)]
         [InlineData(listTrigger, 100, 10)]
@@ -104,7 +104,7 @@ $@"{{
             Assert.Equal(expectedTarget, scaleStatus.TargetWorkerCount);
         }
 
-        //[Theory]
+        [Theory]
         [InlineData(IntegrationTestHelpers.Redis60, 100, 0)]
         [InlineData(IntegrationTestHelpers.Redis60, 0, 100)]
         [InlineData(IntegrationTestHelpers.Redis62, 100, 0)]
@@ -150,7 +150,7 @@ $@"{{
             Assert.Equal(unprocessed / IntegrationTestHelpers.BatchSize, scaleStatus.TargetWorkerCount);
         }
 
-        //[Theory]
+        [Theory]
         [InlineData(IntegrationTestHelpers.Redis60, 75, 25)]
         [InlineData(IntegrationTestHelpers.Redis60, 50, 50)]
         [InlineData(IntegrationTestHelpers.Redis60, 25, 75)]
