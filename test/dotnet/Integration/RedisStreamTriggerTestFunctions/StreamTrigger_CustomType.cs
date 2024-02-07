@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(StreamTrigger_CustomType))]
         public static void Run(
-            [RedisStreamTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(StreamTrigger_CustomType), IntegrationTestHelpers.PollingIntervalShort)] CustomType entry,
+            [RedisStreamTrigger(IntegrationTestHelpers.ConnectionString, nameof(StreamTrigger_CustomType), IntegrationTestHelpers.PollingIntervalShort)] CustomType entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));

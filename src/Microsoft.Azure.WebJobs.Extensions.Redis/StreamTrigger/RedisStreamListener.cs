@@ -18,12 +18,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string consumerName;
         internal string entriesReadKey;
 
-        public RedisStreamListener(string name, IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
-            : base(name, configuration, azureComponentFactory, connectionStringSetting, key, pollingInterval, maxBatchSize, batch, executor, logger)
+        public RedisStreamListener(string name, IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connection, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
+            : base(name, configuration, azureComponentFactory, connection, key, pollingInterval, maxBatchSize, batch, executor, logger)
         {
             this.consumerName = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? Guid.NewGuid().ToString();
             this.logPrefix = $"[Name:{name}][Trigger:{RedisUtilities.RedisStreamTrigger}][ConsumerGroup:{name}][Key:{key}][Consumer:{consumerName}]";
-            this.scaleMonitor = new RedisStreamTriggerScaleMonitor(name, configuration, azureComponentFactory, connectionStringSetting, maxBatchSize, key);
+            this.scaleMonitor = new RedisStreamTriggerScaleMonitor(name, configuration, azureComponentFactory, connection, maxBatchSize, key);
             this.entriesReadKey = RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.RedisStreamTrigger, key);
         }
 

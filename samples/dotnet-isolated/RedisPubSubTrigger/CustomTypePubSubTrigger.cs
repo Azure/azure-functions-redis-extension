@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisPubSubT
 
         [Function(nameof(CustomTypePubSubTrigger))]
         public void Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, "pubsubTest")] Common.CustomType type)
+            [RedisPubSubTrigger(Common.connectionString, "pubsubTest")] Common.CustomType type)
         {
             logger.LogInformation(JsonConvert.SerializeObject(type));
         }

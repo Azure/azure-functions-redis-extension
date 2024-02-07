@@ -5,9 +5,9 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisOutputB
     internal class SetDeleter
     {
         [Function(nameof(SetDeleter))]
-        [RedisOutput(Common.connectionStringSetting, "DEL")]
+        [RedisOutput(Common.connectionString, "DEL")]
         public static string Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, "__keyevent@0__:set")] string key,
+            [RedisPubSubTrigger(Common.connectionString, "__keyevent@0__:set")] string key,
             ILogger logger)
         {
             logger.LogInformation($"Deleting recently SET key '{key}'");

@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisPubSubT
 
         [Function(nameof(SimplePubSubTrigger))]
         public void Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, "pubsubTest")] string message)
+            [RedisPubSubTrigger(Common.connectionString, "pubsubTest")] string message)
         {
             logger.LogInformation(message);
         }

@@ -37,11 +37,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisListTrigger, StringComparison.OrdinalIgnoreCase))
             {
-                scaleMonitor = new RedisListTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, azureComponentFactory, metadata.connectionStringSetting, metadata.maxBatchSize, key);
+                scaleMonitor = new RedisListTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, azureComponentFactory, metadata.connection, metadata.maxBatchSize, key);
             }
             else if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisStreamTrigger, StringComparison.OrdinalIgnoreCase))
             {
-                scaleMonitor = new RedisStreamTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, azureComponentFactory, metadata.connectionStringSetting, metadata.maxBatchSize, key);
+                scaleMonitor = new RedisStreamTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, azureComponentFactory, metadata.connection, metadata.maxBatchSize, key);
             }
             else
             {
@@ -54,7 +54,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public class RedisPollingTriggerMetadata
         {
             [JsonProperty]
-            public string connectionStringSetting { get; set; }
+            public string connection { get; set; }
 
             [JsonProperty]
             public string key { get; set; }

@@ -6,8 +6,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(MultipleAddAsyncCalls))]
         public static async Task Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(MultipleAddAsyncCalls))] string entry,
-            [Redis(IntegrationTestHelpers.ConnectionStringSetting, "SET")] IAsyncCollector<string> collector)
+            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionString, nameof(MultipleAddAsyncCalls))] string entry,
+            [Redis(IntegrationTestHelpers.ConnectionString, "SET")] IAsyncCollector<string> collector)
         {
             string[] keys = entry.Split(',');
             foreach (string key in keys)

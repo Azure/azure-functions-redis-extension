@@ -48,9 +48,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
-        public async Task ResolveConfigurationOptionsAsync_EmptyConnectionStringSetting_ThrowsArgumentNullException(string connectionStringSetting)
+        public async Task ResolveConfigurationOptionsAsync_EmptyConnectionStringSetting_ThrowsArgumentNullException(string connection)
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, null, connectionStringSetting, "test"));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, null, connection, "test"));
         }
 
         [Fact]

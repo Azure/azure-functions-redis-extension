@@ -29,8 +29,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         internal const string KeyspaceChannelAll = "__keyspace@0__:*";
         internal const string AllChannels = "*";
 
-        internal const string ConnectionStringSetting = "redisConnectionString";
-        internal const string ManagedIdentitySetting = "redisManagedIdentity";
+        internal const string ConnectionString = "redisConnectionString";
+        internal const string ManagedIdentity = "redisManagedIdentity";
         internal const string Redis60 = "/redis/redis-6.0.20";
         internal const string Redis62 = "/redis/redis-6.2.14";
         internal const string Redis70 = "/redis/redis-7.0.14";
@@ -87,7 +87,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.OutputDataReceived -= functionLoadedHandler;
 
             // Ensure that the client name is correctly set
-            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, new ClientSecretCredentialComponentFactory(), managedIdentity ? ManagedIdentitySetting : ConnectionStringSetting, nameof(IntegrationTestHelpers));
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, new ClientSecretCredentialComponentFactory(), managedIdentity ? ManagedIdentity : ConnectionString, nameof(IntegrationTestHelpers));
             options.AllowAdmin = true;
             IConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(options);
             ClientInfo[] clients = multiplexer.GetServers()[0].ClientList();

@@ -6,8 +6,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(GetTester))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(GetTester))] string message,
-            [Redis(IntegrationTestHelpers.ConnectionStringSetting, $"GET {nameof(GetTester)}")] string value,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionString, nameof(GetTester))] string message,
+            [Redis(IntegrationTestHelpers.ConnectionString, $"GET {nameof(GetTester)}")] string value,
             ILogger logger)
         {
             logger.LogInformation($"Value of key '{nameof(GetTester)}' is currently a type {value.GetType()}: '{value}'");

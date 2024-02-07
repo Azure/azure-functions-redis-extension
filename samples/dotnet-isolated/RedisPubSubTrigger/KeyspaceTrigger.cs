@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisPubSubT
         
         [Function(nameof(KeyspaceTrigger))]
         public void Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, "__keyspace@0__:keyspaceTest")] string message)
+            [RedisPubSubTrigger(Common.connectionString, "__keyspace@0__:keyspaceTest")] string message)
         {
             logger.LogInformation(message);
         }

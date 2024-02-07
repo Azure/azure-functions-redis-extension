@@ -10,14 +10,14 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// <summary>
         /// Initializes a new <see cref="RedisListTriggerAttribute"/>.
         /// </summary>
-        /// <param name="connectionStringSetting">Redis connection string setting.</param>
+        /// <param name="connection">App setting name that contains Redis connection information.</param>
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in ms.</param>
         /// <param name="maxBatchSize">Number of entries to pull from Redis at one time.</param>
         /// <param name="listDirection">The direction to pop elements from the list. Default: left</param>
-        public RedisListTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, ListDirection listDirection = ListDirection.LEFT)
+        public RedisListTriggerAttribute(string connection, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, ListDirection listDirection = ListDirection.LEFT)
         {
-            ConnectionStringSetting = connectionStringSetting;
+            Connection = connection;
             Key = key;
             PollingIntervalInMs = pollingIntervalInMs;
             MaxBatchSize = maxBatchSize;
@@ -25,10 +25,9 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         }
 
         /// <summary>
-        /// Redis connection string setting.
-        /// This setting will be used to resolve the actual connection string from the appsettings.
+        /// App setting name that contains Redis connection information.
         /// </summary>
-        public string ConnectionStringSetting { get; }
+        public string Connection { get; }
 
         /// <summary>
         /// Key to read from.

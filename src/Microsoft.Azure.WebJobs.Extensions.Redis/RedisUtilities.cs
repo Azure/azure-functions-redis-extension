@@ -47,7 +47,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return setting;
         }
 
-        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string clientName)
+        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connection, string clientName)
         {
             ConfigurationOptions options;
 
@@ -56,22 +56,22 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            if (string.IsNullOrWhiteSpace(connectionStringSetting))
+            if (string.IsNullOrWhiteSpace(connection))
             {
-                throw new ArgumentNullException(nameof(connectionStringSetting));
+                throw new ArgumentNullException(nameof(connection));
             }
 
-            IConfigurationSection section = configuration.GetWebJobsConnectionSection(connectionStringSetting);
+            IConfigurationSection section = configuration.GetWebJobsConnectionSection(connection);
             string connectionString = section.Value;
             string cacheHostName = section[EntraRedisHostName];
             if (string.IsNullOrWhiteSpace(connectionString) && string.IsNullOrWhiteSpace(cacheHostName))
             {
-                throw new ArgumentException($"{nameof(connectionStringSetting)} '{connectionStringSetting}' not found in provided configuration.");
+                throw new ArgumentException($"{nameof(connection)} '{connection}' not found in provided configuration.");
 
             }
             if (!string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(cacheHostName))
             {
-                throw new ArgumentException($"Found both {nameof(connectionStringSetting)} '{connectionStringSetting}' and '{connectionStringSetting}__{EntraRedisHostName}' in provided configuration. Please choose either connection string or managed identity connection.");
+                throw new ArgumentException($"Found both {nameof(connection)} '{connection}' and '{connection}__{EntraRedisHostName}' in provided configuration. Please choose either connection string or managed identity connection.");
             }
 
             if (!string.IsNullOrWhiteSpace(connectionString))
@@ -85,7 +85,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
                 if (string.IsNullOrWhiteSpace(principalId))
                 {
-                    throw new ArgumentNullException($"{connectionStringSetting}__{EntraPrincipalId}");
+                    throw new ArgumentNullException($"{connection}__{EntraPrincipalId}");
                 }
 
                 TokenCredential tokenCredential = azureComponentFactory.CreateTokenCredential(section);

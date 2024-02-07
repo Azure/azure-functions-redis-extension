@@ -25,7 +25,7 @@ $@"{{
     ""type"": ""redisListTrigger"",
     ""direction"": ""in"",
     ""functionName"": ""{nameof(ListTrigger_Batch_String)}"",
-    ""connectionStringSetting"": ""{IntegrationTestHelpers.ConnectionStringSetting}"",
+    ""connection"": ""{IntegrationTestHelpers.ConnectionString}"",
     ""key"": ""{nameof(ListTrigger_Batch_String)}"",
     ""maxBatchSize"": ""10"",
 }}";
@@ -36,7 +36,7 @@ $@"{{
     ""type"": ""redisStreamTrigger"",
     ""direction"": ""in"",
     ""functionName"": ""{nameof(StreamTrigger_Batch_String)}"",
-    ""connectionStringSetting"": ""{IntegrationTestHelpers.ConnectionStringSetting}"",
+    ""connection"": ""{IntegrationTestHelpers.ConnectionString}"",
     ""key"": ""{nameof(StreamTrigger_Batch_String)}"",
     ""maxBatchSize"": ""10"",
 }}";
@@ -76,7 +76,7 @@ $@"{{
 
             AggregateScaleStatus scaleStatus;
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(IntegrationTestHelpers.Redis60))
-            using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, null, IntegrationTestHelpers.ConnectionStringSetting, "test")))
+            using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, null, IntegrationTestHelpers.ConnectionString, "test")))
             using (IHost scaleHost = await CreateScaleHostAsync(triggerMetadata))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
@@ -122,7 +122,7 @@ $@"{{
             long streamLength;
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(redisVersion))
             using (IHost scaleHost = await CreateScaleHostAsync(triggerMetadata))
-            using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, null, IntegrationTestHelpers.ConnectionStringSetting, "test")))
+            using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, null, IntegrationTestHelpers.ConnectionString, "test")))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
                 foreach (int value in Enumerable.Range(0, processed))
@@ -167,7 +167,7 @@ $@"{{
             long streamLength;
             using (Process redisProcess = IntegrationTestHelpers.StartRedis(redisVersion))
             using (IHost scaleHost = await CreateScaleHostAsync(triggerMetadata))
-            using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, null, IntegrationTestHelpers.ConnectionStringSetting, "test")))
+            using (ConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, null, IntegrationTestHelpers.ConnectionString, "test")))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(redisMetadata.key);
                 foreach (int value in Enumerable.Range(0, processed))
