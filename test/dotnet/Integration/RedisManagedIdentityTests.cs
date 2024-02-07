@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             bool exists = true;
             using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentitySetting, "test")))
             {
-                using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071))
+                using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071, true))
                 {
                     functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
 

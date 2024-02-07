@@ -35,7 +35,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         internal const string Redis62 = "/redis/redis-6.2.14";
         internal const string Redis70 = "/redis/redis-7.0.14";
 
-        internal static async Task<Process> StartFunctionAsync(string functionName, int port)
+        internal static async Task<Process> StartFunctionAsync(string functionName, int port, bool managedIdentity = false)
         {
             ProcessStartInfo info = new ProcessStartInfo
             {
@@ -87,10 +87,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.OutputDataReceived -= functionLoadedHandler;
 
             // Ensure that the client name is correctly set
-            IConnectionMultiplexer multiplexer;
-            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, new ClientSecretCredentialComponentFactory(), ConnectionStringSetting, nameof(IntegrationTestHelpers));
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, new ClientSecretCredentialComponentFactory(), managedIdentity ? ManagedIdentitySetting : ConnectionStringSetting, nameof(IntegrationTestHelpers));
             options.AllowAdmin = true;
-            multiplexer = await ConnectionMultiplexer.ConnectAsync(options);
+            IConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(options);
             ClientInfo[] clients = multiplexer.GetServers()[0].ClientList();
             if (!clients.Any(client => client.Name == RedisUtilities.GetRedisClientName(functionName)))
             {
