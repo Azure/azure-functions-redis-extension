@@ -8,8 +8,8 @@ There are five bindings in this extension:
 - `RedisPubSubTrigger` trigger binding for [Redis pub/sub messages](https://redis.io/docs/manual/pubsub/)
 - `RedisListTrigger` trigger binding for [Redis list entries](https://redis.io/docs/data-types/lists/)
 - `RedisStreamTrigger` trigger binding for [Redis stream entries](https://redis.io/docs/data-types/streams/)
-- `Redis` input binding for reading from Redis
-- `Redis` output binding for writing to Redis
+- `RedisInput` input binding for reading from Redis
+- `RedisOutput` output binding for writing to Redis
 
 ## Getting Started
 See the following docs for details on setup and samples of the Redis triggers:
@@ -36,7 +36,7 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
 > This trigger is not capable of listening to keyspace notifications on clustered caches.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Channel`: Redis pubsub channel that the trigger will listen to.
 - `Pattern`: If the channel is a pattern.
   - Default: `false`
@@ -72,7 +72,7 @@ public static void PubSubTrigger(
 The `RedisListTrigger` pops entries from a list and surfaces those entries to the function. The trigger polls Redis at a configurable fixed interval, and uses [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/) to pop entries from the lists.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Key`: Key to read from.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
@@ -81,8 +81,9 @@ These are usually processed in parallel, with each entry from the list triggerin
 If a `dotnet in-process` function defines the parameter type as [`RedisValue[]`](https://github.com/StackExchange/StackExchange.Redis/blob/main/src/StackExchange.Redis/RedisValue.cs), `string[]`, or `byte[][]`, there will only be one function invocation with all entries returned as this array type.
   - Only supported on Redis 6.2+ using the `COUNT` argument in [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/).
   - Default: `16`
-- `ListPopFromBeginning`: determines whether to pop entries from the beginning using [`LPOP`](https://redis.io/commands/lpop/) or to pop entries from the end using [`RPOP`](https://redis.io/commands/rpop/).
-  - Default: `true`
+- `ListDirection`: The direction to pop elements from the list: `LEFT` using [`LPOP`](https://redis.io/commands/lpop/) or `RIGHT` using [`RPOP`](https://redis.io/commands/rpop/).
+  - Allowed Values: `LEFT`, `RIGHT`
+  - Default: `LEFT`
 
 #### Available Parameter Types
 - Types exclusive to `dotnet in-process`
@@ -111,7 +112,7 @@ The consumer group for all instances of a function will be the name of the funct
 Each functions instance will use the `WEBSITE_INSTANCE_ID` ([documented here](https://learn.microsoft.com/azure/app-service/reference-app-settings?tabs=kudu%2Cdotnet#scaling)) or generate a random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Key`: Key to read from.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
@@ -156,7 +157,7 @@ public static void StreamsTrigger(
 ### `RedisInput` Input Binding
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Command`: The redis-cli command to be executed on the cache with all arguments separated by spaces. (e.g. `"GET key"`, `"HGET key field"`)
 
 > **Note**
@@ -183,7 +184,7 @@ public static void SetGetter(
 ### `RedisOutput` Output Binding
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the to the Redis cache connection string (e.g. `<cacheName>.redis.cache.windows.net:6380,password=...`).
+- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Command`: The Redis command to be executed on the cache without any arguments. (e.g. `"GET"`, `"HGET"`)
 
 > **Note**
@@ -205,6 +206,38 @@ public static void SetDeleter(
     arguments = key;
 }
 ```
+
+## Connection Types
+There are three types of connections that are allowed from an Azure Functions instane to a Redis Cache.
+In the appsettings, this is how to configure each of the following types of client authentication, assuming the `ConnectionStringSetting` was set to `"Redis"` in the function.
+1. Connection String
+    ```json
+    "Redis": "<cacheName>.redis.cache.windows.net:6380,password=..."
+    ```
+
+1. System-Assigned Managed Identity
+    ```json
+    "Redis:redisHostName": "<cacheName>.redis.cache.windows.net",
+    "Redis:principalId": "<principalId>"
+    ```
+
+1. User-Assigned Managed Identity
+    ```json
+    "Redis:redisHostName": "<cacheName>.redis.cache.windows.net",
+    "Redis:principalId": "<principalId>",
+    "Redis:clientId": "<clientId>"
+    ```
+
+1. Service Principal Secret
+    > **Note**
+    > Connections using Service Principal Secrets are only available during local development.
+    ```json
+    "Redis:redisHostName": "<cacheName>.redis.cache.windows.net",
+    "Redis:principalId": "<principalId>",
+    "Redis:clientId": "<clientId>"
+    "Redis:tenantId": "<tenantId>"
+    "Redis:clientSecret": "<clientSecret>"
+    ```
 
 ## Contributing
 This project welcomes contributions and suggestions. Most contributions require you to agree to a

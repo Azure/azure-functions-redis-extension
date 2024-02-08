@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Azure.Core;
+using Azure.Identity;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
@@ -27,11 +30,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         internal const string AllChannels = "*";
 
         internal const string ConnectionStringSetting = "redisConnectionString";
+        internal const string ManagedIdentitySetting = "redisManagedIdentity";
         internal const string Redis60 = "/redis/redis-6.0.20";
         internal const string Redis62 = "/redis/redis-6.2.14";
         internal const string Redis70 = "/redis/redis-7.0.14";
 
-        internal static async Task<Process> StartFunctionAsync(string functionName, int port)
+        internal static async Task<Process> StartFunctionAsync(string functionName, int port, bool managedIdentity = false)
         {
             ProcessStartInfo info = new ProcessStartInfo
             {
@@ -83,9 +87,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             functionsProcess.OutputDataReceived -= functionLoadedHandler;
 
             // Ensure that the client name is correctly set
-            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, ConnectionStringSetting, nameof(IntegrationTestHelpers));
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, new ClientSecretCredentialComponentFactory(), managedIdentity ? ManagedIdentitySetting : ConnectionStringSetting, nameof(IntegrationTestHelpers));
             options.AllowAdmin = true;
-            IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(options);
+            IConnectionMultiplexer multiplexer = await ConnectionMultiplexer.ConnectAsync(options);
             ClientInfo[] clients = multiplexer.GetServers()[0].ClientList();
             if (!clients.Any(client => client.Name == RedisUtilities.GetRedisClientName(functionName)))
             {
@@ -223,6 +227,27 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
         {
             public int vote;
             public int targetWorkerCount;
+        }
+
+        internal class ClientSecretCredentialComponentFactory : AzureComponentFactory
+        {
+            public override object CreateClient(Type clientType, IConfiguration configuration, TokenCredential credential, object clientOptions)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override object CreateClientOptions(Type optionsType, object serviceVersion, IConfiguration configuration)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override TokenCredential CreateTokenCredential(IConfiguration configuration)
+            {
+                var clientId = configuration["clientId"];
+                var tenantId = configuration["tenantId"];
+                var clientSecret = configuration["clientSecret"];
+                return new ClientSecretCredential(tenantId, clientId, clientSecret);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -24,17 +25,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         {
             IConfiguration configuration = serviceProvider.GetService<IConfiguration>();
             INameResolver nameResolver = serviceProvider.GetService<INameResolver>();
+            AzureComponentFactory azureComponentFactory = serviceProvider.GetService<AzureComponentFactory>();
+            if ((triggerMetadata.Properties != null) && (triggerMetadata.Properties.TryGetValue(nameof(AzureComponentFactory), out object value)))
+            {
+                // If it exists, use the AzureComponentFactory passed from the ScaleController
+                azureComponentFactory = value as AzureComponentFactory;
+            }
 
             RedisPollingTriggerMetadata metadata = JsonConvert.DeserializeObject<RedisPollingTriggerMetadata>(triggerMetadata.Metadata.ToString());
             string key = RedisUtilities.ResolveString(nameResolver, metadata.key, nameof(metadata.key));
 
             if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisListTrigger, StringComparison.OrdinalIgnoreCase))
             {
-                scaleMonitor = new RedisListTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, metadata.connectionStringSetting, metadata.maxBatchSize, key);
+                scaleMonitor = new RedisListTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, azureComponentFactory, metadata.connectionStringSetting, metadata.maxBatchSize, key);
             }
             else if (string.Equals(triggerMetadata.Type, RedisUtilities.RedisStreamTrigger, StringComparison.OrdinalIgnoreCase))
             {
-                scaleMonitor = new RedisStreamTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, metadata.connectionStringSetting, metadata.maxBatchSize, key);
+                scaleMonitor = new RedisStreamTriggerScaleMonitor(triggerMetadata.FunctionName, configuration, azureComponentFactory, metadata.connectionStringSetting, metadata.maxBatchSize, key);
             }
             else
             {

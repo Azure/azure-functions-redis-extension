@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,12 +14,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisListTriggerBindingProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration configuration;
+        private readonly AzureComponentFactory azureComponentFactory;
         private readonly INameResolver nameResolver;
         private readonly ILogger logger;
 
-        public RedisListTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
+        public RedisListTriggerBindingProvider(IConfiguration configuration, AzureComponentFactory azureComponentFactory, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
+            this.azureComponentFactory = azureComponentFactory;
             this.nameResolver = nameResolver;
             this.logger = logger;
         }
@@ -43,7 +46,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string key = RedisUtilities.ResolveString(nameResolver, attribute.Key, nameof(attribute.Key));
             TimeSpan pollingInterval = TimeSpan.FromMilliseconds(attribute.PollingIntervalInMs);
 
-            return Task.FromResult<ITriggerBinding>(new RedisListTriggerBinding(configuration, attribute.ConnectionStringSetting, key, pollingInterval, attribute.MaxBatchSize, attribute.ListPopFromBeginning, parameter.ParameterType, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisListTriggerBinding(configuration, azureComponentFactory, attribute.ConnectionStringSetting, key, pollingInterval, attribute.MaxBatchSize, attribute.ListDirection, parameter.ParameterType, logger));
         }
     }
 }

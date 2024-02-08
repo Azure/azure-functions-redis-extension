@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System;
@@ -11,10 +12,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public RedisListTriggerScaleMonitor(
             string name,
             IConfiguration configuration,
+            AzureComponentFactory azureComponentFactory,
             string connectionStringSetting,
             int maxBatchSize,
             string key) 
-            : base(name, configuration, connectionStringSetting, maxBatchSize, key)
+            : base(name, configuration, azureComponentFactory, connectionStringSetting, maxBatchSize, key)
         {
             this.Descriptor = new ScaleMonitorDescriptor(name, RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.RedisListTrigger, key));
             this.TargetScalerDescriptor = new TargetScalerDescriptor(RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.RedisListTrigger, key));
@@ -22,7 +24,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, connectionStringSetting, nameof(RedisListTriggerScaleMonitor));
+            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connectionStringSetting, nameof(RedisListTriggerScaleMonitor));
             var metrics = new RedisPollingTriggerBaseMetrics
             {
                 Remaining = await multiplexer.GetDatabase().ListLengthAsync(key),

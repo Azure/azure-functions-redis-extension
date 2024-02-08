@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,12 +14,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisPubSubTriggerBindingProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration configuration;
+        private readonly AzureComponentFactory azureComponentFactory;
         private readonly INameResolver nameResolver;
         private readonly ILogger logger;
 
-        public RedisPubSubTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
+        public RedisPubSubTriggerBindingProvider(IConfiguration configuration, AzureComponentFactory azureComponentFactory, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
+            this.azureComponentFactory = azureComponentFactory;
             this.nameResolver = nameResolver;
             this.logger = logger;
         }
@@ -41,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             string channel = RedisUtilities.ResolveString(nameResolver, attribute.Channel, nameof(attribute.Channel));
-            return Task.FromResult<ITriggerBinding>(new RedisPubSubTriggerBinding(configuration, attribute.ConnectionStringSetting, channel, attribute.Pattern, parameter.ParameterType, logger));
+            return Task.FromResult<ITriggerBinding>(new RedisPubSubTriggerBinding(configuration, azureComponentFactory, attribute.ConnectionStringSetting, channel, attribute.Pattern, parameter.ParameterType, logger));
         }
     }
 }

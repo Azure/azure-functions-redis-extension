@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Triggers;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,12 +14,14 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     internal class RedisStreamTriggerBindingProvider : ITriggerBindingProvider
     {
         private readonly IConfiguration configuration;
+        private readonly AzureComponentFactory azureComponentFactory;
         private readonly INameResolver nameResolver;
         private readonly ILogger logger;
 
-        public RedisStreamTriggerBindingProvider(IConfiguration configuration, INameResolver nameResolver, ILogger logger)
+        public RedisStreamTriggerBindingProvider(IConfiguration configuration, AzureComponentFactory azureComponentFactory, INameResolver nameResolver, ILogger logger)
         {
             this.configuration = configuration;
+            this.azureComponentFactory = azureComponentFactory;
             this.nameResolver = nameResolver;
             this.logger = logger;
         }
@@ -46,6 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return Task.FromResult<ITriggerBinding>(new RedisStreamTriggerBinding
             (
                 configuration,
+                azureComponentFactory,
                 attribute.ConnectionStringSetting,
                 key,
                 pollingInterval,
