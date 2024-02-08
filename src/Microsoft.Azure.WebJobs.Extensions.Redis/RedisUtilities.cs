@@ -1,4 +1,6 @@
-﻿using Microsoft.Azure.WebJobs.Host;
+﻿using Azure.Core;
+using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,6 +19,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public const string RedisPubSubTrigger = "RedisPubSubTrigger";
         public const string RedisInputBinding = "RedisInputBinding";
         public const string RedisOutputBinding = "RedisOutputBinding";
+
+        public const string EntraRedisHostName = "redisHostName";
+        public const string EntraPrincipalId = "principalId";
 
         public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
@@ -42,7 +47,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             return setting;
         }
 
-        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, string connectionStringSetting, string clientName)
+        public static async Task<ConfigurationOptions> ResolveConfigurationOptionsAsync(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string clientName)
         {
             ConfigurationOptions options;
 
@@ -58,12 +63,35 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
             IConfigurationSection section = configuration.GetWebJobsConnectionSection(connectionStringSetting);
             string connectionString = section.Value;
-            if (string.IsNullOrWhiteSpace(connectionString))
+            string cacheHostName = section[EntraRedisHostName];
+            if (string.IsNullOrWhiteSpace(connectionString) && string.IsNullOrWhiteSpace(cacheHostName))
             {
                 throw new ArgumentException($"{nameof(connectionStringSetting)} '{connectionStringSetting}' not found in provided configuration.");
+
+            }
+            if (!string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(cacheHostName))
+            {
+                throw new ArgumentException($"Found both {nameof(connectionStringSetting)} '{connectionStringSetting}' and '{connectionStringSetting}__{EntraRedisHostName}' in provided configuration. Please choose either connection string or managed identity connection.");
             }
 
-            options = ConfigurationOptions.Parse(connectionString);
+            if (!string.IsNullOrWhiteSpace(connectionString))
+            {
+                options = ConfigurationOptions.Parse(connectionString);
+            }
+            else
+            {
+                // Entra Id Connections
+                string principalId = section[EntraPrincipalId];
+
+                if (string.IsNullOrWhiteSpace(principalId))
+                {
+                    throw new ArgumentNullException($"{connectionStringSetting}__{EntraPrincipalId}");
+                }
+
+                TokenCredential tokenCredential = azureComponentFactory.CreateTokenCredential(section);
+                options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithTokenCredentialAsync(principalId, tokenCredential);
+            }
+
             options.ClientName = GetRedisClientName(clientName);
             return options;
         }

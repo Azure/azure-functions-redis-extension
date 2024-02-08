@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Scale;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -21,6 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             builder.AddExtension<RedisExtensionConfigProvider>();
+            builder.Services.AddAzureClientsCore();
             return builder;
         }
 

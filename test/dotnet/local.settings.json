@@ -5,6 +5,11 @@
     "FUNCTIONS_WORKER_RUNTIME": "dotnet"
   },
   "ConnectionStrings": {
-    "redisConnectionString": "127.0.0.1:6379"
+    "redisConnectionString": "127.0.0.1:6379",
+    "redisManagedIdentity:redisHostName": "{{AZURE_CACHE_HOST_NAME}}",
+    "redisManagedIdentity:clientId": "{{AZURE_CLIENT_ID}}",
+    "redisManagedIdentity:principalId": "{{AZURE_PRINCIPAL_ID}}",
+    "redisManagedIdentity:tenantId": "{{AZURE_TENANT_ID}}",
+    "redisManagedIdentity:clientSecret": "{{AZURE_CLIENT_SECRET}}"
   }
 }
