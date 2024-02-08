@@ -3,7 +3,7 @@
         {
             "type": "redisListTrigger",
             "listDirection": "left",
-            "connectionStringSetting": "redisConnectionString",
+            "connection": "redisConnectionString",
             "key": "listTest",
             "pollingIntervalInMs": 100,
             "maxBatchSize": 16,

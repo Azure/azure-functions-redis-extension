@@ -8,12 +8,12 @@ public class SetDeleter {
     @FunctionName("SetDeleter")
     @RedisOutput(
                 name = "value",
-                connectionStringSetting = "redisConnectionString",
+                connection = "redisConnectionString",
                 command = "DEL")
     public String run(
             @RedisPubSubTrigger(
                 name = "key",
-                connectionStringSetting = "redisConnectionString",
+                connection = "redisConnectionString",
                 channel = "__keyevent@0__:set")
                 String key,
             final ExecutionContext context) {

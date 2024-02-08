@@ -2,14 +2,14 @@
     "bindings": [
         {
             "type": "redisPubSubTrigger",
-            "connectionStringSetting": "redisLocalhost",
+            "connection": "redisLocalhost",
             "channel": "__keyevent@0__:set",
             "name": "key",
             "direction": "in"
         },
         {
             "type": "redis",
-            "connectionStringSetting": "redisLocalhost",
+            "connection": "redisLocalhost",
             "command": "DEL",
             "name": "retVal",
             "direction": "out"

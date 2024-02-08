@@ -24,7 +24,7 @@ import com.microsoft.azure.functions.annotation.CustomBinding;
  * <pre>
  * &#64;FunctionName("RedisPubSubExample")
  * public void run(
- *         &#64;RedisPubSubTrigger(connectionStringSetting = "ConnectionString", channel = "redischannel") String message,
+ *         &#64;RedisPubSubTrigger(connection = "ConnectionString", channel = "redischannel") String message,
  *         final ExecutionContext context) {
  *     context.getLogger().info("Java Redis PubSub trigger function processed a message: " + message);
  * }
@@ -55,7 +55,7 @@ public @interface RedisPubSubTrigger {
      * Setting name for Redis connection string.
      * @return Setting name for Redis connection string.
      */
-    String connectionStringSetting();
+    String connection();
 
     /**
      * Redis pubsub channel. Supports channel patterns.

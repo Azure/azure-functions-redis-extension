@@ -24,8 +24,8 @@ import com.microsoft.azure.functions.annotation.CustomBinding;
  * <pre>
  * &#64;FunctionName("RedisInputExample")
  * public void run(
- *         &#64;RedisPubSubTrigger(connectionStringSetting = "ConnectionString", channel = "__keyevent@0__:set") String key,
- *         &#64;RedisInput(connectionStringSetting = "ConnectionString", command = "GET {Message}") String value,
+ *         &#64;RedisPubSubTrigger(connection = "ConnectionString", channel = "__keyevent@0__:set") String key,
+ *         &#64;RedisInput(connection = "ConnectionString", command = "GET {Message}") String value,
  *         final ExecutionContext context) {
  *     context.getLogger().info("Key '" + key + '" was set to "' + value + '"');
  * }
@@ -45,7 +45,7 @@ public @interface RedisInput {
      * Setting name for Redis connection string.
      * @return Setting name for Redis connection string.
      */
-    String connectionStringSetting();
+    String connection();
 
     /**
      * The command to be executed on the cache.

@@ -36,7 +36,7 @@ The `RedisPubSubTrigger` subscribes to a Redis pub/sub channel and surfaces mess
 > This trigger is not capable of listening to keyspace notifications on clustered caches.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
+- `Connection`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Channel`: pubsub channel that the trigger should listen to.
   - Supports channel patterns.
 
@@ -62,7 +62,7 @@ public static void PubSubTrigger(
 The `RedisListTrigger` pops entries from a list and surfaces those entries to the function. The trigger polls Redis at a configurable fixed interval, and uses [`LPOP`](https://redis.io/commands/lpop/)/[`RPOP`](https://redis.io/commands/rpop/) to pop entries from the lists.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
+- `Connection`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Key`: Key to read from.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
@@ -96,7 +96,7 @@ The consumer group for all instances of a function will be the name of the funct
 Each functions instance will use the `WEBSITE_INSTANCE_ID` ([documented here](https://learn.microsoft.com/azure/app-service/reference-app-settings?tabs=kudu%2Cdotnet#scaling)) or generate a random GUID to use as its consumer name within the group to ensure that scaled out instances of the function will not read the same messages from the stream.
 
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
+- `Connection`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Key`: Key to read from.
 - `PollingIntervalInMs`: How often to poll Redis in milliseconds.
   - Default: `1000`
@@ -126,7 +126,7 @@ public static void StreamsTrigger(
 
 ### `Redis` Input Binding
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
+- `Connection`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Command`: The redis-cli command to be executed on the cache with all arguments separated by spaces. (e.g. `"GET key"`, `"HGET key field"`)
 
 > **Note**
@@ -152,7 +152,7 @@ public static void SetGetter(
 
 ### `Redis` Output Binding
 #### Inputs
-- `ConnectionStringSetting`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
+- `Connection`: Name of the setting in the appsettings that holds the Redis connection string or managed identity information.
 - `Command`: The Redis command to be executed on the cache without any arguments. (e.g. `"GET"`, `"HGET"`)
 
 > **Note**
@@ -177,7 +177,7 @@ public static void SetDeleter(
 
 ## Connection Types
 There are three types of connections that are allowed from an Azure Functions instane to a Redis Cache.
-In the appsettings, this is how to configure each of the following types of client authentication, assuming the `ConnectionStringSetting` was set to `"Redis"` in the function.
+In the appsettings, this is how to configure each of the following types of client authentication, assuming the `Connection` was set to `"Redis"` in the function.
 1. Connection String
     ```json
     "Redis": "<cacheName>.redis.cache.windows.net:6380,password=..."

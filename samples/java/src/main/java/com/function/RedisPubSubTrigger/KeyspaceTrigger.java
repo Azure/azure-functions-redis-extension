@@ -9,7 +9,7 @@ public class KeyspaceTrigger {
     public void run(
             @RedisPubSubTrigger(
                 name = "req",
-                connectionStringSetting = "redisConnectionString",
+                connection = "redisConnectionString",
                 channel = "__keyspace@0__:keyspaceTest")
                 String message,
             final ExecutionContext context) {

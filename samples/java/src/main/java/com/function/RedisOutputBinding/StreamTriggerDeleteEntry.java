@@ -10,12 +10,12 @@ public class StreamTriggerDeleteEntry {
     public void run(
             @RedisStreamTrigger(
                 name = "entry",
-                connectionStringSetting = "redisConnectionString",
+                connection = "redisConnectionString",
                 key = "streamTest2")
                 RedisStreamEntry entry,
             @RedisOutput(
                 name = "value",
-                connectionStringSetting = "redisConnectionString",
+                connection = "redisConnectionString",
                 command = "DEL")
                 OutputBinding<String> value,
             final ExecutionContext context) {

@@ -24,7 +24,7 @@ import com.microsoft.azure.functions.annotation.CustomBinding;
  * <pre>
  * &#64;FunctionName("RedisListExample")
  * public void run(
- *         &#64;RedisListTrigger(connectionStringSetting = "ConnectionString", key = "listkey") String entry,
+ *         &#64;RedisListTrigger(connection = "ConnectionString", key = "listkey") String entry,
  *         final ExecutionContext context) {
  *     context.getLogger().info("Java Redis List trigger function processed a list entry: " + entry);
  * }
@@ -55,7 +55,7 @@ public @interface RedisListTrigger {
      * Setting name for Redis connection string.
     * @return Setting name for Redis connection string.
     */
-    String connectionStringSetting();
+    String connection();
 
     /**
      * Key to read from.

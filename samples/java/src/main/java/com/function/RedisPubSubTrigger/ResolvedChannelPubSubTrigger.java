@@ -9,7 +9,7 @@ public class ResolvedChannelPubSubTrigger {
     public void run(
             @RedisPubSubTrigger(
                 name = "req",
-                connectionStringSetting = "redisConnectionString",
+                connection = "redisConnectionString",
                 channel = "%pubsubChannel%")
                 String message,
             final ExecutionContext context) {

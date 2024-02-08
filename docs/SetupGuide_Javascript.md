@@ -19,7 +19,7 @@
      "bindings": [
        {
          "type": "redisPubSubTrigger",
-         "connectionStringSetting": "Redis",
+         "connection": "Redis",
          "channel": "pubsubTest",
          "name": "message",
          "direction": "in"
