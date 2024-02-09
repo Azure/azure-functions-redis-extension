@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
@@ -6,11 +7,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(HgetTester))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(HgetTester))] string message,
-            [Redis(IntegrationTestHelpers.ConnectionStringSetting, $"HGET {nameof(HgetTester)} field")] string value,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionStringSetting, "__keyevent@0__:hset")] ChannelMessage message,
+            [Redis(IntegrationTestHelpers.ConnectionStringSetting, "HGET {Message} field")] string value,
             ILogger logger)
         {
-            logger.LogInformation($"Value of field 'field' in hash '{nameof(HgetTester)}' is currently '{value}'");
+            logger.LogInformation($"Value of field 'field' in hash at key '{message.Message}' is currently '{value}'");
         }
     }
 }
