@@ -42,8 +42,7 @@ public @interface RedisInput {
     String name();
 
     /**
-     * Setting name for Redis connection string.
-     * @return Setting name for Redis connection string.
+     * App setting name that contains Redis connection information.
      */
     String connection();
 
