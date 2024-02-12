@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisPubSubTrigger
 {

@@ -15,14 +15,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
     {
         internal IConnectionMultiplexer multiplexer;
         internal string channel;
+        internal bool pattern;
         internal ITriggeredFunctionExecutor executor;
         internal ILogger logger;
         internal string logPrefix;
 
-        public RedisPubSubListener(string name, IConnectionMultiplexer multiplexer, string channel, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPubSubListener(string name, IConnectionMultiplexer multiplexer, string channel, bool pattern, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.multiplexer = multiplexer;
             this.channel = channel;
+            this.pattern = pattern;
             this.executor = executor;
             this.logger = logger;
             this.logPrefix = $"[Name:{name}][Trigger:RedisPubSubTrigger][Channel:{channel}]";
@@ -33,7 +35,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            ChannelMessageQueue channelMessageQeueue = await multiplexer.GetSubscriber().SubscribeAsync(channel);
+            RedisChannel redisChannel = new RedisChannel(channel, pattern ? RedisChannel.PatternMode.Pattern : RedisChannel.PatternMode.Literal);
+            ChannelMessageQueue channelMessageQeueue = await multiplexer.GetSubscriber().SubscribeAsync(redisChannel);
             channelMessageQeueue.OnMessage(async (message) =>
             {
                 logger?.LogDebug($"{logPrefix} Message received on channel '{channel}'.");

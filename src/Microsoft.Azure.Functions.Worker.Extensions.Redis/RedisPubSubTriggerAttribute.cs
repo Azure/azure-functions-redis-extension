@@ -12,10 +12,12 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// </summary>
         /// <param name="connectionStringSetting">Redis connection string setting.</param>
         /// <param name="channel">Redis pubsub channel name.</param>
-        public RedisPubSubTriggerAttribute(string connectionStringSetting, string channel)
+        /// <param name="pattern">If the given channel is a pattern. Default: false</param>
+        public RedisPubSubTriggerAttribute(string connectionStringSetting, string channel, bool pattern = false)
         {
             ConnectionStringSetting = connectionStringSetting;
             Channel = channel;
+            Pattern = pattern;
         }
 
         /// <summary>
@@ -28,5 +30,10 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// The channel that the trigger will listen to.
         /// </summary>
         public string Channel { get; }
+
+        /// <summary>
+        /// If the given channel is a pattern.
+        /// </summary>
+        public bool Pattern { get; }
     }
 }

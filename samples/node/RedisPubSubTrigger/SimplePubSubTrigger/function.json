@@ -4,6 +4,7 @@
       "type": "redisPubSubTrigger",
       "connectionStringSetting": "redisConnectionString",
       "channel": "pubsubTest",
+      "pattern": false,
       "name": "message",
       "direction": "in"
     }

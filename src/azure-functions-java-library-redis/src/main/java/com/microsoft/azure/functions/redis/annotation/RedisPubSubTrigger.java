@@ -58,8 +58,13 @@ public @interface RedisPubSubTrigger {
     String connectionStringSetting();
 
     /**
-     * Redis pubsub channel. Supports channel patterns.
+     * Redis pubsub channel.
      * @return Redis pubsub channel.
      */
     String channel();
+
+    /**
+     * If the given channel is a pattern.
+     */
+    boolean pattern() default false;
 }

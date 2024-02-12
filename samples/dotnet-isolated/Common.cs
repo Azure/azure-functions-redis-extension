@@ -10,5 +10,12 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples
             public string Id { get; set; }
             public string Field { get; set; }
         }
+
+        public class ChannelMessage
+        {
+            public string SubscriptionChannel { get; set; }
+            public string Channel { get; set; }
+            public string Message { get; set; }
+        }
     }
 }

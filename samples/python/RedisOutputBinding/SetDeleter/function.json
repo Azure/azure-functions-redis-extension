@@ -4,6 +4,7 @@
             "type": "redisPubSubTrigger",
             "connectionStringSetting": "redisLocalhost",
             "channel": "__keyevent@0__:set",
+            "pattern": false,
             "name": "key",
             "direction": "in"
         },

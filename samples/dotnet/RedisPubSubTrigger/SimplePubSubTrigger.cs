@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisPubSubTrigger
 {
@@ -6,10 +7,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisPubSubTrigger
     {
         [FunctionName(nameof(SimplePubSubTrigger))]
         public static void Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, "pubsubTest")] string message,
+            [RedisPubSubTrigger(Common.connectionStringSetting, "pubsubTest")] ChannelMessage message,
             ILogger logger)
         {
-            logger.LogInformation(message);
+            logger.LogInformation(message.Message);
         }
     }
 }

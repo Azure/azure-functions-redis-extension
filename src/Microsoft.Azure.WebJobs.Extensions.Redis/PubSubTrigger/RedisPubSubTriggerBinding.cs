@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -21,15 +22,17 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         private readonly AzureComponentFactory azureComponentFactory;
         private readonly string connectionStringSetting;
         private readonly string channel;
+        private readonly bool pattern;
         private readonly Type parameterType;
         private readonly ILogger logger;
 
-        public RedisPubSubTriggerBinding(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string channel, Type parameterType, ILogger logger)
+        public RedisPubSubTriggerBinding(IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string channel, bool pattern, Type parameterType, ILogger logger)
         {
             this.configuration = configuration;
             this.azureComponentFactory = azureComponentFactory;
             this.connectionStringSetting = connectionStringSetting;
             this.channel = channel;
+            this.pattern = pattern;
             this.parameterType = parameterType;
             this.logger = logger;
         }
@@ -52,7 +55,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connectionStringSetting, context.Descriptor.ShortName);
-            return new RedisPubSubListener(context.Descriptor.LogName, multiplexer, channel, context.Executor, logger);
+            return new RedisPubSubListener(context.Descriptor.LogName, multiplexer, channel, pattern, context.Executor, logger);
         }
 
         public ParameterDescriptor ToParameterDescriptor()
