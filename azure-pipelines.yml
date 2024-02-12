@@ -17,7 +17,7 @@ variables:
   # It is a release build if it is triggered by the main branch.
   isReleaseBuild: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}
   majorVersion: 0
-  minorVersion: 4
+  minorVersion: 5
   patchVersion: $[ counter(format('{0}.{1}-{2}', variables['majorVersion'], variables['minorVersion'], variables['isReleaseBuild']), 0) ]
   fullVersion: $[ format('{0}.{1}.{2}', variables['majorVersion'], variables['minorVersion'], variables['patchVersion']) ]
   ${{ if parameters['previewBuild'] }}:
