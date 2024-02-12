@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
             counts.TryAdd($"Value of key '{functionName}' is currently a type {value.GetType()}: '{value}'", 1);
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentitySetting, "test")))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentity, "test")))
             {
                 await multiplexer.GetDatabase().KeyDeleteAsync(functionName);
                 await multiplexer.GetDatabase().StringSetAsync(functionName, value);
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
 
             bool exists = true;
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentitySetting, "test")))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentity, "test")))
             {
                 using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071, true))
                 {
@@ -78,7 +78,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
             counts.TryAdd($"Executed '{functionName}' (Succeeded", 1);
             counts.TryAdd(destinationType.FullName, 1);
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentitySetting, "test")))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentity, "test")))
             using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071, true))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);
@@ -113,7 +113,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
                 { destinationType.FullName, 1},
             };
 
-            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentitySetting, "test")))
+            using (ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(await RedisUtilities.ResolveConfigurationOptionsAsync(IntegrationTestHelpers.localsettings, new IntegrationTestHelpers.ClientSecretCredentialComponentFactory(), IntegrationTestHelpers.ManagedIdentity, "test")))
             using (Process functionsProcess = await IntegrationTestHelpers.StartFunctionAsync(functionName, 7071, true))
             {
                 functionsProcess.OutputDataReceived += IntegrationTestHelpers.CounterHandlerCreator(counts);

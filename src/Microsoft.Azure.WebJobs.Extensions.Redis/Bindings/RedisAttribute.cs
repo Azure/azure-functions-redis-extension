@@ -13,20 +13,19 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Initializes a new <see cref="RedisAttribute"/>.
         /// </summary>
-        /// <param name="connectionStringSetting">Redis connection string setting.</param>
+        /// <param name="connection">App setting name that contains Redis connection information.</param>
         /// <param name="command">The command to be executed on the cache.</param>
-        public RedisAttribute(string connectionStringSetting, string command)
+        public RedisAttribute(string connection, string command)
         {
-            ConnectionStringSetting = connectionStringSetting;
+            Connection = connection;
             Command = command;
         }
 
         /// <summary>
-        /// Redis connection string setting.
-        /// This setting will be used to resolve the actual connection string from the appsettings.
+        /// App setting name that contains Redis connection information.
         /// </summary>
         [AutoResolve]
-        public string ConnectionStringSetting { get; }
+        public string Connection { get; }
 
         /// <summary>
         /// For an input binding, this is the redis command with space-delimited arguments.

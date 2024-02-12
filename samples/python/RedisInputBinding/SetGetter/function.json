@@ -2,7 +2,7 @@
     "bindings": [
         {
             "type": "redisPubSubTrigger",
-            "connectionStringSetting": "redisConnectionString",
+            "connection": "redisConnectionString",
             "channel": "__keyevent@0__:set",
             "pattern": false,
             "name": "key",
@@ -10,7 +10,7 @@
         },
         {
             "type": "redis",
-            "connectionStringSetting": "redisConnectionString",
+            "connection": "redisConnectionString",
             "command": "GET {Message}",
             "name": "value",
             "direction": "in"

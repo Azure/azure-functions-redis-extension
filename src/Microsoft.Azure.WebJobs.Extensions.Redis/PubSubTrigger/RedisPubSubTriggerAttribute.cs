@@ -14,22 +14,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Initializes a new <see cref="RedisPubSubTriggerAttribute"/>.
         /// </summary>
-        /// <param name="connectionStringSetting">Redis connection string setting.</param>
+        /// <param name="connection">App setting name that contains Redis connection information.</param>
         /// <param name="channel">Redis pubsub channel name.</param>
         /// <param name="pattern">If the given channel is a pattern. Default: false</param>
-        public RedisPubSubTriggerAttribute(string connectionStringSetting, string channel, bool pattern = false)
+        public RedisPubSubTriggerAttribute(string connection, string channel, bool pattern = false)
         {
-            ConnectionStringSetting = connectionStringSetting;
+            Connection = connection;
             Channel = channel;
             Pattern = pattern;
         }
 
         /// <summary>
-        /// Redis connection string setting.
-        /// This setting will be used to resolve the actual connection string from the appsettings.
+        /// App setting name that contains Redis connection information.
         /// </summary>
         [ConnectionString]
-        public string ConnectionStringSetting { get; }
+        public string Connection { get; }
 
         /// <summary>
         /// The channel that the trigger will listen to.

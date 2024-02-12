@@ -6,8 +6,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(GetTester_ManagedIdentity))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.ManagedIdentitySetting, nameof(GetTester_ManagedIdentity))] string message,
-            [Redis(IntegrationTestHelpers.ManagedIdentitySetting, $"GET {nameof(GetTester_ManagedIdentity)}")] string value,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ManagedIdentity, nameof(GetTester_ManagedIdentity))] string message,
+            [Redis(IntegrationTestHelpers.ManagedIdentity, $"GET {nameof(GetTester_ManagedIdentity)}")] string value,
             ILogger logger)
         {
             logger.LogInformation($"Value of key '{nameof(GetTester_ManagedIdentity)}' is currently a type {value.GetType()}: '{value}'");

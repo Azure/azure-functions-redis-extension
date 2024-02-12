@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisPubSubT
         
         [Function(nameof(KeyspaceTrigger))]
         public void Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, "__keyspace@0__:keyspaceTest")] Common.ChannelMessage channelMessage)
+            [RedisPubSubTrigger(Common.connectionString, "__keyspace@0__:keyspaceTest")] Common.ChannelMessage channelMessage)
         {
             logger.LogInformation($"Key 'keyspaceTest' was updated with operation '{channelMessage.Message}'");
         }

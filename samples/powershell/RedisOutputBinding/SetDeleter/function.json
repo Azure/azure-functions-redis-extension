@@ -2,7 +2,7 @@
     "bindings": [
         {
             "type": "redisPubSubTrigger",
-            "connectionStringSetting": "redisLocalhost",
+            "connection": "redisLocalhost",
             "channel": "__keyevent@0__:set",
             "pattern": false,
             "name": "key",
@@ -10,7 +10,7 @@
         },
         {
             "type": "redis",
-            "connectionStringSetting": "redisLocalhost",
+            "connection": "redisLocalhost",
             "command": "DEL",
             "name": "retVal",
             "direction": "out"

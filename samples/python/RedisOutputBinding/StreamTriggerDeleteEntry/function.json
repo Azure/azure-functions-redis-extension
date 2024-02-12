@@ -2,7 +2,7 @@
     "bindings": [
         {
             "type": "redisStreamTrigger",
-            "connectionStringSetting": "redisLocalhost",
+            "connection": "redisLocalhost",
             "key": "streamTest2",
             "pollingIntervalInMs": 1000,
             "maxBatchSize": 16,
@@ -11,7 +11,7 @@
           },
           {
             "type": "redis",
-            "connectionStringSetting": "redisLocalhost",
+            "connection": "redisLocalhost",
             "command": "XDEL",
             "name": "result",
             "direction": "out"

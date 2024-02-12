@@ -7,7 +7,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisListTrigger
     {
         [FunctionName(nameof(CustomTypeListTrigger))]
         public static void Run(
-            [RedisListTrigger(Common.connectionStringSetting, "listKey")] Common.CustomType entry,
+            [RedisListTrigger(Common.connectionString, "listKey")] Common.CustomType entry,
             ILogger logger)
         {
             logger.LogInformation(JsonConvert.SerializeObject(entry));

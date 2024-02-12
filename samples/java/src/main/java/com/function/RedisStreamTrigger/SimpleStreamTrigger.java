@@ -9,7 +9,7 @@ public class SimpleStreamTrigger {
     public void run(
             @RedisStreamTrigger(
                 name = "req",
-                connectionStringSetting = "redisConnectionString",
+                connection = "redisConnectionString",
                 key = "streamTest",
                 pollingIntervalInMs = 1000,
                 maxBatchSize = 1)

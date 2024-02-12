@@ -50,7 +50,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             (
                 configuration,
                 azureComponentFactory,
-                attribute.ConnectionStringSetting,
+                attribute.Connection,
                 key,
                 pollingInterval,
                 attribute.MaxBatchSize,

@@ -10,19 +10,18 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis
         /// <summary>
         /// Initializes a new <see cref="RedisInputAttribute"/>.
         /// </summary>
-        /// <param name="connectionStringSetting">Redis connection string setting.</param>
+        /// <param name="connection">App setting name that contains Redis connection information.</param>
         /// <param name="command">The command to be executed on the cache.</param>
-        public RedisInputAttribute(string connectionStringSetting, string command)
+        public RedisInputAttribute(string connection, string command)
         {
-            ConnectionStringSetting = connectionStringSetting;
+            Connection = connection;
             Command = command;
         }
 
         /// <summary>
-        /// Redis connection string setting.
-        /// This setting will be used to resolve the actual connection string from the appsettings.
+        /// App setting name that contains Redis connection information.
         /// </summary>
-        public string ConnectionStringSetting { get; }
+        public string Connection { get; }
 
         /// <summary>
         /// The full command to be executed on the cache, with space-delimited arguments.

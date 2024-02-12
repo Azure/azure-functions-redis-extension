@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(ListTrigger_Single_String_ManagedIdentity))]
         public static void Run(
-            [RedisListTrigger(IntegrationTestHelpers.ManagedIdentitySetting, nameof(ListTrigger_Single_String_ManagedIdentity), IntegrationTestHelpers.PollingIntervalShort)] string entry,
+            [RedisListTrigger(IntegrationTestHelpers.ManagedIdentity, nameof(ListTrigger_Single_String_ManagedIdentity), IntegrationTestHelpers.PollingIntervalShort)] string entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));

@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisStreamT
 
         [Function(nameof(FastPollingStreamTrigger))]
         public void Run(
-            [RedisStreamTrigger(Common.connectionStringSetting, "streamKey", pollingIntervalInMs: 100)] string entry)
+            [RedisStreamTrigger(Common.connectionString, "streamKey", pollingIntervalInMs: 100)] string entry)
         {
             logger.LogInformation(entry);
         }

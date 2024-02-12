@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(StreamTrigger_String_ManagedIdentity))]
         public static void Run(
-            [RedisStreamTrigger(IntegrationTestHelpers.ManagedIdentitySetting, nameof(StreamTrigger_String_ManagedIdentity), IntegrationTestHelpers.PollingIntervalShort)] string values,
+            [RedisStreamTrigger(IntegrationTestHelpers.ManagedIdentity, nameof(StreamTrigger_String_ManagedIdentity), IntegrationTestHelpers.PollingIntervalShort)] string values,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(values));

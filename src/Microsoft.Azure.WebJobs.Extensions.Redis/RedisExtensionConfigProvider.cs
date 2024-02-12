@@ -64,23 +64,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 #pragma warning restore CS0618
         }
 
-        internal static async Task<IConnectionMultiplexer> GetOrCreateConnectionMultiplexerAsync(IConfiguration configuration, AzureComponentFactory componentFactory, string connectionStringSetting, string clientName)
+        internal static async Task<IConnectionMultiplexer> GetOrCreateConnectionMultiplexerAsync(IConfiguration configuration, AzureComponentFactory componentFactory, string connection, string clientName)
         {
-            if (connectionMultiplexerCache.ContainsKey(connectionStringSetting))
+            if (connectionMultiplexerCache.ContainsKey(connection))
             {
-                connectionMultiplexerCache.TryGetValue(connectionStringSetting, out IConnectionMultiplexer connectionMultiplexer);
+                connectionMultiplexerCache.TryGetValue(connection, out IConnectionMultiplexer connectionMultiplexer);
                 return connectionMultiplexer;
             }
             else
             {
-                IConnectionMultiplexer connectionMultiplexer = await CreateConnectionMultiplexerAsync(configuration, componentFactory, connectionStringSetting, clientName);
-                return connectionMultiplexerCache.GetOrAdd(connectionStringSetting, connectionMultiplexer);
+                IConnectionMultiplexer connectionMultiplexer = await CreateConnectionMultiplexerAsync(configuration, componentFactory, connection, clientName);
+                return connectionMultiplexerCache.GetOrAdd(connection, connectionMultiplexer);
             }
         }
 
-        internal static async Task<IConnectionMultiplexer> CreateConnectionMultiplexerAsync(IConfiguration configuration, AzureComponentFactory componentFactory, string connectionStringSetting, string clientName)
+        internal static async Task<IConnectionMultiplexer> CreateConnectionMultiplexerAsync(IConfiguration configuration, AzureComponentFactory componentFactory, string connection, string clientName)
         {
-            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(configuration, componentFactory, connectionStringSetting, clientName);
+            ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(configuration, componentFactory, connection, clientName);
             return await ConnectionMultiplexer.ConnectAsync(options);
         }
     }

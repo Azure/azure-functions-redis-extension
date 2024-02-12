@@ -24,7 +24,7 @@ import com.microsoft.azure.functions.annotation.CustomBinding;
  * <pre>
  * &#64;FunctionName("RedisStreamExample")
  * public void run(
- *         &#64;RedisStreamTrigger(connectionStringSetting = "ConnectionString", key = "streamkey") String entry,
+ *         &#64;RedisStreamTrigger(connection = "ConnectionString", key = "streamkey") String entry,
  *         final ExecutionContext context) {
  *     context.getLogger().info("Java Redis Stream trigger function processed a entry: " + entry);
  * }
@@ -52,10 +52,9 @@ public @interface RedisStreamTrigger {
     String dataType() default "";
 
     /**
-     * Setting name for Redis connection string.
-     * @return Setting name for Redis connection string.
+     * App setting name that contains Redis connection information.
      */
-    String connectionStringSetting();
+    String connection();
 
     /**
      * Key to read from.

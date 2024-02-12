@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisPubSubT
 
         [Function(nameof(ResolvedChannelPubSubTrigger))]
         public void Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, "%pubsubChannel%")] Common.ChannelMessage channelMessage)
+            [RedisPubSubTrigger(Common.connectionString, "%pubsubChannel%")] Common.ChannelMessage channelMessage)
         {
             logger.LogInformation($"Message receieved from channel '{channelMessage.Channel}': {channelMessage.Message}");
         }

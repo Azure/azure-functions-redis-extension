@@ -13,13 +13,13 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Initializes a new <see cref="RedisListTriggerAttribute"/>.
         /// </summary>
-        /// <param name="connectionStringSetting">Redis connection string setting.</param>
+        /// <param name="connection">App setting name that contains Redis connection information.</param>
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in milliseconds. Default: 1000</param>
         /// <param name="maxBatchSize">Number of entries to pull from a Redis list at one time. Default: 16</param>
         /// <param name="listDirection">The direction to pop elements from the list. Default: left</param>
-        public RedisListTriggerAttribute(string connectionStringSetting, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, ListDirection listDirection = ListDirection.LEFT)
-            : base(connectionStringSetting, key, pollingIntervalInMs, maxBatchSize)
+        public RedisListTriggerAttribute(string connection, string key, int pollingIntervalInMs = 1000, int maxBatchSize = 16, ListDirection listDirection = ListDirection.LEFT)
+            : base(connection, key, pollingIntervalInMs, maxBatchSize)
         {
             ListDirection = listDirection;
         }

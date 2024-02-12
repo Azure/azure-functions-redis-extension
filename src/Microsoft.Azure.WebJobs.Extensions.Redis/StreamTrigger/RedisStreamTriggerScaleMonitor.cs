@@ -14,10 +14,10 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             string name,
             IConfiguration configuration,
             AzureComponentFactory azureComponentFactory,
-            string connectionStringSetting,
+            string connection,
             int maxBatchSize,
             string key)
-            : base(name, configuration, azureComponentFactory, connectionStringSetting, maxBatchSize, key)
+            : base(name, configuration, azureComponentFactory, connection, maxBatchSize, key)
         {
             this.Descriptor = new ScaleMonitorDescriptor(name, RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.RedisStreamTrigger, key));
             this.TargetScalerDescriptor = new TargetScalerDescriptor(RedisScalerProvider.GetFunctionScalerId(name, RedisUtilities.RedisStreamTrigger, key));
@@ -25,7 +25,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connectionStringSetting, nameof(RedisStreamTriggerScaleMonitor));
+            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connection, nameof(RedisStreamTriggerScaleMonitor));
             long streamLength = await multiplexer.GetDatabase().StreamLengthAsync(key);
             if (streamLength == 0)
             {

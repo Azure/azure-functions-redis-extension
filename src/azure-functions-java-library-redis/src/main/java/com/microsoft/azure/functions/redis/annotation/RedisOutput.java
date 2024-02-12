@@ -24,8 +24,8 @@ import com.microsoft.azure.functions.annotation.CustomBinding;
  * <pre>
  * &#64;FunctionName("RedisOutputExample")
  * public void run(
- *         &#64;RedisPubSubTrigger(connectionStringSetting = "ConnectionString", channel = "__keyevent@0__:set") String key,
- *         &#64;RedisOutput(connectionStringSetting = "ConnectionString", command = "DEL") OutputBinding<String> command,
+ *         &#64;RedisPubSubTrigger(connection = "ConnectionString", channel = "__keyevent@0__:set") String key,
+ *         &#64;RedisOutput(connection = "ConnectionString", command = "DEL") OutputBinding<String> command,
  *         final ExecutionContext context) {
  *     context.getLogger().info("Deleting recently SET '" + key + "'");
  *     command.setValue(key);
@@ -43,10 +43,9 @@ public @interface RedisOutput {
     String name();
 
     /**
-     * Setting name for Redis connection string.
-     * @return Setting name for Redis connection string.
+     * App setting name that contains Redis connection information.
      */
-    String connectionStringSetting();
+    String connection();
 
     /**
      * The command to be executed on the cache without any arguments.

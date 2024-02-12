@@ -14,16 +14,16 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string name;
         internal IConfiguration configuration;
         internal AzureComponentFactory azureComponentFactory;
-        internal string connectionStringSetting;
+        internal string connection;
         internal int maxBatchSize;
         internal string key;
 
-        public RedisPollingTriggerBaseScaleMonitor(string name, IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, int maxBatchSize, string key)
+        public RedisPollingTriggerBaseScaleMonitor(string name, IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connection, int maxBatchSize, string key)
         {
             this.name = name;
             this.configuration = configuration;
             this.azureComponentFactory = azureComponentFactory;
-            this.connectionStringSetting = connectionStringSetting;
+            this.connection = connection;
             this.maxBatchSize = maxBatchSize;
             this.key = key;
         }

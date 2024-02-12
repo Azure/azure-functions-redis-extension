@@ -7,8 +7,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisOutputBinding
     {
         [FunctionName(nameof(BatchedCollector))]
         public static async Task Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, nameof(BatchedCollector))] string message,
-            [Redis(Common.connectionStringSetting, "SET")] IAsyncCollector<string> collector,
+            [RedisPubSubTrigger(Common.connectionString, nameof(BatchedCollector))] string message,
+            [Redis(Common.connectionString, "SET")] IAsyncCollector<string> collector,
             ILogger logger)
         {
             logger.LogInformation(message);

@@ -20,7 +20,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal string name;
         internal IConfiguration configuration;
         internal AzureComponentFactory azureComponentFactory;
-        internal string connectionStringSetting;
+        internal string connection;
         internal string key;
         internal TimeSpan pollingInterval;
         internal int maxBatchSize;
@@ -33,12 +33,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal Version serverVersion;
         internal RedisPollingTriggerBaseScaleMonitor scaleMonitor;
 
-        public RedisPollingTriggerBaseListener(string name, IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connectionStringSetting, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
+        public RedisPollingTriggerBaseListener(string name, IConfiguration configuration, AzureComponentFactory azureComponentFactory, string connection, string key, TimeSpan pollingInterval, int maxBatchSize, bool batch, ITriggeredFunctionExecutor executor, ILogger logger)
         {
             this.name = name;
             this.configuration = configuration;
             this.azureComponentFactory = azureComponentFactory;
-            this.connectionStringSetting = connectionStringSetting;
+            this.connection = connection;
             this.key = key;
             this.pollingInterval = pollingInterval;
             this.maxBatchSize = maxBatchSize;
@@ -52,7 +52,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// </summary>
         public virtual async Task StartAsync(CancellationToken cancellationToken)
         {
-            multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connectionStringSetting, name);
+            multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connection, name);
             logger?.LogInformation($"{logPrefix} Connecting to Redis.");
             serverVersion = multiplexer.GetServers()[0].Version;
             BeforePolling();

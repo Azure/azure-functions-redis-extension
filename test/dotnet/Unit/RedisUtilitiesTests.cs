@@ -28,7 +28,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         private static IConfiguration localsettings = new ConfigurationBuilder().AddJsonFile(Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, "local.settings.json")).Build();
 
         [Fact]
-        public async void ResolveConfigurationOptionsAsync_ValidConnectionStringSetting_ReturnsResolvedString()
+        public async void ResolveConfigurationOptionsAsync_ValidConnection_ReturnsResolvedString()
         {
             ConfigurationOptions options = await RedisUtilities.ResolveConfigurationOptionsAsync(localsettings, null, "redisConnectionString", "test");
             Assert.Single(options.EndPoints);
@@ -48,9 +48,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
-        public async Task ResolveConfigurationOptionsAsync_EmptyConnectionStringSetting_ThrowsArgumentNullException(string connectionStringSetting)
+        public async Task ResolveConfigurationOptionsAsync_EmptyConnection_ThrowsArgumentNullException(string connection)
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, null, connectionStringSetting, "test"));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await RedisUtilities.ResolveConfigurationOptionsAsync(testConfig, null, connection, "test"));
         }
 
         [Fact]

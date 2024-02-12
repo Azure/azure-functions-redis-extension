@@ -26,7 +26,7 @@
       public void PubSubTrigger(
         @RedisPubSubTrigger(
           name = "message",
-          connectionStringSetting = "Redis",
+          connection = "Redis",
           channel = "pubsubTest")
           String message,
         final ExecutionContext context) {

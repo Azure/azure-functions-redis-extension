@@ -8,9 +8,9 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisOutputB
     internal class StreamTriggerDeleteEntry
     {
         [Function(nameof(StreamTriggerDeleteEntry))]
-        [RedisOutput(Common.connectionStringSetting, "XDEL")]
+        [RedisOutput(Common.connectionString, "XDEL")]
         public static string Run(
-            [RedisStreamTrigger(Common.connectionStringSetting, "streamTest2")] StreamEntry entry,
+            [RedisStreamTrigger(Common.connectionString, "streamTest2")] StreamEntry entry,
             ILogger logger)
         {
             logger.LogInformation($"Stream entry from key 'streamTest2' with Id '{entry.Id}' and values '" +

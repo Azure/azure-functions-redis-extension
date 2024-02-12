@@ -7,7 +7,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisPubSubTrigger
     {
         [FunctionName(nameof(KeyeventTrigger))]
         public static void Run(
-            [RedisPubSubTrigger(Common.connectionStringSetting, "__keyevent@0__:del")] ChannelMessage message,
+            [RedisPubSubTrigger(Common.connectionString, "__keyevent@0__:del")] ChannelMessage message,
             ILogger logger)
         {
             logger.LogInformation($"Key '{message.Message}' deleted.");

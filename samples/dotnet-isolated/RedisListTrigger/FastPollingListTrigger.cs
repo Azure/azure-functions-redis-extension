@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisListTri
 
         [Function(nameof(FastPollingListTrigger))]
         public void Run(
-            [RedisListTrigger(Common.connectionStringSetting, "listKey", pollingIntervalInMs: 100)] string entry)
+            [RedisListTrigger(Common.connectionString, "listKey", pollingIntervalInMs: 100)] string entry)
         {
             logger.LogInformation(JsonConvert.SerializeObject(entry));
         }

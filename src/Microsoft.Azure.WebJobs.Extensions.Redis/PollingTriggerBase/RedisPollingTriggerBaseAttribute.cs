@@ -11,24 +11,23 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <summary>
         /// Initializes a new <see cref="RedisPollingTriggerBaseAttribute"/>.
         /// </summary>
-        /// <param name="connectionStringSetting">Redis connection string setting.</param>
+        /// <param name="connection">App setting name that contains Redis connection information.</param>
         /// <param name="key">Key to read from.</param>
         /// <param name="pollingIntervalInMs">How often to poll Redis in ms.</param>
         /// <param name="maxBatchSize">Number of entries to pull from Redis at one time. Used to determine scaling.</param>
-        public RedisPollingTriggerBaseAttribute(string connectionStringSetting, string key, int pollingIntervalInMs, int maxBatchSize)
+        public RedisPollingTriggerBaseAttribute(string connection, string key, int pollingIntervalInMs, int maxBatchSize)
         {
-            this.ConnectionStringSetting = connectionStringSetting;
+            this.Connection = connection;
             this.Key = key;
             this.PollingIntervalInMs = pollingIntervalInMs;
             this.MaxBatchSize = maxBatchSize;
         }
 
         /// <summary>
-        /// Redis connection string setting.
-        /// This setting will be used to resolve the actual connection string from the appsettings.
+        /// App setting name that contains Redis connection information.
         /// </summary>
         [ConnectionString]
-        public string ConnectionStringSetting { get; }
+        public string Connection { get; }
 
         /// <summary>
         /// Key to read from.

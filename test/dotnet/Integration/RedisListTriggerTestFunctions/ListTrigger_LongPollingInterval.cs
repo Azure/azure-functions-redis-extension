@@ -7,7 +7,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(ListTrigger_LongPollingInterval))]
         public static void Run(
-            [RedisListTrigger(IntegrationTestHelpers.ConnectionStringSetting, nameof(ListTrigger_LongPollingInterval), IntegrationTestHelpers.PollingIntervalLong, maxBatchSize: 1)] RedisValue entry,
+            [RedisListTrigger(IntegrationTestHelpers.ConnectionString, nameof(ListTrigger_LongPollingInterval), IntegrationTestHelpers.PollingIntervalLong, maxBatchSize: 1)] RedisValue entry,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(entry));
