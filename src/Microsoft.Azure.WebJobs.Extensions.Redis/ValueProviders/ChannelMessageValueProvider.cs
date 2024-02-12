@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis
@@ -41,7 +43,24 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 return Task.FromResult<object>(message);
             }
-            return Task.FromResult(RedisUtilities.RedisValueTypeConverter(message.Message, Type));
+            if (Type.Equals(typeof(RedisValue)))
+            {
+                return Task.FromResult<object>(message.Message);
+            }
+            if (Type.Equals(typeof(string)))
+            {
+                return Task.FromResult<object>(ToInvokeString());
+            }
+            if (Type.Equals(typeof(byte[])))
+            {
+                return Task.FromResult<object>(Encoding.UTF8.GetBytes(ToInvokeString()));
+            }
+            if (Type.Equals(typeof(ReadOnlyMemory<byte>)))
+            {
+                return Task.FromResult<object>(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(ToInvokeString())));
+            }
+
+            return Task.FromResult(JsonConvert.DeserializeObject(ToInvokeString(), Type));
         }
 
         /// <summary>
@@ -50,7 +69,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         /// <returns></returns>
         public string ToInvokeString()
         {
-            return message.Message.ToString();
+            return JsonConvert.SerializeObject(new Dictionary<string, string>()
+            {
+                { nameof(ChannelMessage.SubscriptionChannel), message.SubscriptionChannel.ToString() },
+                { nameof(ChannelMessage.Channel), message.Channel.ToString() },
+                { nameof(ChannelMessage.Message) , message.Message.ToString() },
+            });
         }
     }
 }

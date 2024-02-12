@@ -6,7 +6,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(AllKeys))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionString, IntegrationTestHelpers.KeyspaceChannelAll)] string message,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ConnectionString, IntegrationTestHelpers.KeyspaceChannelAll, true)] string message,
             ILogger logger)
         {
             logger.LogInformation(IntegrationTestHelpers.GetLogValue(message));

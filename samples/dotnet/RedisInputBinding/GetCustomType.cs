@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisInputBinding
 {
@@ -7,11 +8,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.RedisInputBinding
     {
         [FunctionName(nameof(GetCustomType))]
         public static void Run(
-            [RedisPubSubTrigger(Common.connectionString, "__keyevent@0__:set")] string key,
+            [RedisPubSubTrigger(Common.connectionString, "__keyevent@0__:set")] ChannelMessage message,
             [Redis(Common.connectionString, "GET {Message}")] Common.CustomType value,
             ILogger logger)
         {
-            logger.LogInformation($"Key '{key}' was set to value '{JsonConvert.SerializeObject(value)}'");
+            logger.LogInformation($"Key '{message.Message}' was set to value '{JsonConvert.SerializeObject(value)}'");
         }
     }
 }

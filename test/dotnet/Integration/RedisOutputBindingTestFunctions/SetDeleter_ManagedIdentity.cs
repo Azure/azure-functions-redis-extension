@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
 {
@@ -6,12 +7,12 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Integration
     {
         [FunctionName(nameof(SetDeleter_ManagedIdentity))]
         public static void Run(
-            [RedisPubSubTrigger(IntegrationTestHelpers.ManagedIdentity, IntegrationTestHelpers.KeyeventChannelSet)] string key,
+            [RedisPubSubTrigger(IntegrationTestHelpers.ManagedIdentity, IntegrationTestHelpers.KeyeventChannelSet)] ChannelMessage channelMessage,
             [Redis(IntegrationTestHelpers.ManagedIdentity, "DEL")] out string arguments,
             ILogger logger)
         {
-            logger.LogInformation($"Deleting recently SET key '{key}'");
-            arguments = key;
+            logger.LogInformation($"Deleting recently SET key '{channelMessage.Message}'");
+            arguments = channelMessage.Message;
         }
     }
 }

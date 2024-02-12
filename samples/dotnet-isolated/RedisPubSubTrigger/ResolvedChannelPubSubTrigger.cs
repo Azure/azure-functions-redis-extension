@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Google.Protobuf;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisPubSubTrigger
 {
@@ -13,9 +14,9 @@ namespace Microsoft.Azure.Functions.Worker.Extensions.Redis.Samples.RedisPubSubT
 
         [Function(nameof(ResolvedChannelPubSubTrigger))]
         public void Run(
-            [RedisPubSubTrigger(Common.connectionString, "%pubsubChannel%")] string message)
+            [RedisPubSubTrigger(Common.connectionString, "%pubsubChannel%")] Common.ChannelMessage channelMessage)
         {
-            logger.LogInformation(message);
+            logger.LogInformation($"Message receieved from channel '{channelMessage.Channel}': {channelMessage.Message}");
         }
     }
 }
