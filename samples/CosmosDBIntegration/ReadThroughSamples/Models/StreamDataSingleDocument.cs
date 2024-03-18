@@ -1,29 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
+namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.CosmosDB.Models
 {
-    public class StreamData
-    {
-        public string id { get; set; }
-        public Dictionary<string, string> values { get; set; }
-
-        // Helper method to format stream message
-        public static StreamData Format(StreamEntry entry, ILogger logger)
-        {
-            logger.LogInformation("ID: {val}", entry.Id.ToString());
-
-            // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
-
-            StreamData sampleItem = new StreamData { id = entry.Id, values = dict };
-            return sampleItem;
-        }
-    }
-
     public class StreamDataSingleDocument
     {
         public string id { get; set; }
@@ -35,7 +16,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
             logger.LogInformation("Creating a new document for {val}. Inserting ID: {val} as the first entry", streamName, entry.Id.ToString());
 
             // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
+            Dictionary<string, string> dict = entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
 
             // Create a new list of messages
             var list = new Dictionary<string, Dictionary<string, string>>();
@@ -50,7 +31,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
             logger.LogInformation("Adding to {val} document. Inserting ID: {val} ", results.id, entry.Id.ToString());
 
             // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
+            Dictionary<string, string> dict = entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
 
             // Update list of messages
             var list = results.messages;
@@ -65,25 +46,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
             StreamDataSingleDocument data = new StreamDataSingleDocument { id = results.id, maxlen = results.maxlen, messages = list };
             return data;
         }
+
     }
-
-    public record RedisData(
-        string id,
-        string key,
-        string value,
-        DateTime timestamp
-        );
-
-    public record PubSubData(
-        string id,
-        string channel,
-        string message,
-        DateTime timestamp
-        );
-
-    public record CosmosDBListData(
-        string id,
-        List<string> value
-        );
-
 }
