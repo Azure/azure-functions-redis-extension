@@ -10,7 +10,8 @@ public class KeyspaceTrigger {
             @RedisPubSubTrigger(
                 name = "req",
                 connection = "redisConnectionString",
-                channel = "__keyspace@0__:keyspaceTest")
+                channel = "__keyspace@0__:keyspaceTest",
+                pattern = false)
                 String message,
             final ExecutionContext context) {
             context.getLogger().info(message);

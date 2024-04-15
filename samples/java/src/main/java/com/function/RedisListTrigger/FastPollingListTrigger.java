@@ -12,7 +12,8 @@ public class FastPollingListTrigger {
                 connection = "redisConnectionString",
                 key = "listTest",
                 pollingIntervalInMs = 100,
-                maxBatchSize = 1)
+                maxBatchSize = 1,
+                listDirection = ListDirection.LEFT)
                 String message,
             final ExecutionContext context) {
             context.getLogger().info(message);

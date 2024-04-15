@@ -65,5 +65,5 @@ public @interface RedisPubSubTrigger {
     /**
      * If the given channel is a pattern.
      */
-    boolean pattern() default false;
+    boolean pattern();
 }

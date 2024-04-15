@@ -11,7 +11,9 @@ public class StreamTriggerDeleteEntry {
             @RedisStreamTrigger(
                 name = "entry",
                 connection = "redisConnectionString",
-                key = "streamTest2")
+                key = "streamTest2",
+                pollingIntervalInMs = 1000,
+                maxBatchSize = 1)
                 RedisStreamEntry entry,
             @RedisOutput(
                 name = "value",
