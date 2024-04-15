@@ -25,8 +25,28 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connection, nameof(RedisStreamTriggerScaleMonitor));
-            long streamLength = await multiplexer.GetDatabase().StreamLengthAsync(key);
+            long streamLength = 0;
+            StreamGroupInfo[] groups;
+            StreamInfo info;
+            Version serverVersion;
+            try
+            {
+                IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connection, nameof(RedisStreamTriggerScaleMonitor));
+                streamLength = await multiplexer.GetDatabase().StreamLengthAsync(key);
+                groups = multiplexer.GetDatabase().StreamGroupInfo(key);
+                info = await multiplexer.GetDatabase().StreamInfoAsync(key);
+                serverVersion = multiplexer.GetServers()[0].Version;
+            }
+            catch (ObjectDisposedException ex)
+            {
+                // If multiplexer is disposed, then listener has already been stopped.
+                return new RedisPollingTriggerBaseMetrics
+                {
+                    Remaining = 0,
+                    Timestamp = DateTime.UtcNow,
+                };
+            }
+
             if (streamLength == 0)
             {
                 return new RedisPollingTriggerBaseMetrics
@@ -36,7 +56,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 };
             }
 
-            StreamGroupInfo[] groups = multiplexer.GetDatabase().StreamGroupInfo(key);
             if (!groups.Any(g => g.Name == name))
             {
                 // group doesn't exist, assume all entries in stream have not been processed
@@ -48,7 +67,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
 
             StreamGroupInfo group = groups.First(g => g.Name == name);
-            if (multiplexer.GetServers()[0].Version >= RedisUtilities.Version70 && group.Lag.HasValue)
+            if (serverVersion >= RedisUtilities.Version70 && group.Lag.HasValue)
             {
                 // Redis 7: Scaler gets number of remaining entries for the consumer group from XINFO GROUPS.
                 return new RedisPollingTriggerBaseMetrics
@@ -58,7 +77,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 };
             }
 
-            StreamInfo info = await multiplexer.GetDatabase().StreamInfoAsync(key);
             string firstId = (string)info.FirstEntry.Id;
             string lastId = (string)info.LastEntry.Id;
             string lastDeliveredId = group.LastDeliveredId ?? firstId;
@@ -97,7 +115,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             double timeRemaining = Math.Max(1, lastTimestamp - lastDeliveredTimestamp);
             double timeTotal = Math.Max(1, lastTimestamp - firstTimestamp);
             double percentageRemaining = timeRemaining / timeTotal;
-            long estimatedRemaining = (long) Math.Min(streamLength, Math.Max(1, percentageRemaining * streamLength));
+            long estimatedRemaining = (long)Math.Min(streamLength, Math.Max(1, percentageRemaining * streamLength));
             return new RedisPollingTriggerBaseMetrics
             {
                 Remaining = estimatedRemaining,

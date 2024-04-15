@@ -45,7 +45,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             }
             else
             {
-                throw new ArgumentException("Trigger is not the RedisStreamTrigger or the RedisListTrigger");
+                throw new ArgumentException($"Trigger is not the {RedisUtilities.RedisStreamTrigger} or the {RedisUtilities.RedisListTrigger}");
             }
         }
 

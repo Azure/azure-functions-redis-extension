@@ -24,14 +24,21 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connection, nameof(RedisListTriggerScaleMonitor));
-            var metrics = new RedisPollingTriggerBaseMetrics
+            long remaining = 0;
+            try
             {
-                Remaining = await multiplexer.GetDatabase().ListLengthAsync(key),
+                IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connection, nameof(RedisListTriggerScaleMonitor));
+                remaining = await multiplexer.GetDatabase().ListLengthAsync(key);
+            }
+            catch (ObjectDisposedException)
+            {
+                // If multiplexer is disposed, then listener has already been stopped.
+            }
+            return new RedisPollingTriggerBaseMetrics
+            {
+                Remaining = remaining,
                 Timestamp = DateTime.UtcNow,
             };
-
-            return metrics;
         }
     }
 }
