@@ -6,7 +6,7 @@
     <RepositoryUrl>https://github.com/Azure/azure-functions-redis-extension</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.10.4" />
+    <PackageReference Include="Azure.Identity" Version="1.11.0" />
     <PackageReference Include="FakeItEasy" Version="7.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Host.Storage" Version="5.0.0" />
