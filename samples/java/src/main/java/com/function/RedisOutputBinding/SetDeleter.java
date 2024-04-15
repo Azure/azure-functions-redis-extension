@@ -14,7 +14,8 @@ public class SetDeleter {
             @RedisPubSubTrigger(
                 name = "key",
                 connection = "redisConnectionString",
-                channel = "__keyevent@0__:set")
+                channel = "__keyevent@0__:set",
+                pattern = false)
                 String key,
             final ExecutionContext context) {
         context.getLogger().info("Deleting recently SET key '" + key + "'");

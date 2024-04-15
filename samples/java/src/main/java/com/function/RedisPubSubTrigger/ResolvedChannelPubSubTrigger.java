@@ -10,7 +10,8 @@ public class ResolvedChannelPubSubTrigger {
             @RedisPubSubTrigger(
                 name = "req",
                 connection = "redisConnectionString",
-                channel = "%pubsubChannel%")
+                channel = "%pubsubChannel%",
+                pattern = false)
                 String message,
             final ExecutionContext context) {
             context.getLogger().info(message);

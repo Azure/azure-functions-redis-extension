@@ -10,7 +10,8 @@ public class SetGetter {
             @RedisPubSubTrigger(
                 name = "key",
                 connection = "redisConnectionString",
-                channel = "__keyevent@0__:set")
+                channel = "__keyevent@0__:set",
+                pattern = false)
                 String key,
             @RedisInput(
                 name = "value",

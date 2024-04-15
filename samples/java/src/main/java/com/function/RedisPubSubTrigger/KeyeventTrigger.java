@@ -10,7 +10,8 @@ public class KeyeventTrigger {
             @RedisPubSubTrigger(
                 name = "req",
                 connection = "redisConnectionString",
-                channel = "__keyevent@0__:del")
+                channel = "__keyevent@0__:del",
+                pattern = false)
                 String message,
             final ExecutionContext context) {
             context.getLogger().info(message);

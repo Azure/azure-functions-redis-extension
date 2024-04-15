@@ -66,11 +66,11 @@ public @interface RedisStreamTrigger {
      * How often to poll Redis in milliseconds.
      * @return How often to poll Redis in milliseconds.
      */
-    int pollingIntervalInMs() default 1000;
+    int pollingIntervalInMs();
 
     /**
      * Number of entries to pull from Redis at one time.
      * @return Number of entries to pull from Redis at one time.
      */
-    int maxBatchSize() default 16;
+    int maxBatchSize();
 }
