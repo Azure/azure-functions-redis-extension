@@ -4,7 +4,6 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
@@ -93,6 +92,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = decreasingMetrics };
             Assert.Equal(expected, monitor.GetScaleStatus(context).Vote);
         }
+
         [Theory]
         [InlineData(1, 10, ScaleVote.ScaleOut)]
         [InlineData(7, 10, ScaleVote.None)]
@@ -103,6 +103,30 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Tests.Unit
             RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), A.Fake<AzureComponentFactory>(), "connection", batchSize, "key");
             ScaleStatusContext context = new ScaleStatusContext { WorkerCount = workerCount, Metrics = increasingMetrics };
             Assert.Equal(expected, monitor.GetScaleStatus(context).Vote);
+        }
+
+        [Fact]
+        public async void RedisListTriggerScaleMonitor_DoesntThrowObjectDisposedException()
+        {
+            string connection = "connection";
+            IConnectionMultiplexer fakeMultiplexer = A.Fake<IConnectionMultiplexer>();
+            RedisExtensionConfigProvider.connectionMultiplexerCache.TryAdd(connection, fakeMultiplexer);
+            A.CallTo(() => fakeMultiplexer.GetDatabase(A<int>._, A<object>._)).Throws(new ObjectDisposedException("fake"));
+            RedisPollingTriggerBaseScaleMonitor monitor = new RedisListTriggerScaleMonitor("name", A.Fake<IConfiguration>(), A.Fake<AzureComponentFactory>(), connection, 1, "key");
+            RedisPollingTriggerBaseMetrics metrics = await monitor.GetMetricsAsync();
+            Assert.Equal(0, metrics.Remaining);
+        }
+
+        [Fact]
+        public async void RedisStreamTriggerScaleMonitor_DoesntThrowObjectDisposedException()
+        {
+            string connection = "connection";
+            IConnectionMultiplexer fakeMultiplexer = A.Fake<IConnectionMultiplexer>();
+            RedisExtensionConfigProvider.connectionMultiplexerCache.TryAdd(connection, fakeMultiplexer);
+            A.CallTo(() => fakeMultiplexer.GetDatabase(A<int>._, A<object>._)).Throws(new ObjectDisposedException("fake"));
+            RedisPollingTriggerBaseScaleMonitor monitor = new RedisStreamTriggerScaleMonitor("name", A.Fake<IConfiguration>(), A.Fake<AzureComponentFactory>(), connection, 1, "key");
+            RedisPollingTriggerBaseMetrics metrics = await monitor.GetMetricsAsync();
+            Assert.Equal(0, metrics.Remaining);
         }
     }
 }
