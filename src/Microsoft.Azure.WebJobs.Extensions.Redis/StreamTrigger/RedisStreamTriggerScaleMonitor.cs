@@ -66,29 +66,28 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
                 ulong lastTimestamp = ulong.Parse(lastIdSplit[0]);
                 ulong lastDeliveredTimestamp = ulong.Parse(lastDeliveredIdSplit[0]);
 
+                long estimatedRemaining = 0;
                 if (lastTimestamp == lastDeliveredTimestamp)
                 {
                     // If timestamp is the same, return counter difference
                     ulong lastCounter = ulong.Parse(lastIdSplit[1]);
                     ulong lastDelieveredCoutner = ulong.Parse(lastDeliveredIdSplit[1]);
-                    return new RedisPollingTriggerBaseMetrics
-                    {
-                        Remaining = Math.Min(streamLength, (long)Math.Max(0, lastCounter - lastDelieveredCoutner)),
-                        Timestamp = DateTime.UtcNow,
-                    };
+                    estimatedRemaining = Math.Min(streamLength, (long)Math.Max(0, lastCounter - lastDelieveredCoutner));
+                }
+                else
+                {
+                    // Assume percentage of time processsed as percentage of entries processed
+                    double timeRemaining = Math.Max(1, lastTimestamp - lastDeliveredTimestamp);
+                    double timeTotal = Math.Max(1, lastTimestamp - firstTimestamp);
+                    double percentageRemaining = timeRemaining / timeTotal;
+                    estimatedRemaining = (long)Math.Min(streamLength, Math.Max(0, percentageRemaining * streamLength));
                 }
 
-                // Assume percentage of time processsed as percentage of entries processed
-                double timeRemaining = Math.Max(1, lastTimestamp - lastDeliveredTimestamp);
-                double timeTotal = Math.Max(1, lastTimestamp - firstTimestamp);
-                double percentageRemaining = timeRemaining / timeTotal;
-                long estimatedRemaining = (long)Math.Min(streamLength, Math.Max(0, percentageRemaining * streamLength));
                 return new RedisPollingTriggerBaseMetrics
                 {
                     Remaining = estimatedRemaining,
                     Timestamp = DateTime.UtcNow,
                 };
-
             }
             catch (ObjectDisposedException)
             {
