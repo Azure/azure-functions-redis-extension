@@ -25,82 +25,82 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
 
         public override async Task<RedisPollingTriggerBaseMetrics> GetMetricsAsync()
         {
-            IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connection, nameof(RedisStreamTriggerScaleMonitor));
-            long streamLength = await multiplexer.GetDatabase().StreamLengthAsync(key);
-            if (streamLength == 0)
+            try
             {
+                IConnectionMultiplexer multiplexer = await RedisExtensionConfigProvider.GetOrCreateConnectionMultiplexerAsync(configuration, azureComponentFactory, connection, nameof(RedisStreamTriggerScaleMonitor));
+                long streamLength = await multiplexer.GetDatabase().StreamLengthAsync(key);
+
+                StreamGroupInfo[] groups = multiplexer.GetDatabase().StreamGroupInfo(key);
+                if (!groups.Any(g => g.Name == name))
+                {
+                    // group doesn't exist, assume all entries in stream have not been processed
+                    return new RedisPollingTriggerBaseMetrics
+                    {
+                        Remaining = streamLength,
+                        Timestamp = DateTime.UtcNow,
+                    };
+                }
+
+                StreamGroupInfo group = groups.First(g => g.Name == name);
+                Version serverVersion = multiplexer.GetServers()[0].Version;
+                if (serverVersion >= RedisUtilities.Version70 && group.Lag.HasValue)
+                {
+                    // Redis 7: Scaler gets number of remaining entries for the consumer group from XINFO GROUPS.
+                    return new RedisPollingTriggerBaseMetrics
+                    {
+                        Remaining = group.Lag.Value,
+                        Timestamp = DateTime.UtcNow,
+                    };
+                }
+
+                // Redis 6/6.2 does not have an internal counter for remaining entries for the consumer group
+                // Estimate remaining entries using the time field from the entry ID (assuming ID="time-counter")
+                StreamInfo info = await multiplexer.GetDatabase().StreamInfoAsync(key);
+                string firstId = (string)info.FirstEntry.Id;
+                string lastId = (string)info.LastEntry.Id;
+                string lastDeliveredId = group.LastDeliveredId ?? firstId;
+                string[] firstIdSplit = firstId.Split('-');
+                string[] lastIdSplit = lastId.Split('-');
+                string[] lastDeliveredIdSplit = lastDeliveredId.Split('-');
+                ulong firstTimestamp = ulong.Parse(firstIdSplit[0]);
+                ulong lastTimestamp = ulong.Parse(lastIdSplit[0]);
+                ulong lastDeliveredTimestamp = ulong.Parse(lastDeliveredIdSplit[0]);
+
+                long estimatedRemaining = 0;
+                if (lastTimestamp == lastDeliveredTimestamp)
+                {
+                    // If timestamp is the same, return counter difference
+                    ulong lastCounter = ulong.Parse(lastIdSplit[1]);
+                    ulong lastDelieveredCoutner = ulong.Parse(lastDeliveredIdSplit[1]);
+                    estimatedRemaining = Math.Min(streamLength, (long)Math.Max(0, lastCounter - lastDelieveredCoutner));
+                }
+                else
+                {
+                    // Assume percentage of time processsed as percentage of entries processed
+                    double timeRemaining = Math.Max(1, lastTimestamp - lastDeliveredTimestamp);
+                    double timeTotal = Math.Max(1, lastTimestamp - firstTimestamp);
+                    double percentageRemaining = timeRemaining / timeTotal;
+                    estimatedRemaining = (long)Math.Min(streamLength, Math.Max(0, percentageRemaining * streamLength));
+                }
+
                 return new RedisPollingTriggerBaseMetrics
                 {
-                    Remaining = 0,
+                    Remaining = estimatedRemaining,
                     Timestamp = DateTime.UtcNow,
                 };
             }
-
-            StreamGroupInfo[] groups = multiplexer.GetDatabase().StreamGroupInfo(key);
-            if (!groups.Any(g => g.Name == name))
+            catch (ObjectDisposedException)
             {
-                // group doesn't exist, assume all entries in stream have not been processed
-                return new RedisPollingTriggerBaseMetrics
-                {
-                    Remaining = streamLength,
-                    Timestamp = DateTime.UtcNow,
-                };
+                // If multiplexer is disposed, then listener has already been stopped.
+            }
+            catch (RedisException)
+            {
+                // If the key is not a stream, there should be no length.
             }
 
-            StreamGroupInfo group = groups.First(g => g.Name == name);
-            if (multiplexer.GetServers()[0].Version >= RedisUtilities.Version70 && group.Lag.HasValue)
-            {
-                // Redis 7: Scaler gets number of remaining entries for the consumer group from XINFO GROUPS.
-                return new RedisPollingTriggerBaseMetrics
-                {
-                    Remaining = group.Lag.Value,
-                    Timestamp = DateTime.UtcNow,
-                };
-            }
-
-            StreamInfo info = await multiplexer.GetDatabase().StreamInfoAsync(key);
-            string firstId = (string)info.FirstEntry.Id;
-            string lastId = (string)info.LastEntry.Id;
-            string lastDeliveredId = group.LastDeliveredId ?? firstId;
-            if (lastId == lastDeliveredId)
-            {
-                // processed all entries in the stream
-                return new RedisPollingTriggerBaseMetrics
-                {
-                    Remaining = 0,
-                    Timestamp = DateTime.UtcNow,
-                };
-            }
-
-            // Redis 6/6.2 does not have an internal counter for remaining entries for the consumer group
-            // Estimate remaining entries using the time field from the entry ID (assuming ID="time-counter")
-            string[] firstIdSplit = firstId.Split('-');
-            string[] lastIdSplit = lastId.Split('-');
-            string[] lastDeliveredIdSplit = lastDeliveredId.Split('-');
-            ulong firstTimestamp = ulong.Parse(firstIdSplit[0]);
-            ulong lastTimestamp = ulong.Parse(lastIdSplit[0]);
-            ulong lastDeliveredTimestamp = ulong.Parse(lastDeliveredIdSplit[0]);
-
-            if (lastTimestamp == lastDeliveredTimestamp)
-            {
-                // If timestamp is the same, return counter difference
-                ulong lastCounter = ulong.Parse(lastIdSplit[1]);
-                ulong lastDelieveredCoutner = ulong.Parse(lastDeliveredIdSplit[1]);
-                return new RedisPollingTriggerBaseMetrics
-                {
-                    Remaining = Math.Min(streamLength, (long)Math.Max(1, lastCounter - lastDelieveredCoutner)),
-                    Timestamp = DateTime.UtcNow,
-                };
-            }
-
-            // Assume percentage of time processsed as percentage of entries processed
-            double timeRemaining = Math.Max(1, lastTimestamp - lastDeliveredTimestamp);
-            double timeTotal = Math.Max(1, lastTimestamp - firstTimestamp);
-            double percentageRemaining = timeRemaining / timeTotal;
-            long estimatedRemaining = (long) Math.Min(streamLength, Math.Max(1, percentageRemaining * streamLength));
             return new RedisPollingTriggerBaseMetrics
             {
-                Remaining = estimatedRemaining,
+                Remaining = 0,
                 Timestamp = DateTime.UtcNow,
             };
         }

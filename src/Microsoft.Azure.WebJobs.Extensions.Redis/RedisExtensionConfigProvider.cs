@@ -22,7 +22,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         internal readonly ILoggerFactory loggerFactory;
         internal readonly AzureComponentFactory azureComponentFactory;
 
-        private static readonly ConcurrentDictionary<string, IConnectionMultiplexer> connectionMultiplexerCache = new ConcurrentDictionary<string, IConnectionMultiplexer>();
+        internal static readonly ConcurrentDictionary<string, IConnectionMultiplexer> connectionMultiplexerCache = new ConcurrentDictionary<string, IConnectionMultiplexer>();
 
         /// <summary>
         /// Adds Redis triggers and bindings to the extension context.
