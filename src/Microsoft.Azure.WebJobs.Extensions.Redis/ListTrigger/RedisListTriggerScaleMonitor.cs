@@ -34,6 +34,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             {
                 // If multiplexer is disposed, then listener has already been stopped.
             }
+
             return new RedisPollingTriggerBaseMetrics
             {
                 Remaining = remaining,
