@@ -21,7 +21,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
         public const string RedisOutputBinding = "RedisOutputBinding";
 
         public const string EntraRedisHostName = "redisHostName";
-        public const string EntraPrincipalId = "principalId";
 
         public const char BindingDelimiter = ' ';
         public static Version Version62 = new Version("6.2");
@@ -81,15 +80,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis
             else
             {
                 // Entra Id Connections
-                string principalId = section[EntraPrincipalId];
-
-                if (string.IsNullOrWhiteSpace(principalId))
-                {
-                    throw new ArgumentNullException($"{connection}__{EntraPrincipalId}");
-                }
-
                 TokenCredential tokenCredential = azureComponentFactory.CreateTokenCredential(section);
-                options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithTokenCredentialAsync(principalId, tokenCredential);
+                options = await ConfigurationOptions.Parse(cacheHostName).ConfigureForAzureWithTokenCredentialAsync(tokenCredential);
             }
 
             options.ClientName = GetRedisClientName(clientName);

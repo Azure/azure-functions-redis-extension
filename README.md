@@ -208,7 +208,7 @@ public static void SetDeleter(
 ```
 
 ## Connection Types
-There are three types of connections that are allowed from an Azure Functions instane to a Redis Cache.
+There are three types of connections that are allowed from an Azure Functions instance to a Redis Cache.
 In the appsettings, this is how to configure each of the following types of client authentication, assuming the `Connection` was set to `"Redis"` in the function.
 1. Connection String
     ```json
@@ -218,13 +218,11 @@ In the appsettings, this is how to configure each of the following types of clie
 1. System-Assigned Managed Identity
     ```json
     "Redis:redisHostName": "<cacheName>.redis.cache.windows.net",
-    "Redis:principalId": "<principalId>"
     ```
 
 1. User-Assigned Managed Identity
     ```json
     "Redis:redisHostName": "<cacheName>.redis.cache.windows.net",
-    "Redis:principalId": "<principalId>",
     "Redis:clientId": "<clientId>"
     ```
 
@@ -233,7 +231,6 @@ In the appsettings, this is how to configure each of the following types of clie
     > Connections using Service Principal Secrets are only available during local development.
     ```json
     "Redis:redisHostName": "<cacheName>.redis.cache.windows.net",
-    "Redis:principalId": "<principalId>",
     "Redis:clientId": "<clientId>"
     "Redis:tenantId": "<tenantId>"
     "Redis:clientSecret": "<clientSecret>"

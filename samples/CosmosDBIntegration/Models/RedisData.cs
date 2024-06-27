@@ -17,7 +17,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
             logger.LogInformation("ID: {val}", entry.Id.ToString());
 
             // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
+            Dictionary<string, string> dict = entry.ToDictionary();
 
             StreamData sampleItem = new StreamData { id = entry.Id, values = dict };
             return sampleItem;
@@ -35,7 +35,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
             logger.LogInformation("Creating a new document for {val}. Inserting ID: {val} as the first entry", streamName, entry.Id.ToString());
 
             // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
+            Dictionary<string, string> dict = entry.ToDictionary();
 
             // Create a new list of messages
             var list = new Dictionary<string, Dictionary<string, string>>();
@@ -50,7 +50,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
             logger.LogInformation("Adding to {val} document. Inserting ID: {val} ", results.id, entry.Id.ToString());
 
             // Map each key value pair
-            Dictionary<string, string> dict = RedisUtilities.StreamEntryToDictionary(entry);
+            Dictionary<string, string> dict = entry.ToDictionary();
 
             // Update list of messages
             var list = results.messages;
@@ -85,5 +85,11 @@ namespace Microsoft.Azure.WebJobs.Extensions.Redis.Samples.Models
         string id,
         List<string> value
         );
+
+    internal static class Extensions
+    {
+        internal static Dictionary<string, string> ToDictionary(this StreamEntry entry)
+            => entry.Values.ToDictionary(value => value.Name.ToString(), value => value.Value.ToString());
+    }
 
 }
